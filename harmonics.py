@@ -52,14 +52,14 @@ def is_harmonic(note, fundamental_note):
 def get_harmonic_information(note, fundamental_note):
   if is_harmonic(note, fundamental_note):
     if is_first_harmonic(note, fundamental_note):
-      print(note, 'is the 1st harmonic of', fundamental_note, '(they are the same note)')
+      #print(note, 'is the 1st harmonic of', fundamental_note, '(they are the same note)')
       return (1, fundamental_note)
     else:
       harmonic_information = note.harmonicAndFundamentalFromPitch(fundamental_note)
-      print(note, 'is the', harmonic_information[0], 'st/rd/th harmonic of', harmonic_information[1])
+      #print(note, 'is the', harmonic_information[0], 'st/rd/th harmonic of', harmonic_information[1])
       return harmonic_information
   else:
-    print('Cannot find an equivalent harmonic for a fundamental', fundamental_note, 'that would be', note)
+    #print('Cannot find an equivalent harmonic for a fundamental', fundamental_note, 'that would be', note)
     return 0
 
 # Returns a number between 0 and 1 regarding how probable it is that
@@ -100,9 +100,9 @@ z = m21.pitch.Pitch('C3')
 # get_harmonic_information(z, x)
 
 # Print the probability of the first 16 harmonics
-for i in range(1, 16):
-  print(probabilty_of_harmonic(i))
+# for i in range(1, 16):
+#   print(probabilty_of_harmonic(i))
 
-harmonic_information = get_harmonic_information(y, x)
-if harmonic_information != 0:
-  print('Probability:', probabilty_of_harmonic(harmonic_information[0]))
+# harmonic_information = get_harmonic_information(y, x)
+# if harmonic_information != 0:
+#   print('Probability:', probabilty_of_harmonic(harmonic_information[0]))
