@@ -8,7 +8,7 @@ import music21 as m21
 # Important notes from music21 documentation
 # Note that the tritone is given as diminished fifth, not augmented fourth.
 # Simple will reduce an octave to a unison, semiSimple treats octaves as
-#   distinct intervals (P8.simple: Perfect Unison; P8.semiSimple: Perfect Octave)
+# distinct intervals (P8.simple: Perfect Unison; P8.semiSimple: Perfect Octave)
 
 # Returns an array of pitches which is the harmonic series from the
 # 1st harmonic (fundamental note) to the 16th harmonic
@@ -20,12 +20,12 @@ def build_harmonic_series(fundamental_note):
     harmonic_series.append(fundamental_note.getHarmonic(i))
   return harmonic_series
 
-# Returns whether the given note is the first harmonic of the
+# Returns a boolean about whether the given note is the first harmonic of the
 # supposedly fundamental note (in other words, they are the same note).
 # This is necessary because music21's harmonicAndFundamentalFromPitch would
 # raise an error in this case.
 #
-# Returns a boolean
+# Requires two m21.pitch.Pitch objects
 # TODO: Might need to check microtone differences as well
 def is_first_harmonic(note, fundamental_note):
   return note.nameWithOctave == fundamental_note.nameWithOctave
@@ -78,7 +78,9 @@ def probabilty_of_harmonic(harmonic_number):
   else:
     return 1 / harmonic_number
 
-# Just trying the functions here
+# --------------------------------
+# |Just trying the functions here|
+# --------------------------------
 
 # Build a harmonic series
 # hson = build_harmonic_series(m21.pitch.Pitch('C4'))
