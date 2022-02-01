@@ -21,14 +21,14 @@ def build_harmonic_series(fundamental_note):
   return harmonic_series
 
 # Returns a boolean about whether the given note is the first harmonic of the
-# supposedly fundamental note (in other words, they are the same note).
-# This is necessary because music21's harmonicAndFundamentalFromPitch would
-# raise an error in this case.
+# supposedly fundamental note (in other words, they are the same note
+# or enharmonically equal). This is necessary because music21's
+# harmonicAndFundamentalFromPitch would raise an error in this case.
 #
 # Requires two m21.pitch.Pitch objects
 # TODO: Might need to check microtone differences as well
 def is_first_harmonic(note, fundamental_note):
-  return note.nameWithOctave == fundamental_note.nameWithOctave
+  return (note.nameWithOctave == fundamental_note.nameWithOctave) or (note.isEnharmonic(fundamental_note))
 
 # Returns a boolean regarding whether a note is a harmonic (between 1st
 # and 16th) of a supposedly fundamental note
@@ -49,15 +49,18 @@ def is_harmonic(note, fundamental_note):
 # how many cents the variance is
 #
 # Requires two m21.pitch.Pitch objects
-def get_harmonic_information(note, fundamental_note):
+def get_harmonic_info(note, fundamental_note):
   if is_harmonic(note, fundamental_note):
     if is_first_harmonic(note, fundamental_note):
       #print(note, 'is the 1st harmonic of', fundamental_note, '(they are the same note)')
       return (1, fundamental_note)
     else:
       harmonic_information = note.harmonicAndFundamentalFromPitch(fundamental_note)
-      #print(note, 'is the', harmonic_information[0], 'st/rd/th harmonic of', harmonic_information[1])
-      return harmonic_information
+      if abs(harmonic_information[1].microtone.cents) > 50 : # TODO: Research on whether it should be around 50 or 100
+        return 0
+      else:
+        #print(note, 'is the', harmonic_information[0], 'st/rd/th harmonic of', harmonic_information[1])
+        return harmonic_information
   else:
     #print('Cannot find an equivalent harmonic for a fundamental', fundamental_note, 'that would be', note)
     return 0

@@ -1,6 +1,8 @@
 import music21 as m21
 import harmonics
 
+# Keeping this until evaluate_notes_by_count.py is more ready
+
 # Requires two lists of m21.pitch.Pitch objects
 def compare_notes(expected_notes, given_notes):
   expected_notes_count = len(expected_notes)
@@ -59,7 +61,7 @@ def compare_note_one_to_one(expected_note, given_note):
   elif expected_note.nameWithOctave == given_note.nameWithOctave:
     return (0.5, "Cent difference", given_note, given_note.microtone.cents - expected_note.microtone.cents)
   else:
-    harmonic_information = harmonics.get_harmonic_information(given_note, expected_note)
+    harmonic_information = harmonics.get_harmonic_info(given_note, expected_note)
     if harmonic_information != 0:
       return (1, "Harmonic", given_note, harmonic_information)
     else:
