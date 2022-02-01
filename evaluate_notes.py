@@ -14,6 +14,7 @@ def compare_notes(expected_notes, given_notes):
 def compare_note_one_to_n(expected_note, given_notes):
   notes_information = []
   if len(given_notes) == 0:
+    # TODO: Add mistake point to evaluation answer
     print("Missing note")
     notes_information.append((-2, "Missing note"))
   elif len(given_notes) == 1:
@@ -88,15 +89,25 @@ def print_results(expected_note, notes_information, notes_count):
   
   if notes_count > 1:
     if contains_expected_note:
-      print("Contains expected note. "
-            f"The rest are {(plus_only_cent_difference / (notes_count - 1)) * 100:.2f}% only cent difference, "
-            f"{(plus_harmonics / (notes_count - 1)) * 100:.2f}% harmonics and "
-            f"{(plus_unrelated / (notes_count - 1)) * 100:.2f}% unrelated.")
+      print("Contains expected note. The rest:\n"
+            f"{(plus_only_cent_difference / (notes_count - 1)) * 100:.2f}% "
+            f"({plus_only_cent_difference}/{notes_count - 1}) cent difference\n"
+            f"{(plus_harmonics / (notes_count - 1)) * 100:.2f}% "
+            f"({plus_harmonics}/{notes_count - 1}) harmonics\n"
+            f"{(plus_unrelated / (notes_count - 1)) * 100:.2f}% "
+            f"({plus_unrelated}/{notes_count - 1}) unrelated\n")
     else:
-      print("Does not contain expected note. "
-            f"The rest are {(plus_only_cent_difference / notes_count) * 100:.2f}% only cent difference, "
-            f"{(plus_harmonics / notes_count) * 100:.2f}% harmonics and "
-            f"{(plus_unrelated / notes_count) * 100:.2f}% unrelated.")
+      print("Contains expected note. The rest:\n"
+            f"{(plus_only_cent_difference / (notes_count)) * 100:.2f}% "
+            f"({plus_only_cent_difference}/{notes_count}) cent difference\n"
+            f"{(plus_harmonics / (notes_count)) * 100:.2f}% "
+            f"({plus_harmonics}/{notes_count}) harmonics\n"
+            f"{(plus_unrelated / (notes_count)) * 100:.2f}% "
+            f"({plus_unrelated}/{notes_count}) unrelated\n")
+
+# --------------------------------
+# |Just trying the functions here|
+# --------------------------------
 
 c4_x = m21.pitch.Pitch('c4')
 c4_x.microtone = 20
@@ -110,4 +121,10 @@ notes_y = [c4_x, c4_y]
 notes_z = [g5]
 notes_w = [m21.pitch.Pitch('c2'), m21.pitch.Pitch('g5'), m21.pitch.Pitch('a6')]
 
+compare_notes(notes_x, notes_x)
+print("----------------------")
+compare_notes(notes_x, notes_y)
+print("----------------------")
+compare_notes(notes_x, notes_z)
+print("----------------------")
 compare_notes(notes_x, notes_w)
