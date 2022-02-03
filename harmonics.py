@@ -91,9 +91,9 @@ def probabilty_of_harmonic(harmonic_number):
 #   print(hson[i])
 
 # Check whether C4, G5 and C3 are harmonics of C4
-x = m21.pitch.Pitch('C4')
-y = m21.pitch.Pitch('G5')
-z = m21.pitch.Pitch('C3')
+# x = m21.pitch.Pitch('C4')
+# y = m21.pitch.Pitch('G5')
+# z = m21.pitch.Pitch('C3')
 
 # print(is_harmonic(x, x))
 # print(is_harmonic(y, x))
