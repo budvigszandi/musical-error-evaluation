@@ -80,34 +80,3 @@ def probabilty_of_harmonic(harmonic_number):
     return 1 / (harmonic_number * variance)
   else:
     return 1 / harmonic_number
-
-# --------------------------------
-# |Just trying the functions here|
-# --------------------------------
-
-# Build a harmonic series
-# hson = build_harmonic_series(m21.pitch.Pitch('C4'))
-# for i in range(len(hson)):
-#   print(hson[i])
-
-# Check whether C4, G5 and C3 are harmonics of C4
-# x = m21.pitch.Pitch('C4')
-# y = m21.pitch.Pitch('G5')
-# z = m21.pitch.Pitch('C3')
-
-# print(is_harmonic(x, x))
-# print(is_harmonic(y, x))
-# print(is_harmonic(z, x))
-
-# Get harmonic information for C4, G5 and C3 if C4 is the fundamental
-# get_harmonic_information(x, x)
-# get_harmonic_information(y, x)
-# get_harmonic_information(z, x)
-
-# Print the probability of the first 16 harmonics
-# for i in range(1, 16):
-#   print(probabilty_of_harmonic(i))
-
-# harmonic_information = get_harmonic_information(y, x)
-# if harmonic_information != 0:
-#   print('Probability:', probabilty_of_harmonic(harmonic_information[0]))

@@ -1,11 +1,24 @@
-import music21 as m21
 import harmonics
 from relationship_type import RelationshipType
 from relationship import Relationship
 from itertools import combinations
+from collections import Counter
 
-# Idea: check the number of given notes (less, equal, more) by checking
-#       the relationship matrix rows and columns (<, =, >)
+# TODO: When there is a chance of a harmonic, it should be only up until the 16th harmonic
+# TODO: Scale points according to each other
+
+PERFECT_MATCH_POINT = 20 # Harmonics would be worth more if this were less than 17!
+CENT_DIFFERENCE_POINT = 17
+HARMONIC_POINT = 1
+UNRELATED_POINT = 0
+COVERED_NOTE_POINT = 1
+DUPLICATE_COVER_POINT = 1
+
+RELATIONSHIP_POINT_WEIGHT = 1
+COVERED_NOTE_POINT_WEIGHT = 1
+DUPLICATE_POINT_WEIGHT = 1
+
+MAXIMUM_HARMONIC_NUMBER = 17
 
 # Returns the relationship matrix of the expected and given notes. Each row is
 # a given note, each column is an expected note, each element is the
@@ -47,7 +60,11 @@ def get_relationship_points(relationship_matrix):
   for i in range(rows):
     for j in range(columns):
       # print(f"[{i}][{j}]: {relationship_matrix[i][j]}")
-      relationship_point_matrix[i][j] = get_current_point(relationship_matrix[i][j].type)
+      current_relationship = relationship_matrix[i][j].type
+      if current_relationship == RelationshipType.HARMONIC:
+        relationship_point_matrix[i][j] = get_current_point(current_relationship, relationship_matrix[i][j].harmonic_info[0])
+      else:
+        relationship_point_matrix[i][j] = get_current_point(current_relationship)
   # Just testing here
   for i in range(rows):
     for j in range(columns):
@@ -60,19 +77,20 @@ def get_relationship_points(relationship_matrix):
 # notes deserve.
 #
 # Requires a RelationshipType
-def get_current_point(relationship):
+def get_current_point(relationship, harmonic_number = -1):
   if relationship == RelationshipType.PERFECT_MATCH: # Perfect match
-    return 10
+    return PERFECT_MATCH_POINT
   elif relationship == RelationshipType.CENT_DIFFERENCE: # Cent difference
-    return 8
-  elif relationship == RelationshipType.HARMONIC: # Harmonic TODO: Scale through different harmonics
-    return 5
+    return CENT_DIFFERENCE_POINT
+  elif relationship == RelationshipType.HARMONIC: # Harmonic
+    return (MAXIMUM_HARMONIC_NUMBER - harmonic_number) * HARMONIC_POINT
   elif relationship == RelationshipType.UNRELATED: # Unrelated
-    return -1
+    return UNRELATED_POINT
 
 # Returns a dictionary of all the relationship combinations between the given
 # and expected notes. The keys represent one combination of relationships, and
-# the value is how many points this particular combination is worth.
+# the value is how many points this particular combination is worth. The
+# dictionary is ordered by the value (from highest to lowest).
 #
 # Requires a matrix (2-d array) of the relationships between the expected and
 # given notes and a matrix (2-d array) of the points relating to the other
@@ -88,7 +106,8 @@ def get_scenarios(relationship_matrix, relationship_point_matrix):
     scenario = get_current_scenario(relationship_matrix, index_list)
     scenario_tuple = tuple(scenario)
     scenarios[scenario_tuple] = sum
-  return scenarios
+    sorted_scenarios = sort_scenarios(scenarios)
+  return sorted_scenarios
 
 # Returns a list of all the index combinations we can get from an n x m matrix
 # if we want to get exactly one value from every row.
@@ -124,13 +143,42 @@ def get_sum_of_scenario(index_list, relationship_point_matrix):
   sum = 0
   for i in range(len(index_list)):
     sum += relationship_point_matrix[i][index_list[i]]
+  sum *= RELATIONSHIP_POINT_WEIGHT
+  covered_notes_count = get_covered_notes_count(index_list)
+  sum += covered_notes_count * COVERED_NOTE_POINT_WEIGHT
+  duplicate_covers_count = get_duplicated_count(index_list)
+  sum -= duplicate_covers_count * DUPLICATE_POINT_WEIGHT
   return sum
+
+# Returns a number representing how many notes are covered by a certain
+# combination of indexes.
+#
+# Requires a list of indexes (which column we choose in each row).
+def get_covered_notes_count(index_list):
+  return len(Counter(index_list).keys()) * COVERED_NOTE_POINT
+
+# Returns a number representing how many duplications are in the coverage.
+# E.g. we have 3 notes, the first covered once, the second covered twice,
+# the third covered 3 times, we get 0 + 1 + 2 = 3.
+#
+# Requires a list of indexes (which column we choose in each row).
+def get_duplicated_count(index_list):
+  frequency_of_notes = Counter(index_list).values()
+  number_of_duplicates_list = [i - 1 for i in frequency_of_notes]
+  return sum(number_of_duplicates_list) * DUPLICATE_COVER_POINT
 
 # Returns one of the highest point scenarios. TODO: Return all the best ones?
 #
 # Requires a dictionary of the scenarios
 def get_best_scenario(scenarios):
   return max(scenarios, key=scenarios.get)
+
+# Returns the sorted dictionary of scenarios (sorted by value, highest to lowest).
+#
+# Requires a dictionary of the scenarios
+def sort_scenarios(scenarios):
+  sorted_scenarios = {k: v for k, v in sorted(scenarios.items(), key=lambda item: item[1], reverse=True)}
+  return sorted_scenarios
 
 # Returns a list with information about the current unmatched note pair in
 # 3-4 elements.
@@ -144,40 +192,14 @@ def get_best_scenario(scenarios):
 #                        (which_harmonic, fundamental_note)
 #
 # Requires two m21.pitch.Pitch objects
-# TODO: Create a separate object for this
 def compare_note_pair(given_note, expected_note):
   if expected_note.isEnharmonic(given_note):
     return Relationship(RelationshipType.PERFECT_MATCH, given_note, expected_note)
-    #return (RelationshipType.PERFECT_MATCH, given_note, expected_note)
   elif expected_note.nameWithOctave == given_note.nameWithOctave:
     return Relationship(RelationshipType.CENT_DIFFERENCE, given_note, expected_note, given_note.microtone.cents - expected_note.microtone.cents)
-    #return (RelationshipType.CENT_DIFFERENCE, given_note, expected_note, given_note.microtone.cents - expected_note.microtone.cents)
   else:
     harmonic_info = harmonics.get_harmonic_info(given_note, expected_note)
     if harmonic_info != 0:
       return Relationship(RelationshipType.HARMONIC, given_note, expected_note, None, harmonic_info)
-      #return (RelationshipType.HARMONIC, given_note, expected_note, harmonic_info)
     else:
       return Relationship(RelationshipType.UNRELATED, given_note, expected_note)
-      #return (RelationshipType.UNRELATED, given_note, expected_note)
-
-# --------------------------------
-# |Just trying the functions here|
-# --------------------------------
-
-c_20cent = m21.pitch.Pitch('c4')
-c_20cent.microtone = 20
-expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
-notes_ceg20 = [c_20cent, m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
-given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('c5')]
-notes_ace = [m21.pitch.Pitch('a3'), m21.pitch.Pitch('c3'), m21.pitch.Pitch('e3')]
-
-# rel_matrix = compare_notes(expected_notes, given_notes)
-# print("------------------------------")
-# rel_points_matrix = get_relationship_points(rel_matrix)
-# print("------------------------------")
-# scenarios = get_scenarios(rel_matrix, rel_points_matrix)
-# best_scenario = get_best_scenario(scenarios)
-# print(best_scenario, scenarios[best_scenario])
-# for key, value in scenarios.items():
-#     print(key, ':', value)
