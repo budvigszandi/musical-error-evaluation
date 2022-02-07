@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from evaluate_notes import *
 from relationship_type import RelationshipType
 
-# TODO: When expecting/getting more of the same note, only one is drawn correctly.
-
 expected_nodes = []
 perfect_match_nodes = []
 cent_difference_nodes = []
