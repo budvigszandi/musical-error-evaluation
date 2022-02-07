@@ -13,8 +13,8 @@ unrelated_nodes = []
 expected_with_no_pair_nodes = []
 edge_labels = {}
 
-NODE_SIZE = 1000
-FONT_SIZE = 10
+NODE_SIZE = 750
+FONT_SIZE = 9
 
 def add_nodes(graph, expected_notes, given_notes):
   for i in range(len(expected_notes)):
@@ -28,7 +28,7 @@ def add_nodes(graph, expected_notes, given_notes):
 def get_node_name(index, note, given = False):
   if given:
     # Inserting a space to the front and back to differentiate from expected nodes
-    node_name = f" ({index}) {note.nameWithOctave} " # index + " " + note.nameWithOctave + " "
+    node_name = f" ({index}) {note.nameWithOctave} "
   else:
     node_name = f"({index}) {note.nameWithOctave}"
   cent_difference = note.microtone.cents
@@ -41,29 +41,33 @@ def group_expected_nodes(expected_notes):
     node_name = get_node_name(i, expected_notes[i])
     expected_nodes.append(node_name)
 
-def group_related_nodes_with_edge_creation(graph, expected_notes, given_notes, scenario):
+def group_related_nodes_with_edge_creation(graph, expected_notes, scenario):
   for i in range(len(scenario)):
     current_rel = scenario[i]
     rel_type = current_rel.type
+    # TODO: What happens when expecting the same note more times?
     expected_note = scenario[i].expected_note
-    given_note = scenario[i].given_note
-    exp_index = get_expected_node_index(expected_note, expected_notes)
-    giv_index = get_given_node_index(given_note, given_notes)
+    exp_index = get_expected_node_index(expected_note, expected_notes) 
+    giv_index = i
     given_note_node_name = get_node_name(giv_index, scenario[i].given_note, True)
     expected_note_node_name = get_node_name(exp_index, scenario[i].expected_note)
     if rel_type == RelationshipType.PERFECT_MATCH:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       perfect_match_nodes.append(given_note_node_name)
+      #print("Perfect match edge", expected_note_node_name, given_note_node_name)
     elif rel_type == RelationshipType.CENT_DIFFERENCE:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       edge_labels[(expected_note_node_name, given_note_node_name)] = current_rel.cent_difference
       cent_difference_nodes.append(given_note_node_name)
+      #print("Cent diff edge", expected_note_node_name, given_note_node_name)
     elif rel_type == RelationshipType.HARMONIC:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       edge_labels[(expected_note_node_name, given_note_node_name)] = f"{current_rel.harmonic_info[0]}. harmonic"
       harmonic_nodes.append(given_note_node_name)
+      #print("Harmonic edge", expected_note_node_name, given_note_node_name)
     elif rel_type == RelationshipType.UNRELATED:
       unrelated_nodes.append(given_note_node_name)
+      #print("Unrelated, no edge", expected_note_node_name, given_note_node_name)
 
 def get_expected_node_index(expected_note, expected_notes):
   return expected_notes.index(expected_note)

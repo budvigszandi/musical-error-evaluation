@@ -35,6 +35,6 @@ scenario = list(scenarios.keys())[0]
 for rel in scenario:
   print(str(rel))
 print(scenarios[scenario], "points")
-group_related_nodes_with_edge_creation(graph, expected_notes, given_notes, scenario)
+group_related_nodes_with_edge_creation(graph, expected_notes, scenario)
 group_isolated_expected_nodes(graph)
 draw_graph(graph, ax)
