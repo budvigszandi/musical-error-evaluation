@@ -22,12 +22,16 @@ DUPLICATE_POINT_WEIGHT = 1
 
 MAXIMUM_HARMONIC_NUMBER = 17
 
-# Returns the relationship matrix of the expected and given notes. Each row is
-# a given note, each column is an expected note, each element is the
-# relationship between them.
-#
-# Requires two lists of m21.pitch.Pitch objects
 def get_relationship_matrix(expected_notes, given_notes):
+  '''
+  Returns the relationship matrix of the expected and given notes. Each row is
+  a given note, each column is an expected note, each element is the
+  relationship between them.
+
+  Args:
+    expected_notes: an ordered list of the expected notes as m21.pitch.Pitch objects
+    given_notes: an ordered list of the given notes as m21.pitch.Pitch objects
+  '''
   expected_notes_count = len(expected_notes)
   given_notes_count = len(given_notes)
   relationship_matrix = [[0 for i in range(expected_notes_count)] for j in range(given_notes_count)] 
@@ -47,13 +51,16 @@ def get_relationship_matrix(expected_notes, given_notes):
       print("---")
   return relationship_matrix
 
-# Returns the relationship matrix of the expected and given notes. Each row is
-# a given note, each column is an expected note, each element is the
-# relationship between them.
-#
-# Requires a matrix (2-d array) of the relationships between the expected and
-# given notes.
 def get_relationship_points(relationship_matrix):
+  '''
+  Returns the relationship matrix of the expected and given notes. Each row is
+  a given note, each column is an expected note, each element is the
+  relationship between them (NoteRelationshipType).
+
+  Args:
+    relationship_matrix: a 2-d array of the relationships between the expected
+                         and given notes.
+  '''
   rows = len(relationship_matrix)
   columns = len(relationship_matrix[0])
   # print(f"Points: {rows} rows {columns} columns")
@@ -75,29 +82,39 @@ def get_relationship_points(relationship_matrix):
       print("---")
   return relationship_point_matrix
 
-# Returns the number of points the certain type of relationship between
-# notes deserve.
-#
-# Requires a RelationshipType
-def get_current_point(relationship, harmonic_number = -1):
-  if relationship == NoteRelationshipType.PERFECT_MATCH: # Perfect match
+def get_current_point(relationship_type, harmonic_number = -1):
+  '''
+  Returns the number of points the certain type of relationship between
+  notes deserve.
+
+  Args:
+    relationship_type: a NoteRelationshipType
+    (optional) harmonic_number: if the relationship_type is
+                                NoteRelationshipType.HARMONIC, we have to give
+                                the harmonic number as well
+  '''
+  if relationship_type == NoteRelationshipType.PERFECT_MATCH: # Perfect match
     return PERFECT_MATCH_POINT
-  elif relationship == NoteRelationshipType.CENT_DIFFERENCE: # Cent difference
+  elif relationship_type == NoteRelationshipType.CENT_DIFFERENCE: # Cent difference
     return CENT_DIFFERENCE_POINT
-  elif relationship == NoteRelationshipType.HARMONIC: # Harmonic
+  elif relationship_type == NoteRelationshipType.HARMONIC: # Harmonic
     return (MAXIMUM_HARMONIC_NUMBER - harmonic_number) * HARMONIC_POINT
-  elif relationship == NoteRelationshipType.UNRELATED: # Unrelated
+  elif relationship_type == NoteRelationshipType.UNRELATED: # Unrelated
     return UNRELATED_POINT
 
-# Returns a dictionary of all the relationship combinations between the given
-# and expected notes. The keys represent one combination of relationships, and
-# the value is how many points this particular combination is worth. The
-# dictionary is ordered by the value (from highest to lowest).
-#
-# Requires a matrix (2-d array) of the relationships between the expected and
-# given notes and a matrix (2-d array) of the points relating to the other
-# matrix.
 def get_scenarios(relationship_matrix, relationship_point_matrix):
+  '''
+  Returns a dictionary of all the relationship combinations between the given
+  and expected notes. The keys represent one combination of relationships, and
+  the value says how many points this particular combination is worth. The
+  dictionary is ordered by the value (from highest to lowest).
+
+  Args:
+    relationship_matrix: a 2-d array of the relationships between the expected
+                         and given notes
+    relationship_point_matrix: a 2-d array of the points relating to the
+                               relationship_matrix.
+  '''
   scenarios = {}
   rows = len(relationship_point_matrix)
   columns = len(relationship_point_matrix[0])
@@ -111,11 +128,15 @@ def get_scenarios(relationship_matrix, relationship_point_matrix):
     sorted_scenarios = sort_scenarios(scenarios)
   return sorted_scenarios
 
-# Returns a list of all the index combinations we can get from an n x m matrix
-# if we want to get exactly one value from every row.
-#
-# Requires the number of rows and number of columns
 def get_index_variations(rows, columns):
+  '''
+  Returns a list of all the index combinations we can get from an (n x m) matrix
+  if we want to get exactly one value from every row.
+
+  Args:
+    rows: an integer (>=0) number of rows
+    columns: an integer (>=0) number of columns
+  '''
   indexes = list(range(columns))
   extended_indexes = []
   for i in range(rows):
@@ -124,24 +145,35 @@ def get_index_variations(rows, columns):
   # print(index_variations)
   return index_variations
 
-# Returns a combination of relationships between the given and expected notes
-# from the relationship matrix based on an index_list.
-#
-# Requires a matrix (2-d array) of the relationships between the expected and
-# given notes and a list of indexes that we want to get from the matrix.
 def get_current_scenario(relationship_matrix, index_list):
+  '''
+  Returns a combination of relationships between the given and expected notes
+  from the relationship matrix based on an index_list.
+
+  Args:
+    relationship_matrix: a 2-d array of the relationships between the expected
+                         and given notes
+    index_list: a list of indexes that we want to get from the matrix. The list
+                has to contain as many numbers as there are rows in the matrix,
+                and the indexes have to be >= 0 and < number of columns.
+  '''
   scenario = []
   for i in range(len(index_list)):
     scenario.append(relationship_matrix[i][index_list[i]])
   return scenario
 
-# Returns a number which represents how many points a particular combination
-# of relationships between the expected and given notes is worth.
-#
-# Requires a list of numbers that represent the indexes we need from each line
-# in the relationship matrix, and a matrix (2-d array) of the points relating
-# to the relationship matrix.
 def get_sum_of_scenario(index_list, relationship_point_matrix):
+  '''
+  Returns a number which represents how many points a particular combination
+  of relationships between the expected and given notes is worth.
+
+  Args:
+    index_list: a list of indexes that we want to get from the matrix. The list
+                has to contain as many numbers as there are rows in the matrix,
+                and the indexes have to be >= 0 and < number of columns.
+    relationship_point_matrix: a 2-d array of the points relating to the
+                               relationship matrix.
+  '''
   sum = 0
   for i in range(len(index_list)):
     sum += relationship_point_matrix[i][index_list[i]]
@@ -152,49 +184,69 @@ def get_sum_of_scenario(index_list, relationship_point_matrix):
   sum -= duplicate_covers_count * DUPLICATE_POINT_WEIGHT
   return sum
 
-# Returns a number representing how many notes are covered by a certain
-# combination of indexes.
-#
-# Requires a list of indexes (which column we choose in each row).
 def get_covered_notes_count(index_list):
+  '''
+  Returns a number representing how many notes are covered by a certain
+  combination of indexes.
+  
+  Args:
+    index_list: a list of indexes that we want to get from the matrix. The list
+                has to contain as many numbers as there are rows in the matrix,
+                and the indexes have to be >= 0 and < number of columns.
+  '''
   return len(Counter(index_list).keys()) * COVERED_NOTE_POINT
 
-# Returns a number representing how many duplications are in the coverage.
-# E.g. we have 3 notes, the first covered once, the second covered twice,
-# the third covered 3 times, we get 0 + 1 + 2 = 3.
-#
-# Requires a list of indexes (which column we choose in each row).
 def get_duplicated_count(index_list):
+  '''
+  Returns a number representing how many duplications are in the coverage.
+  E.g. we have 3 notes, the first covered once, the second covered twice,
+  the third covered 3 times, we get 0 + 1 + 2 = 3.
+  
+  Args:
+    index_list: a list of indexes that we want to get from the matrix. The list
+                has to contain as many numbers as there are rows in the matrix,
+                and the indexes have to be >= 0 and < number of columns.
+  '''
   frequency_of_notes = Counter(index_list).values()
   number_of_duplicates_list = [i - 1 for i in frequency_of_notes]
   return sum(number_of_duplicates_list) * DUPLICATE_COVER_POINT
 
-# Returns one of the highest point scenarios. TODO: Return all the best ones?
-#
-# Requires a dictionary of the scenarios
+# TODO: Return all the best ones?
 def get_best_scenario(scenarios):
+  '''
+  Returns one of the highest point scenarios.
+
+  Args:
+    scenarios: a dictionary of the scenarios
+  '''
   return max(scenarios, key=scenarios.get)
 
-# Returns the sorted dictionary of scenarios (sorted by value, highest to lowest).
-#
-# Requires a dictionary of the scenarios
 def sort_scenarios(scenarios):
+  '''
+  Returns the sorted dictionary of scenarios (sorted by value, highest to lowest).
+  
+  Args:
+    scenarios: a dictionary of the scenarios
+  '''
   sorted_scenarios = {k: v for k, v in sorted(scenarios.items(), key=lambda item: item[1], reverse=True)}
   return sorted_scenarios
 
-# Returns a list with information about the current unmatched note pair in
-# 3-4 elements.
-# 1st element: The relationship of the given note with the expected note.
-#              This comes from the Relationship enum.
-# 2nd element: The given note.
-# 3rd element: The expected note.
-# 4th element: Only exists if there is a cent difference or the note is a harmonic.
-#              Cent difference: The difference in a number.
-#              Harmonic: A 2-element list of harmonic information
-#                        (which_harmonic, fundamental_note)
-#
-# Requires two m21.pitch.Pitch objects
 def compare_note_pair(given_note, expected_note):
+  '''
+  Returns a list with information about the current unmatched note pair in
+  3-4 elements.
+  1st element: The relationship of the given note with the expected note.
+               This comes from the Relationship enum.
+  2nd element: The given note.
+  3rd element: The expected note.
+  4th element: Only exists if there is a cent difference or the note is a harmonic.
+               Cent difference: The difference in a number.
+               Harmonic: A 2-element list of harmonic information
+                         (which_harmonic, fundamental_note)
+  Args:
+    given_note: the given note as a m21.pitch.Pitch objects
+    expected_note: the expected note as a m21.pitch.Pitch objects
+  '''
   if expected_note.isEnharmonic(given_note):
     return NoteRelationship(NoteRelationshipType.PERFECT_MATCH, given_note, expected_note)
   elif expected_note.nameWithOctave == given_note.nameWithOctave:
