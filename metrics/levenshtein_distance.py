@@ -1,5 +1,5 @@
 import numpy as np
-from background_colors import *
+from visualizer.background_colors import *
 
 # TODO: Documenting comments and refactoring where it's needed
 

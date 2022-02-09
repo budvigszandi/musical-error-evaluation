@@ -1,7 +1,7 @@
 import music21 as m21
-from evaluate_notes import *
-from draw_harmonic_results import *
-from levenshtein_distance import *
+from metrics.evaluate_notes import *
+from visualizer.draw_harmonic_results import *
+from metrics.levenshtein_distance import *
 
 # ------------------------------
 # Expected and given note arrays
@@ -46,28 +46,28 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, rest_half,    
 # Getting scenarios
 # -----------------
 
-# rel_matrix = get_relationship_matrix(expected_notes, given_notes)
-# print("------------------------------")
-# rel_points_matrix = get_relationship_points(rel_matrix)
-# print("------------------------------")
-# scenarios = get_scenarios(rel_matrix, rel_points_matrix)
+rel_matrix = get_relationship_matrix(expected_notes, given_notes)
+print("------------------------------")
+rel_points_matrix = get_relationship_points(rel_matrix)
+print("------------------------------")
+scenarios = get_scenarios(rel_matrix, rel_points_matrix)
 
 # ------------------
 # Drawing a scenario
 # ------------------
 
-# print("Got scenarios, now drawing")
-# fig, ax = plt.subplots()
-# graph = nx.Graph()
-# add_nodes(graph, expected_notes, given_notes)
-# group_expected_nodes(expected_notes)
-# scenario = list(scenarios.keys())[0]
-# for rel in scenario:
-#   print(str(rel))
-# print(scenarios[scenario], "points")
-# group_related_nodes_with_edge_creation(graph, expected_notes, scenario)
-# group_isolated_expected_nodes(graph)
-# draw_graph(graph, ax)
+print("Got scenarios, now drawing")
+fig, ax = plt.subplots()
+graph = nx.Graph()
+add_nodes(graph, expected_notes, given_notes)
+group_expected_nodes(expected_notes)
+scenario = list(scenarios.keys())[0]
+for rel in scenario:
+  print(str(rel))
+print(scenarios[scenario], "points")
+group_related_nodes_with_edge_creation(graph, expected_notes, scenario)
+group_isolated_expected_nodes(graph)
+draw_graph(graph, ax)
 
 # --------------------
 # Levenshtein distance

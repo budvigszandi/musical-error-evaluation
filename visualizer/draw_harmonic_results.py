@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from evaluate_notes import *
-from relationship_type import RelationshipType
+from metrics.evaluate_notes import *
+from metrics.relationship_type import RelationshipType
 
 expected_nodes = []
 perfect_match_nodes = []

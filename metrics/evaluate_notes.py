@@ -1,6 +1,6 @@
-import harmonics
-from relationship_type import RelationshipType
-from relationship import Relationship
+import metrics.harmonics as harmonics
+from metrics.relationship_type import RelationshipType
+from metrics.relationship import Relationship
 from itertools import combinations
 from collections import Counter
 
