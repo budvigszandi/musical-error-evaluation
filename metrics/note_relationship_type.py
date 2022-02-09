@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-class RelationshipType(Enum):
+class NoteRelationshipType(Enum):
   PERFECT_MATCH = auto()
   HARMONIC = auto()
   CENT_DIFFERENCE = auto()

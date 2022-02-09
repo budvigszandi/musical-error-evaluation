@@ -1,5 +1,4 @@
 import numpy as np
-from visualizer.background_colors import *
 
 # TODO: Documenting comments
 

@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from metrics.evaluate_notes import *
-from metrics.relationship_type import RelationshipType
+from metrics.note_relationship_type import NoteRelationshipType
 
 expected_nodes = []
 perfect_match_nodes = []
@@ -49,21 +49,21 @@ def group_related_nodes_with_edge_creation(graph, expected_notes, scenario):
     giv_index = i
     given_note_node_name = get_node_name(giv_index, scenario[i].given_note, True)
     expected_note_node_name = get_node_name(exp_index, scenario[i].expected_note)
-    if rel_type == RelationshipType.PERFECT_MATCH:
+    if rel_type == NoteRelationshipType.PERFECT_MATCH:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       perfect_match_nodes.append(given_note_node_name)
       #print("Perfect match edge", expected_note_node_name, given_note_node_name)
-    elif rel_type == RelationshipType.CENT_DIFFERENCE:
+    elif rel_type == NoteRelationshipType.CENT_DIFFERENCE:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       edge_labels[(expected_note_node_name, given_note_node_name)] = current_rel.cent_difference
       cent_difference_nodes.append(given_note_node_name)
       #print("Cent diff edge", expected_note_node_name, given_note_node_name)
-    elif rel_type == RelationshipType.HARMONIC:
+    elif rel_type == NoteRelationshipType.HARMONIC:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       edge_labels[(expected_note_node_name, given_note_node_name)] = f"{current_rel.harmonic_info[0]}. harmonic"
       harmonic_nodes.append(given_note_node_name)
       #print("Harmonic edge", expected_note_node_name, given_note_node_name)
-    elif rel_type == RelationshipType.UNRELATED:
+    elif rel_type == NoteRelationshipType.UNRELATED:
       unrelated_nodes.append(given_note_node_name)
       #print("Unrelated, no edge", expected_note_node_name, given_note_node_name)
 

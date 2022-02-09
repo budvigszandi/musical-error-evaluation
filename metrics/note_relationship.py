@@ -1,4 +1,4 @@
-class Relationship:
+class NoteRelationship:
   def __init__(self, type, given_note, expected_note, cent_difference = None, harmonic_info = None):
     self.type = type
     self.given_note = given_note

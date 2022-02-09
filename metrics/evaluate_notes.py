@@ -1,11 +1,13 @@
 import metrics.harmonics as harmonics
-from metrics.relationship_type import RelationshipType
-from metrics.relationship import Relationship
+from metrics.note_relationship_type import NoteRelationshipType
+from metrics.note_relationship import NoteRelationship
 from itertools import combinations
 from collections import Counter
 
 # TODO: When there is a chance of a harmonic, it should be only up until the 16th harmonic
 # TODO: Scale points according to each other
+# TODO: Declaring a maximum point (perfect match * number of expected notes) and
+#       making statistics with the gotten points
 
 PERFECT_MATCH_POINT = 20 # Harmonics would be worth more if this were less than 17!
 CENT_DIFFERENCE_POINT = 17
@@ -61,7 +63,7 @@ def get_relationship_points(relationship_matrix):
     for j in range(columns):
       # print(f"[{i}][{j}]: {relationship_matrix[i][j]}")
       current_relationship = relationship_matrix[i][j].type
-      if current_relationship == RelationshipType.HARMONIC:
+      if current_relationship == NoteRelationshipType.HARMONIC:
         relationship_point_matrix[i][j] = get_current_point(current_relationship, relationship_matrix[i][j].harmonic_info[0])
       else:
         relationship_point_matrix[i][j] = get_current_point(current_relationship)
@@ -78,13 +80,13 @@ def get_relationship_points(relationship_matrix):
 #
 # Requires a RelationshipType
 def get_current_point(relationship, harmonic_number = -1):
-  if relationship == RelationshipType.PERFECT_MATCH: # Perfect match
+  if relationship == NoteRelationshipType.PERFECT_MATCH: # Perfect match
     return PERFECT_MATCH_POINT
-  elif relationship == RelationshipType.CENT_DIFFERENCE: # Cent difference
+  elif relationship == NoteRelationshipType.CENT_DIFFERENCE: # Cent difference
     return CENT_DIFFERENCE_POINT
-  elif relationship == RelationshipType.HARMONIC: # Harmonic
+  elif relationship == NoteRelationshipType.HARMONIC: # Harmonic
     return (MAXIMUM_HARMONIC_NUMBER - harmonic_number) * HARMONIC_POINT
-  elif relationship == RelationshipType.UNRELATED: # Unrelated
+  elif relationship == NoteRelationshipType.UNRELATED: # Unrelated
     return UNRELATED_POINT
 
 # Returns a dictionary of all the relationship combinations between the given
@@ -194,12 +196,12 @@ def sort_scenarios(scenarios):
 # Requires two m21.pitch.Pitch objects
 def compare_note_pair(given_note, expected_note):
   if expected_note.isEnharmonic(given_note):
-    return Relationship(RelationshipType.PERFECT_MATCH, given_note, expected_note)
+    return NoteRelationship(NoteRelationshipType.PERFECT_MATCH, given_note, expected_note)
   elif expected_note.nameWithOctave == given_note.nameWithOctave:
-    return Relationship(RelationshipType.CENT_DIFFERENCE, given_note, expected_note, given_note.microtone.cents - expected_note.microtone.cents)
+    return NoteRelationship(NoteRelationshipType.CENT_DIFFERENCE, given_note, expected_note, given_note.microtone.cents - expected_note.microtone.cents)
   else:
     harmonic_info = harmonics.get_harmonic_info(given_note, expected_note)
     if harmonic_info != 0:
-      return Relationship(RelationshipType.HARMONIC, given_note, expected_note, None, harmonic_info)
+      return NoteRelationship(NoteRelationshipType.HARMONIC, given_note, expected_note, None, harmonic_info)
     else:
-      return Relationship(RelationshipType.UNRELATED, given_note, expected_note)
+      return NoteRelationship(NoteRelationshipType.UNRELATED, given_note, expected_note)
