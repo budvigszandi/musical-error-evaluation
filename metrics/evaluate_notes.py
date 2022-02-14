@@ -8,6 +8,7 @@ from collections import Counter
 # TODO: Scale points according to each other
 # TODO: Declaring a maximum point (perfect match * number of expected notes) and
 #       making statistics with the gotten points
+# TODO: Can the points be the values of the relationship enumerator class?
 
 PERFECT_MATCH_POINT = 20 # Harmonics would be worth more if this were less than 17!
 CENT_DIFFERENCE_POINT = 17
