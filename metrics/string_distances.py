@@ -3,9 +3,14 @@ from itertools import permutations
 from metrics.rhythm_relationship_type import RhythmRelationshipType
 
 # TODO: Documenting comments
+# TODO: Correct the +1s in size_of_source and size_of_target in functions
+
+CORRECT_RHYTHM_POINT = 10
+DELETED_RHYTHM_POINT = -10
+INSERTED_RHYTHM_POINT = -5
+SUBSTITUTED_RHYTHM_POINT = -5
 
 def get_levenshtein_distance(source, target):
-  # TODO: Correct the +1s in size_of_source and size_of_target
   size_of_source = len(source) + 1
   size_of_target = len(target) + 1
   distance_matrix = fill_distance_matrix(source, target)
@@ -43,55 +48,6 @@ def initiate_distance_matrix(size_of_source, size_of_target):
     distance_matrix[0, j] = j
   return distance_matrix
 
-def convert_steps_to_rhythm_relationship_types(step_permutations, source, target):
-  all_step_permutations = list(step_permutations)
-  # print("Amount of different step quantities (8 steps, 6 steps etc.)", len(all_step_permutations))
-
-  # print("Permutations in X amount of steps", len(all_step_permutations[0]))
-
-  steps_of_same_amount = list(all_step_permutations[0])
-  # print("One permutation of steps", len(steps_of_same_amount[1]))
-
-  # sum = 0
-  # for i in range(len(all_step_permutations)):
-  #   sum += len(all_step_permutations[i])
-  # print(sum, "permutations")
-
-  permutations_as_reltypes = []
-
-  for i in range(len(all_step_permutations)):
-    steps_of_same_amount = list(all_step_permutations[i])
-    for j in range(len(steps_of_same_amount)):
-      current_permutation = steps_of_same_amount[j]
-      # print(j, current_permutation)
-      current_source_index = 0
-      current_target_index = 0
-      permutation_as_reltype = []
-      for k in range(len(current_permutation)):
-        current_step = current_permutation[k]
-        # print(current_step)
-        if current_step == "L":
-          # print("L")
-          permutation_as_reltype.append(RhythmRelationshipType.DELETION)
-          current_source_index += 1
-        elif current_step == "R":
-          # print("R")
-          permutation_as_reltype.append(RhythmRelationshipType.INSERTION)
-          current_target_index += 1
-        elif current_step == "D":
-          # print("D")
-          if source[current_source_index] == target[current_target_index]:
-            permutation_as_reltype.append(RhythmRelationshipType.SAME)
-          else:
-            permutation_as_reltype.append(RhythmRelationshipType.SUBSTITUTION)
-          current_source_index += 1
-          current_target_index += 1
-      permutations_as_reltypes.append(permutation_as_reltype)
-      # print(permutation_as_reltype)
-  # print(len(permutations_as_reltypes), permutations_as_reltypes)
-  
-  return permutations_as_reltypes
-
 def get_all_step_permutations(source, target):
   number_of_rows = len(source)
   number_of_columns = len(target)
@@ -126,3 +82,74 @@ def get_all_step_permutations(source, target):
     # print(f"{len(allowed_steps_ordered[i])} long permutations: {len(permutation)}")
   
   return step_permutations
+
+# TODO: Weigh the points based on
+#       - length of rhythm
+#       - note-rhythm and rhythm-note substitution
+def get_rhythmic_point(step_permutation, source, target):
+  # Starting from the maximum possible amount of points
+  point = len(source) * CORRECT_RHYTHM_POINT
+  for i in range(len(step_permutation)):
+    current_step = step_permutation[i]
+    if current_step == RhythmRelationshipType.DELETION:
+      point += DELETED_RHYTHM_POINT
+    elif current_step == RhythmRelationshipType.INSERTION:
+      point += INSERTED_RHYTHM_POINT
+    elif current_step == RhythmRelationshipType.SAME:
+      continue
+    elif current_step == RhythmRelationshipType.SUBSTITUTION:
+      point += SUBSTITUTED_RHYTHM_POINT
+  return point
+
+def convert_steps_with_points(step_permutations, source, target):
+  all_step_permutations = list(step_permutations)
+  # print("Amount of different step quantities (8 steps, 6 steps etc.)", len(all_step_permutations))
+
+  # print("Permutations in X amount of steps", len(all_step_permutations[0]))
+
+  steps_of_same_amount = list(all_step_permutations[0])
+  # print("One permutation of steps", len(steps_of_same_amount[1]))
+
+  # sum = 0
+  # for i in range(len(all_step_permutations)):
+  #   sum += len(all_step_permutations[i])
+  # print(sum, "permutations")
+
+  converted_permutations = []
+  points = [] # TODO: This is a separate array because of the weird indexing
+              # in the lower for loop 'for j in range(len(steps_of_same_amount)):'
+              # This needs further checking.
+
+  for i in range(len(all_step_permutations)):
+    steps_of_same_amount = list(all_step_permutations[i])
+    for j in range(len(steps_of_same_amount)):
+      current_permutation = steps_of_same_amount[j]
+      # print(j, current_permutation)
+      current_source_index = 0
+      current_target_index = 0
+      permutation_as_reltype = []
+      for k in range(len(current_permutation)):
+        current_step = current_permutation[k]
+        # print(current_step)
+        if current_step == "L":
+          # print("L")
+          permutation_as_reltype.append(RhythmRelationshipType.DELETION)
+          current_source_index += 1
+        elif current_step == "R":
+          # print("R")
+          permutation_as_reltype.append(RhythmRelationshipType.INSERTION)
+          current_target_index += 1
+        elif current_step == "D":
+          # print("D")
+          if source[current_source_index] == target[current_target_index]:
+            permutation_as_reltype.append(RhythmRelationshipType.SAME)
+          else:
+            permutation_as_reltype.append(RhythmRelationshipType.SUBSTITUTION)
+          current_source_index += 1
+          current_target_index += 1
+      converted_permutations.append(permutation_as_reltype)
+      points.append(get_rhythmic_point(permutation_as_reltype, source, target))
+      # print(permutation_as_reltype)
+  # print(len(permutations_as_reltypes), permutations_as_reltypes)
+  
+  return converted_permutations, points

@@ -47,28 +47,28 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter ] # 
 # Getting scenarios
 # -----------------
 
-# rel_matrix = get_relationship_matrix(expected_notes, given_notes)
-# print("------------------------------")
-# rel_points_matrix = get_relationship_points(rel_matrix)
-# print("------------------------------")
-# scenarios = get_scenarios(rel_matrix, rel_points_matrix)
+rel_matrix = get_relationship_matrix(expected_notes, given_notes)
+print("------------------------------")
+rel_points_matrix = get_relationship_points(rel_matrix)
+print("------------------------------")
+scenarios = get_scenarios(rel_matrix, rel_points_matrix)
 
 # ------------------
 # Drawing a scenario
 # ------------------
 
-# print("Got scenarios, now drawing")
-# fig, ax = plt.subplots()
-# graph = nx.Graph()
-# add_nodes(graph, expected_notes, given_notes)
-# group_expected_nodes(expected_notes)
-# scenario = list(scenarios.keys())[0]
-# for rel in scenario:
-#   print(str(rel))
-# print(scenarios[scenario], "points")
-# group_related_nodes_with_edge_creation(graph, expected_notes, scenario)
-# group_isolated_expected_nodes(graph)
-# draw_graph(graph, ax)
+print("Got scenarios, now drawing")
+fig, ax = plt.subplots()
+graph = nx.Graph()
+add_nodes(graph, expected_notes, given_notes)
+group_expected_nodes(expected_notes)
+scenario = list(scenarios.keys())[0]
+for rel in scenario:
+  print(str(rel))
+print(scenarios[scenario], "points")
+group_related_nodes_with_edge_creation(graph, expected_notes, scenario)
+group_isolated_expected_nodes(graph)
+draw_graph(graph, ax)
 
 # --------------------
 # Levenshtein distance
@@ -76,21 +76,23 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter ] # 
 # source = '1234567890'
 # target = '123890'
 
-source = "woman"
-target = "man"
-# # source = expected_rhythm
-# # target = given_rhythm
+# source = "ab"
+# target = "ab"
+source = expected_rhythm
+target = given_rhythm
 
 all_step_permutations = get_all_step_permutations(source, target)
 # print(all_step_permutations)
-permutations_as_reltypes = convert_steps_to_rhythm_relationship_types(all_step_permutations, source, target)
+converted_permutations, points = convert_steps_with_points(all_step_permutations, source, target)
 # print(len(permutations_as_reltypes), permutations_as_reltypes)
 print("All permutations:")
-for i in range(len(permutations_as_reltypes)):
+for i in range(len(converted_permutations)):
   print(i + 1)
-  draw_rhythmic_differences_from_steps(source, target, permutations_as_reltypes[i])
+  draw_rhythmic_differences_from_steps(source, target, converted_permutations[i])
+  print("Point:", points[i])
+  print()
 
-print("Best case scenario (Levenshtein):")
+print("Levenshtein scenario:")
 get_levenshtein_distance(source, target)
 distance_matrix = fill_distance_matrix(source, target)
 draw_rhythmic_differences_from_matrix(source, target, distance_matrix)

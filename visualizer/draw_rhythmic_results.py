@@ -47,7 +47,6 @@ def draw_rhythmic_differences_from_matrix(source, target, distance_matrix):
         compared_source_string.add_to_front(current_source, backgroundColors.SUBSTITUTION)
         compared_target_string.add_to_front(current_target, backgroundColors.SUBSTITUTION)
     current = distance_matrix[i][j]
-  print("Best scenario")
   print("Wanted:", compared_source_string.string)
   print("Got   :", compared_target_string.string)
   print("\n" + get_color_map())
@@ -62,8 +61,10 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
   for i in range(len(steps)):
     current_step = steps[i]
     # print("si", current_source_index, "ti", current_target_index)
-    current_source = source[current_source_index]
-    current_target = target[current_target_index]
+    # current_source = source[current_source_index]
+    # current_target = target[current_target_index]
+    current_source = get_current_element_string(source, current_source_index)
+    current_target = get_current_element_string(target, current_target_index)
     if current_step == RhythmRelationshipType.DELETION:
       # print("deletion", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.DELETION)
@@ -95,20 +96,19 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
   
   print("Wanted:", compared_source_string.string)
   print("Got   :", compared_target_string.string)
-  print()
 
 def get_current_element_string(elements, index):
   current_element = ""
   for i in range(len(elements)):
-    # Commented these because of testing with simple strings instead of notes
+    # Comment here to testing with simple strings instead of notes
     # and rests until the logic is ready
-    # if elements[i].isNote:
-    #   type = "N"
-    # elif elements[i].isRest:
-    #   type = "R"
+    if elements[i].isNote:
+      type = "N"
+    elif elements[i].isRest:
+      type = "R"
     if i == index:
-      # current_element = type + " - " + str(elements[i].duration.quarterLength)
-      current_element = str(elements[i])
+      current_element = type + " - " + str(elements[i].duration.quarterLength)
+      # current_element = str(elements[i])
   return current_element
 
   # ---
