@@ -3,6 +3,7 @@ from metrics.evaluate_notes import *
 from visualizer.draw_harmonic_results import *
 from metrics.string_distances import *
 from visualizer.draw_rhythmic_results import *
+from metrics.evaluate_rhythms import *
 
 # ------------------------------
 # Expected and given note arrays
@@ -11,9 +12,12 @@ from visualizer.draw_rhythmic_results import *
 # expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
 # given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('c5')]
 
-# expected_notes = [m21.pitch.Pitch('d1'),
-#                   m21.pitch.Pitch('d--1'), m21.pitch.Pitch('c#3'), m21.pitch.Pitch('c#4')]
-# given_notes = [m21.pitch.Pitch('d-3'), m21.pitch.Pitch('d1'),  m21.pitch.Pitch('e2')]
+expected_notes = [m21.pitch.Pitch('d1'),
+                  m21.pitch.Pitch('d--1'), m21.pitch.Pitch('c#3'), m21.pitch.Pitch('c#4'),
+                  m21.pitch.Pitch('a4'), m21.pitch.Pitch('b4'), m21.pitch.Pitch('c5')]
+given_notes = [m21.pitch.Pitch('d-3'), m21.pitch.Pitch('d1'),  m21.pitch.Pitch('e2'),
+               m21.pitch.Pitch('f3'), m21.pitch.Pitch('g3'), m21.pitch.Pitch('a3'),
+               m21.pitch.Pitch('a4')]
 
 # Example 1 for harmonics with coverage
 # expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('f4'), m21.pitch.Pitch('c5')]
@@ -23,8 +27,8 @@ from visualizer.draw_rhythmic_results import *
 # expected_notes = [m21.pitch.Pitch('a1'), m21.pitch.Pitch('c2'), m21.pitch.Pitch('e2')]
 # given_notes = [m21.pitch.Pitch('c2'), m21.pitch.Pitch('e3'), m21.pitch.Pitch('b3')]
 
-expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
-given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('c5'), m21.pitch.Pitch('c5')]
+# expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
+# given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('c5'), m21.pitch.Pitch('c5')]
 
 # ----------------------------------
 # Expected and given rhythmic arrays
@@ -62,7 +66,8 @@ fig, ax = plt.subplots()
 graph = nx.Graph()
 add_nodes(graph, expected_notes, given_notes)
 group_expected_nodes(expected_notes)
-scenario = list(scenarios.keys())[0]
+# scenario = list(scenarios.keys())[0]
+scenario = get_best_scenario(scenarios)
 for rel in scenario:
   print(str(rel))
 print(scenarios[scenario], "points")
@@ -73,26 +78,21 @@ draw_graph(graph, ax)
 # --------------------
 # Levenshtein distance
 # --------------------
-# source = '1234567890'
-# target = '123890'
+# source = expected_rhythm
+# target = given_rhythm
 
-# source = "ab"
-# target = "ab"
-source = expected_rhythm
-target = given_rhythm
+# all_step_permutations = get_all_step_permutations(source, target)
+# # print(all_step_permutations)
+# converted_permutations, points = convert_steps_with_points(all_step_permutations, source, target)
+# # print(len(permutations_as_reltypes), permutations_as_reltypes)
+# print("All permutations:")
+# for i in range(len(converted_permutations)):
+#   print(i + 1)
+#   draw_rhythmic_differences_from_steps(source, target, converted_permutations[i])
+#   print("Point:", points[i])
+#   print()
 
-all_step_permutations = get_all_step_permutations(source, target)
-# print(all_step_permutations)
-converted_permutations, points = convert_steps_with_points(all_step_permutations, source, target)
-# print(len(permutations_as_reltypes), permutations_as_reltypes)
-print("All permutations:")
-for i in range(len(converted_permutations)):
-  print(i + 1)
-  draw_rhythmic_differences_from_steps(source, target, converted_permutations[i])
-  print("Point:", points[i])
-  print()
-
-print("Levenshtein scenario:")
-get_levenshtein_distance(source, target)
-distance_matrix = fill_distance_matrix(source, target)
-draw_rhythmic_differences_from_matrix(source, target, distance_matrix)
+# print("Levenshtein scenario:")
+# get_levenshtein_distance(source, target)
+# distance_matrix = fill_distance_matrix(source, target)
+# draw_rhythmic_differences_from_matrix(source, target, distance_matrix)

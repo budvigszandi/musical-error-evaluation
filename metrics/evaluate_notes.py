@@ -121,13 +121,14 @@ def get_scenarios(relationship_matrix, relationship_point_matrix):
   columns = len(relationship_point_matrix[0])
   #print(f"{rows} rows {columns} columns")
   index_variations = get_index_variations(rows, columns)
-  for index_list in list(index_variations):
+  for index_list in index_variations:
     sum = get_sum_of_scenario(index_list, relationship_point_matrix)
     scenario = get_current_scenario(relationship_matrix, index_list)
     scenario_tuple = tuple(scenario)
     scenarios[scenario_tuple] = sum
-    sorted_scenarios = sort_scenarios(scenarios)
-  return sorted_scenarios
+    # sorted_scenarios = sort_scenarios(scenarios)
+  # return sorted_scenarios
+  return scenarios
 
 def get_index_variations(rows, columns):
   '''
@@ -142,9 +143,19 @@ def get_index_variations(rows, columns):
   extended_indexes = []
   for i in range(rows):
     extended_indexes += indexes
-  index_variations = list(dict.fromkeys(combinations(extended_indexes, rows)))
-  # print(index_variations)
-  return index_variations
+  # index_variations = list(set(combinations(extended_indexes, rows)))
+  index_variations = combinations(extended_indexes, rows)
+  unique_index_variations = remove_duplicate_index_variations(index_variations)
+  return unique_index_variations
+  # return index_variations
+
+def remove_duplicate_index_variations(index_variations):
+	unique = set()
+	for x in index_variations:
+		if x not in unique:
+			yield x
+			unique.add(x)
+	return unique
 
 def get_current_scenario(relationship_matrix, index_list):
   '''
