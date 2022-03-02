@@ -23,9 +23,9 @@ def fill_distance_matrix(source, target):
     for j in range(1, size_of_target):
       current_source = source[i - 1]
       current_target = target [j - 1]
-      #both_are_same_type = current_source.isNote == current_target.isNote or current_source.isRest == current_target.isRest
-      if current_source == current_target:
-      #if current_source == current_target and both_are_same_type:
+      both_are_same_type = current_source.isNote == current_target.isNote or current_source.isRest == current_target.isRest
+      # if current_source == current_target:
+      if current_source == current_target and both_are_same_type:
         substitution_cost = 0
       else:
         substitution_cost = 1
@@ -76,3 +76,42 @@ def get_all_step_permutations(source, target):
     # print(f"{len(allowed_steps_ordered[i])} long permutations: {len(permutation)}")
   
   return step_permutations
+
+def dtw(s, t, window):
+  n, m = len(s), len(t)
+  w = np.max([window, abs(n-m)])
+  dtw_matrix = np.zeros((n+1, m+1))
+  
+  for i in range(n+1):
+      for j in range(m+1):
+          dtw_matrix[i, j] = np.inf
+  dtw_matrix[0, 0] = 0
+  
+  for i in range(1, n+1):
+      for j in range(np.max([1, i-w]), np.min([m, i+w])+1):
+          dtw_matrix[i, j] = 0
+  
+  for i in range(1, n+1):
+      for j in range(np.max([1, i-w]), np.min([m, i+w])+1):
+          # cost = abs(s[i-1] - t[j-1])
+          cost = rhythmic_distance(s[i-1], t[j-1])
+          # take last min from a square box
+          last_min = np.min([dtw_matrix[i-1, j],     # insertion
+                             dtw_matrix[i, j-1],     # deletion
+                             dtw_matrix[i-1, j-1]])  # match
+          dtw_matrix[i, j] = cost + last_min
+  return dtw_matrix
+
+# requires two m21.note.Note objects
+# TODO: Points should consider other rhythmic points as well
+def rhythmic_distance(source, target):
+  both_are_same_type = source.isNote == target.isNote or source.isRest == target.isRest
+  if not both_are_same_type:
+    return 5
+  elif source.quarterLength != target.quarterLength:
+    if source.quarterLength > target.quarterLength:
+      return (source.quarterLength - target.quarterLength) * 1 # TODO: weight
+    else:
+      return (target.quarterLength - source.quarterLength) * 1 # TODO: weight
+  else:
+    return 0
