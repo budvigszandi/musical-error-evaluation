@@ -154,7 +154,6 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix)
         continue
       converted_permutations.append(permutation_as_reltype)
       points.append(get_rhythmic_point(permutation_as_reltype, source, target))
-      print("-------------------")
   
   return converted_permutations, points
 
