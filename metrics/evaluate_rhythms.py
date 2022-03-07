@@ -6,23 +6,51 @@ DELETED_RHYTHM_POINT = -10
 INSERTED_RHYTHM_POINT = -5
 SUBSTITUTED_RHYTHM_POINT = -5
 
+DIFFERENT_TYPE_POINT = 10
+LENGTH_DIFFERENCE_WEIGHT = 1
+
 # TODO: Weigh the points based on
 #       - length of rhythm
 #       - note-rhythm and rhythm-note substitution
 def get_rhythmic_point(step_permutation, source, target):
   # Starting from the maximum possible amount of points
   point = len(source) * CORRECT_RHYTHM_POINT
+  current_source_index = 0
+  current_target_index = 0
   for i in range(len(step_permutation)):
     current_step = step_permutation[i]
+    print("source", current_source_index, "target", current_target_index, "step", current_step)
     if current_step == RhythmRelationshipType.DELETION:
       point += DELETED_RHYTHM_POINT
+      point -= source[current_source_index].quarterLength * LENGTH_DIFFERENCE_WEIGHT
+      if current_source_index < len(source) - 1: current_source_index += 1
     elif current_step == RhythmRelationshipType.INSERTION:
       point += INSERTED_RHYTHM_POINT
+      point -= target[current_target_index].quarterLength * LENGTH_DIFFERENCE_WEIGHT
+      if current_target_index < len(target) - 1: current_target_index += 1
     elif current_step == RhythmRelationshipType.SAME:
+      if current_source_index < len(source) - 1: current_source_index += 1
+      if current_target_index < len(target) - 1: current_target_index += 1
       continue
     elif current_step == RhythmRelationshipType.SUBSTITUTION:
       point += SUBSTITUTED_RHYTHM_POINT
+      point -= abs(get_rhythmic_distance(source[current_source_index], target[current_target_index]))
+      if current_source_index < len(source) - 1: current_source_index += 1
+      if current_target_index < len(target) - 1: current_target_index += 1
   return point
+
+# requires two m21.note.Note objects
+# TODO: Points should consider other rhythmic points as well
+def get_rhythmic_distance(source, target):
+  distance = 0
+  if source.isNote != target.isNote:
+    distance += DIFFERENT_TYPE_POINT
+  if source.quarterLength != target.quarterLength:
+    if source.quarterLength > target.quarterLength:
+      distance += (source.quarterLength - target.quarterLength) * LENGTH_DIFFERENCE_WEIGHT
+    else:
+      distance += (target.quarterLength - source.quarterLength) * LENGTH_DIFFERENCE_WEIGHT
+  return distance
 
 def convert_steps_with_points_levenshtein(step_permutations, source, target):
   all_step_permutations = list(step_permutations)
@@ -84,7 +112,7 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix)
   converted_permutations = []
   points = [] # TODO: This is a separate array because of the weird indexing
               # in the lower for loop 'for j in range(len(steps_of_same_amount)):'
-              # This needs further checking.ú
+              # This needs further checking, maybe conversion to generator object.
 
   for i in range(len(all_step_permutations)):
     steps_of_same_amount = list(all_step_permutations[i])
@@ -102,17 +130,19 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix)
           dtw_matrix_i += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
           permutation_as_reltype.append(RhythmRelationshipType.INSERTION)
-          current_source_index += 1
+          current_target_index += 1
         elif current_step == "R":
           dtw_matrix_j += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
           permutation_as_reltype.append(RhythmRelationshipType.DELETION)
-          current_target_index += 1
+          current_source_index += 1
         elif current_step == "D":
           dtw_matrix_i += 1
           dtw_matrix_j += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
-          if source[current_source_index] == target[current_target_index]:
+          rhythms_are_equal = source[current_source_index].quarterLength == target[current_target_index].quarterLength
+          types_are_the_same = source[current_source_index].isNote == target[current_target_index].isNote
+          if rhythms_are_equal and types_are_the_same:
             permutation_as_reltype.append(RhythmRelationshipType.SAME)
           else:
             permutation_as_reltype.append(RhythmRelationshipType.SUBSTITUTION)
@@ -124,6 +154,7 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix)
         continue
       converted_permutations.append(permutation_as_reltype)
       points.append(get_rhythmic_point(permutation_as_reltype, source, target))
+      print("-------------------")
   
   return converted_permutations, points
 

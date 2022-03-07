@@ -1,5 +1,6 @@
 import numpy as np
 from itertools import permutations
+from metrics.evaluate_rhythms import get_rhythmic_distance
 
 # TODO: Documenting comments
 # TODO: Correct the +1s in size_of_source and size_of_target in functions
@@ -94,24 +95,10 @@ def dtw(s, t, window):
   for i in range(1, n+1):
       for j in range(np.max([1, i-w]), np.min([m, i+w])+1):
           # cost = abs(s[i-1] - t[j-1])
-          cost = rhythmic_distance(s[i-1], t[j-1])
+          cost = abs(get_rhythmic_distance(s[i-1], t[j-1]))
           # take last min from a square box
           last_min = np.min([dtw_matrix[i-1, j],     # insertion
                              dtw_matrix[i, j-1],     # deletion
                              dtw_matrix[i-1, j-1]])  # match
           dtw_matrix[i, j] = cost + last_min
   return dtw_matrix
-
-# requires two m21.note.Note objects
-# TODO: Points should consider other rhythmic points as well
-def rhythmic_distance(source, target):
-  both_are_same_type = source.isNote == target.isNote or source.isRest == target.isRest
-  if not both_are_same_type:
-    return 5
-  elif source.quarterLength != target.quarterLength:
-    if source.quarterLength > target.quarterLength:
-      return (source.quarterLength - target.quarterLength) * 1 # TODO: weight
-    else:
-      return (target.quarterLength - source.quarterLength) * 1 # TODO: weight
-  else:
-    return 0
