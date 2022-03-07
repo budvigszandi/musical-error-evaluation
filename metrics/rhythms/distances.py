@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import permutations
-from metrics.evaluate_rhythms import get_rhythmic_distance
+from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 
 # TODO: Documenting comments
 # TODO: Correct the +1s in size_of_source and size_of_target in functions

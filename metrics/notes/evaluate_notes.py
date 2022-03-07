@@ -1,6 +1,6 @@
-import metrics.harmonics as harmonics
-from metrics.note_relationship_type import NoteRelationshipType
-from metrics.note_relationship import NoteRelationship
+import metrics.notes.harmonics as harmonics
+from metrics.notes.note_relationship_type import NoteRelationshipType
+from metrics.notes.note_relationship import NoteRelationship
 from itertools import combinations
 from collections import Counter
 

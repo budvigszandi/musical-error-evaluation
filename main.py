@@ -1,9 +1,9 @@
 import music21 as m21
-from metrics.evaluate_notes import *
+from metrics.notes.evaluate_notes import *
 from visualizer.draw_harmonic_results import *
-from metrics.distances import *
+from metrics.rhythms.distances import *
 from visualizer.draw_rhythmic_results import *
-from metrics.evaluate_rhythms import *
+from metrics.rhythms.evaluate_rhythms import *
 
 # ------------------------------
 # Expected and given note arrays

@@ -1,4 +1,4 @@
-from metrics.rhythm_relationship_type import RhythmRelationshipType
+from metrics.rhythms.rhythm_relationship_type import RhythmRelationshipType
 import numpy as np
 
 CORRECT_RHYTHM_POINT = 10

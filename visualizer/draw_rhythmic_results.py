@@ -1,4 +1,4 @@
-from metrics.rhythm_relationship_type import RhythmRelationshipType
+from metrics.rhythms.rhythm_relationship_type import RhythmRelationshipType
 from visualizer.background_colors import *
 from visualizer.rhythm_difference_string import *
 
