@@ -95,6 +95,7 @@ def dtw(s, t, window):
   for i in range(1, n + 1):
     for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
       # cost = abs(s[i - 1] - t[j - 1])
+      # TODO: Use different costs when evaluating rhythms vs harmonic parts
       cost = abs(get_rhythmic_distance(s[i - 1], t[j - 1]))
       # take last min from a square box
       last_min = np.min([dtw_matrix[i - 1, j],       # insertion
