@@ -1,4 +1,4 @@
-from metrics.rhythms.rhythm_relationship_type import DistanceType
+from metrics.distances.distance_type import DistanceType
 from visualizer.background_colors import *
 from visualizer.rhythm_difference_string import *
 

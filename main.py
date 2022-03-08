@@ -1,9 +1,10 @@
 import music21 as m21
 from metrics.notes.evaluate_notes import *
 from visualizer.draw_harmonic_results import *
-from metrics.rhythms.distances import *
+from metrics.distances.distances import *
 from visualizer.draw_rhythmic_results import *
 from metrics.rhythms.evaluate_rhythms import *
+from input.midi_reader import *
 
 # ------------------------------
 # Expected and given note arrays
@@ -142,3 +143,25 @@ print(dtw_matrix)
 # print("Levenshtein permutations:", len(converted_permutations_lev))
 # print("DTW permutations:", len(converted_permutations_dtw))
 # print(f"DTW permutations / Levenshtein permutations: {((len(converted_permutations_dtw) / len(converted_permutations_lev)) * 100):.2f} %")
+
+# ---------------------------
+# Expected and given melodies
+# ---------------------------
+
+# score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
+# simplified_data = get_simplified_data_from_score(score)
+
+# score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
+# simplified_data_multinote = get_simplified_data_from_score(score_multinote)
+
+# expected_melody = []
+# given_melody    = []
+
+# print(simplified_data)
+# print(simplified_data_multinote)
+# dtw_matrix = dtw(simplified_data, simplified_data_multinote, 3)
+# print(dtw_matrix)
+
+# -----------------
+# Melody evaluation
+# -----------------
