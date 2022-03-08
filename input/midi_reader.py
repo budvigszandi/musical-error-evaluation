@@ -4,6 +4,7 @@ def get_score_from_midi(file_path):
   # TODO: Exception when file doesn't exist
   return m21.converter.parse(file_path)
 
+# TODO: consider m21.stream.Voice object (when one note is longer from the harmony)
 def get_simplified_data_from_score(score):
   simplified_data = []
   number_of_parts = len(score.parts)

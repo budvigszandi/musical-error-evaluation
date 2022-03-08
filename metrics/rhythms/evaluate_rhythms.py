@@ -1,5 +1,4 @@
 from metrics.distances.distance_type import DistanceType
-import numpy as np
 
 CORRECT_RHYTHM_POINT = 10
 DELETED_RHYTHM_POINT = -10

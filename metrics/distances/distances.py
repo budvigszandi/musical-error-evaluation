@@ -2,6 +2,7 @@ import numpy as np
 from itertools import permutations
 from metrics.rhythms.evaluate_rhythms import *
 from metrics.distances.distance_type import *
+from metrics.harmonic_parts.evaluate_harmonic_parts import get_harmonic_part_distance
 
 # TODO: Documenting comments
 # TODO: Correct the +1s in size_of_source and size_of_target in functions
@@ -9,7 +10,7 @@ from metrics.distances.distance_type import *
 def get_levenshtein_distance(source, target):
   size_of_source = len(source) + 1
   size_of_target = len(target) + 1
-  distance_matrix = fill_distance_matrix(source, target)
+  distance_matrix = fill_levenshtein_distance_matrix(source, target)
   # Just testing output here
   print(distance_matrix)
   print("Levenshtein distance:", distance_matrix[size_of_source - 1][size_of_target - 1])
@@ -17,10 +18,10 @@ def get_levenshtein_distance(source, target):
   return distance_matrix[size_of_source - 1][size_of_target - 1]
 
 # len(source) number of rows, len(target) number of columns
-def fill_distance_matrix(source, target):
+def fill_levenshtein_distance_matrix(source, target):
   size_of_source = len(source) + 1
   size_of_target = len(target) + 1
-  distance_matrix = initiate_distance_matrix(size_of_source, size_of_target)
+  distance_matrix = initiate_levenshtein_distance_matrix(size_of_source, size_of_target)
   for i in range(1, size_of_source):
     for j in range(1, size_of_target):
       current_source = source[i - 1]
@@ -36,13 +37,40 @@ def fill_distance_matrix(source, target):
                                   distance_matrix[i - 1, j - 1] + substitution_cost)  # substitution
   return distance_matrix
 
-def initiate_distance_matrix(size_of_source, size_of_target):
+def initiate_levenshtein_distance_matrix(size_of_source, size_of_target):
   distance_matrix = np.zeros((size_of_source, size_of_target))
   for i in range(size_of_source):
     distance_matrix[i, 0] = i
   for j in range(size_of_target):
     distance_matrix[0, j] = j
   return distance_matrix
+
+def dtw(s, t, window, harmonic_parts = False):
+  n, m = len(s), len(t)
+  w = np.max([window, abs(n - m)])
+  dtw_matrix = np.zeros((n + 1, m + 1))
+  
+  for i in range(n + 1):
+    for j in range(m + 1):
+      dtw_matrix[i, j] = np.inf
+  dtw_matrix[0, 0] = 0
+  
+  for i in range(1, n + 1):
+    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
+      dtw_matrix[i, j] = 0
+  
+  for i in range(1, n + 1):
+    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
+      if harmonic_parts:
+        cost = abs(get_harmonic_part_distance(s[i - 1], t[j - 1]))
+      else: 
+        cost = abs(get_rhythmic_distance(s[i - 1], t[j - 1]))
+      # take last min from a square box
+      last_min = np.min([dtw_matrix[i - 1, j],       # insertion
+                         dtw_matrix[i, j - 1],       # deletion
+                         dtw_matrix[i - 1, j - 1]])  # match
+      dtw_matrix[i, j] = cost + last_min
+  return dtw_matrix
 
 def get_all_step_permutations(source, target):
   number_of_rows = len(source)
@@ -78,32 +106,6 @@ def get_all_step_permutations(source, target):
     # print(f"{len(allowed_steps_ordered[i])} long permutations: {len(permutation)}")
   
   return step_permutations
-
-def dtw(s, t, window):
-  n, m = len(s), len(t)
-  w = np.max([window, abs(n - m)])
-  dtw_matrix = np.zeros((n + 1, m + 1))
-  
-  for i in range(n + 1):
-    for j in range(m + 1):
-      dtw_matrix[i, j] = np.inf
-  dtw_matrix[0, 0] = 0
-  
-  for i in range(1, n + 1):
-    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
-      dtw_matrix[i, j] = 0
-  
-  for i in range(1, n + 1):
-    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
-      # cost = abs(s[i - 1] - t[j - 1])
-      # TODO: Use different costs when evaluating rhythms vs harmonic parts
-      cost = abs(get_rhythmic_distance(s[i - 1], t[j - 1]))
-      # take last min from a square box
-      last_min = np.min([dtw_matrix[i - 1, j],       # insertion
-                         dtw_matrix[i, j - 1],       # deletion
-                         dtw_matrix[i - 1, j - 1]])  # match
-      dtw_matrix[i, j] = cost + last_min
-  return dtw_matrix
 
 def convert_steps_with_points_levenshtein(step_permutations, source, target):
   all_step_permutations = list(step_permutations)
