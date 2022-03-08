@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-class RhythmRelationshipType(Enum):
+class DistanceType(Enum):
   SAME = auto()
   DELETION = auto()
   INSERTION = auto()

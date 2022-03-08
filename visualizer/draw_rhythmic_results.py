@@ -1,4 +1,4 @@
-from metrics.rhythms.rhythm_relationship_type import RhythmRelationshipType
+from metrics.rhythms.rhythm_relationship_type import DistanceType
 from visualizer.background_colors import *
 from visualizer.rhythm_difference_string import *
 
@@ -65,19 +65,19 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
     # current_target = target[current_target_index]
     current_source = get_current_element_string(source, current_source_index)
     current_target = get_current_element_string(target, current_target_index)
-    if current_step == RhythmRelationshipType.DELETION:
+    if current_step == DistanceType.DELETION:
       # print("deletion", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.DELETION)
       compared_target_string.add_to_back(" " * len(current_source), backgroundColors.DELETION)
       if current_source_index < len(source) - 1:
         current_source_index += 1
-    elif current_step == RhythmRelationshipType.INSERTION:
+    elif current_step == DistanceType.INSERTION:
       # print("insertion", current_source, current_target)
       compared_source_string.add_to_back(" " * len(current_target), backgroundColors.INSERTION)
       compared_target_string.add_to_back(current_target, backgroundColors.INSERTION)
       if current_target_index < len(target) - 1:
         current_target_index += 1
-    elif current_step == RhythmRelationshipType.SAME:
+    elif current_step == DistanceType.SAME:
       # print("same", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.SAME)
       compared_target_string.add_to_back(current_target, backgroundColors.SAME)
@@ -85,7 +85,7 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
         current_source_index += 1
       if current_target_index < len(target) - 1:
         current_target_index += 1
-    elif current_step == RhythmRelationshipType.SUBSTITUTION:
+    elif current_step == DistanceType.SUBSTITUTION:
       # print("substitution", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.SUBSTITUTION)
       compared_target_string.add_to_back(current_target, backgroundColors.SUBSTITUTION)
