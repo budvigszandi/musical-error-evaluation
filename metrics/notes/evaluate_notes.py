@@ -1,6 +1,7 @@
 import metrics.notes.harmonics as harmonics
 from metrics.notes.note_relationship_type import NoteRelationshipType
 from metrics.notes.note_relationship import NoteRelationship
+from metrics.notes.note_points import NotePoints
 from itertools import combinations
 from collections import Counter
 
@@ -9,19 +10,6 @@ from collections import Counter
 # TODO: Declaring a maximum point (perfect match * number of expected notes) and
 #       making statistics with the gotten points
 # TODO: Can the points be the values of the relationship enumerator class?
-
-PERFECT_MATCH_POINT = 20 # Harmonics would be worth more if this were less than 17!
-CENT_DIFFERENCE_POINT = 17
-HARMONIC_POINT = 1
-UNRELATED_POINT = 0
-COVERED_NOTE_POINT = 1
-DUPLICATE_COVER_POINT = 1
-
-RELATIONSHIP_POINT_WEIGHT = 1
-COVERED_NOTE_POINT_WEIGHT = 1
-DUPLICATE_POINT_WEIGHT = 1
-
-MAXIMUM_HARMONIC_NUMBER = 17
 
 def get_relationship_matrix(expected_notes, given_notes):
   '''
@@ -95,13 +83,13 @@ def get_current_point(relationship_type, harmonic_number = -1):
                                 the harmonic number as well
   '''
   if relationship_type == NoteRelationshipType.PERFECT_MATCH: # Perfect match
-    return PERFECT_MATCH_POINT
+    return NotePoints.PERFECT_MATCH_POINT
   elif relationship_type == NoteRelationshipType.CENT_DIFFERENCE: # Cent difference
-    return CENT_DIFFERENCE_POINT
+    return NotePoints.CENT_DIFFERENCE_POINT
   elif relationship_type == NoteRelationshipType.HARMONIC: # Harmonic
-    return (MAXIMUM_HARMONIC_NUMBER - harmonic_number) * HARMONIC_POINT
+    return (NotePoints.MAXIMUM_HARMONIC_NUMBER - harmonic_number) * NotePoints.HARMONIC_POINT
   elif relationship_type == NoteRelationshipType.UNRELATED: # Unrelated
-    return UNRELATED_POINT
+    return NotePoints.UNRELATED_POINT
 
 def get_scenarios(relationship_matrix, relationship_point_matrix):
   '''
@@ -245,11 +233,11 @@ def get_sum_of_scenario(index_list, relationship_point_matrix):
   sum = 0
   for i in range(len(index_list)):
     sum += relationship_point_matrix[i][index_list[i]]
-  sum *= RELATIONSHIP_POINT_WEIGHT
+  sum *= NotePoints.RELATIONSHIP_POINT_WEIGHT
   covered_notes_count = get_covered_notes_count(index_list)
-  sum += covered_notes_count * COVERED_NOTE_POINT_WEIGHT
+  sum += covered_notes_count * NotePoints.COVERED_NOTE_POINT_WEIGHT
   duplicate_covers_count = get_duplicated_count(index_list)
-  sum -= duplicate_covers_count * DUPLICATE_POINT_WEIGHT
+  sum -= duplicate_covers_count * NotePoints.DUPLICATE_POINT_WEIGHT
   return sum
 
 def get_covered_notes_count(index_list):
@@ -262,7 +250,7 @@ def get_covered_notes_count(index_list):
                 has to contain as many numbers as there are rows in the matrix,
                 and the indexes have to be >= 0 and < number of columns.
   '''
-  return len(Counter(index_list).keys()) * COVERED_NOTE_POINT
+  return len(Counter(index_list).keys()) * NotePoints.COVERED_NOTE_POINT
 
 def get_duplicated_count(index_list):
   '''
@@ -277,7 +265,7 @@ def get_duplicated_count(index_list):
   '''
   frequency_of_notes = Counter(index_list).values()
   number_of_duplicates_list = [i - 1 for i in frequency_of_notes]
-  return sum(number_of_duplicates_list) * DUPLICATE_COVER_POINT
+  return sum(number_of_duplicates_list) * NotePoints.DUPLICATE_COVER_POINT
 
 # TODO: Return all the best ones?
 def get_best_scenario(scenarios):
