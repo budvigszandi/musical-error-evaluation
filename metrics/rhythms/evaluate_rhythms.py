@@ -1,9 +1,6 @@
 from metrics.distances.distance_type import DistanceType
 from metrics.rhythms.rhythm_points import RhythmPoints
 
-# TODO: Weigh the points based on
-#       - length of rhythm
-#       - note-rhythm and rhythm-note substitution
 def get_rhythmic_point(step_permutation, source, target):
   # Starting from the maximum possible amount of points
   point = len(source) * RhythmPoints.CORRECT_RHYTHM_POINT
@@ -33,9 +30,10 @@ def get_rhythmic_point(step_permutation, source, target):
 
 # requires two m21.note.Note objects
 # TODO: Points should consider other rhythmic points as well
+# TODO: Consider m21.stream.Voice behaviour
 def get_rhythmic_distance(source, target):
   distance = 0
-  if source.isNote != target.isNote:
+  if source.isNote != target.isNote and source.isChord != target.isChord and source.isRest != target.isRest:
     distance += RhythmPoints.DIFFERENT_TYPE_POINT
   if source.quarterLength != target.quarterLength:
     if source.quarterLength > target.quarterLength:

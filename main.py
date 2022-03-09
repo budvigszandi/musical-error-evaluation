@@ -1,10 +1,11 @@
 import music21 as m21
 from metrics.notes.evaluate_notes import *
-from visualizer.draw_harmonic_results import *
+from visualizer.draw_note_results import *
 from metrics.distances.distances import *
 from visualizer.draw_rhythmic_results import *
 from metrics.rhythms.evaluate_rhythms import *
 from input.midi_reader import *
+from visualizer.draw_harmonic_part_results import *
 
 # ------------------------------
 # Expected and given note arrays
@@ -30,6 +31,9 @@ given_notes = [m21.pitch.Pitch('d-3'), m21.pitch.Pitch('d1'),  m21.pitch.Pitch('
 
 # expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
 # given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('c5'), m21.pitch.Pitch('c5')]
+
+# expected_notes = [m21.pitch.Pitch('c4')]
+# given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
 
 # -----------------
 # Getting scenarios
@@ -109,32 +113,32 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # --------------------
 # Dynamic time warping
 # --------------------
-source = expected_rhythm
-target = given_rhythm
+# source = expected_rhythm
+# target = given_rhythm
 
-dtw_matrix = dtw(expected_rhythm, given_rhythm, 3)
+# dtw_matrix = dtw(expected_rhythm, given_rhythm, 3)
 
-all_step_permutations = get_all_step_permutations(source, target)
-# print(all_step_permutations)
-converted_permutations_dtw, points = convert_steps_with_points_dtw(all_step_permutations, source, target, dtw_matrix)
-# print(len(permutations_as_reltypes), permutations_as_reltypes)
+# all_step_permutations = get_all_step_permutations(source, target)
+# # print(all_step_permutations)
+# converted_permutations_dtw, points = convert_steps_with_points_dtw(all_step_permutations, source, target, dtw_matrix)
+# # print(len(permutations_as_reltypes), permutations_as_reltypes)
 
-print("All permutations:")
-for i in range(len(converted_permutations_dtw)):
-  print(i + 1)
-  draw_rhythmic_differences_from_steps(source, target, converted_permutations_dtw[i])
-  print("Point:", points[i])
-  print()
+# print("All permutations:")
+# for i in range(len(converted_permutations_dtw)):
+#   print(i + 1)
+#   draw_rhythmic_differences_from_steps(source, target, converted_permutations_dtw[i])
+#   print("Point:", points[i])
+#   print()
 
-best_permutation_indices = get_best_permutation_indices(points)
+# best_permutation_indices = get_best_permutation_indices(points)
 
-print("Best permutation(s):\n")
-for index in best_permutation_indices:
-  draw_rhythmic_differences_from_steps(source, target, converted_permutations_dtw[index])
-  print("Point:", points[index])
-  print()
+# print("Best permutation(s):\n")
+# for index in best_permutation_indices:
+#   draw_rhythmic_differences_from_steps(source, target, converted_permutations_dtw[index])
+#   print("Point:", points[index])
+#   print()
 
-print(dtw_matrix)
+# print(dtw_matrix)
 
 # ----------------------------
 # DTW - Levenshtein statistics
@@ -148,20 +152,43 @@ print(dtw_matrix)
 # Expected and given melodies
 # ---------------------------
 
-# score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
-# simplified_data = get_simplified_data_from_score(score)
+score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
+simplified_data = get_simplified_data_from_score(score)
 
-# score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
-# simplified_data_multinote = get_simplified_data_from_score(score_multinote)
+score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
+simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
-# expected_melody = []
-# given_melody    = []
-
-# print(simplified_data)
-# print(simplified_data_multinote)
-# dtw_matrix = dtw(simplified_data, simplified_data_multinote, 3)
-# print(dtw_matrix)
+expected_harmonic_part = simplified_data
+given_harmonic_part    = simplified_data_multinote
 
 # -----------------
 # Melody evaluation
 # -----------------
+
+print(simplified_data)
+print(simplified_data_multinote)
+dtw_matrix = dtw(simplified_data, simplified_data_multinote, 3, True)
+print(dtw_matrix)
+
+all_step_permutations = get_all_step_permutations(expected_harmonic_part, given_harmonic_part)
+print("Got all step permutations")
+converted_permutations_dtw, points = convert_steps_with_points_dtw(all_step_permutations, expected_harmonic_part, given_harmonic_part, dtw_matrix, True)
+print("Converted steps, got points")
+
+# print("All permutations:")
+# for i in range(len(converted_permutations_dtw)):
+#   print(i + 1)
+#   draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[i])
+#   print("Point:", points[i])
+#   print()
+
+best_permutation_indices = get_best_permutation_indices(points)
+print("Got best permutation indices")
+
+print("Best permutation(s):\n")
+for index in best_permutation_indices:
+  draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[index])
+  print("Point:", points[index])
+  print()
+
+print(dtw_matrix)

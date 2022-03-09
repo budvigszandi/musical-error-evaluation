@@ -2,7 +2,7 @@ import numpy as np
 from itertools import permutations
 from metrics.rhythms.evaluate_rhythms import *
 from metrics.distances.distance_type import *
-from metrics.harmonic_parts.evaluate_harmonic_parts import get_harmonic_part_distance
+from metrics.harmonic_parts.evaluate_harmonic_parts import get_harmonic_part_distance, get_harmonic_part_point
 
 # TODO: Documenting comments
 # TODO: Correct the +1s in size_of_source and size_of_target in functions
@@ -63,7 +63,7 @@ def dtw(s, t, window, harmonic_parts = False):
     for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
       if harmonic_parts:
         cost = abs(get_harmonic_part_distance(s[i - 1], t[j - 1]))
-      else: 
+      else:
         cost = abs(get_rhythmic_distance(s[i - 1], t[j - 1]))
       # take last min from a square box
       last_min = np.min([dtw_matrix[i - 1, j],       # insertion
@@ -160,7 +160,7 @@ def convert_steps_with_points_levenshtein(step_permutations, source, target):
   
   return converted_permutations, points
 
-def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix):
+def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False):
   all_step_permutations = list(step_permutations)
   steps_of_same_amount = list(all_step_permutations[0])
 
@@ -208,7 +208,10 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix)
       if contains_infinity:
         continue
       converted_permutations.append(permutation_as_reltype)
-      points.append(get_rhythmic_point(permutation_as_reltype, source, target))
+      if harmonic_parts:
+        points.append(get_harmonic_part_point(permutation_as_reltype, source, target))
+      else:
+        points.append(get_rhythmic_point(permutation_as_reltype, source, target))
   
   return converted_permutations, points
 
