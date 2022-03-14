@@ -152,10 +152,10 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
+score = get_score_from_midi("../midi/sna-short-onenote.mid")
 simplified_data = get_simplified_data_from_score(score)
 
-score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
+score_multinote = get_score_from_midi("../midi/sna-short-multinote.mid")
 simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
 expected_harmonic_part = simplified_data
@@ -172,15 +172,15 @@ print(dtw_matrix)
 
 all_step_permutations = get_all_step_permutations(expected_harmonic_part, given_harmonic_part)
 print("Got all step permutations")
-converted_permutations_dtw, points = convert_steps_with_points_dtw(all_step_permutations, expected_harmonic_part, given_harmonic_part, dtw_matrix, True)
+converted_permutations_dtw, points, note_evaluations = convert_steps_with_points_dtw(all_step_permutations, expected_harmonic_part, given_harmonic_part, dtw_matrix, True)
 print("Converted steps, got points")
 
-# print("All permutations:")
-# for i in range(len(converted_permutations_dtw)):
-#   print(i + 1)
-#   draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[i])
-#   print("Point:", points[i])
-#   print()
+print("All permutations:")
+for i in range(len(converted_permutations_dtw)):
+  print(i + 1)
+  draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[i])
+  print("Point:", points[i])
+  print()
 
 best_permutation_indices = get_best_permutation_indices(points)
 print("Got best permutation indices")

@@ -1,8 +1,8 @@
 import numpy as np
-from itertools import permutations
+from more_itertools import distinct_permutations
 from metrics.rhythms.evaluate_rhythms import *
 from metrics.distances.distance_type import *
-from metrics.harmonic_parts.evaluate_harmonic_parts import get_harmonic_part_distance, get_harmonic_part_point
+from metrics.harmonic_parts.evaluate_harmonic_parts import *
 
 # TODO: Documenting comments
 # TODO: Correct the +1s in size_of_source and size_of_target in functions
@@ -98,10 +98,9 @@ def get_all_step_permutations(source, target):
       allowed_steps.append("D") # diagonal (go diagonally down)
     allowed_steps_ordered.append(allowed_steps)
 
-  # print(allowed_step_variations)
   step_permutations = []
   for i in range(len(allowed_steps_ordered)):
-    permutation = set(list(permutations(allowed_steps_ordered[i])))
+    permutation = distinct_permutations(allowed_steps_ordered[i])
     step_permutations.append(permutation)
     # print(f"{len(allowed_steps_ordered[i])} long permutations: {len(permutation)}")
   
@@ -168,6 +167,7 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
   points = [] # TODO: This is a separate array because of the weird indexing
               # in the lower for loop 'for j in range(len(steps_of_same_amount)):'
               # This needs further checking, maybe conversion to generator object.
+  note_evaluations = []
 
   for i in range(len(all_step_permutations)):
     steps_of_same_amount = list(all_step_permutations[i])
@@ -210,10 +210,20 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
       converted_permutations.append(permutation_as_reltype)
       if harmonic_parts:
         points.append(get_harmonic_part_point(permutation_as_reltype, source, target))
+        current_source = source[current_source_index - 1]
+        current_target = target[current_target_index - 1]
+        if current_source.isRest or current_target.isRest:
+          note_evaluations.append(None)
+        else:
+          note_evaluation = get_best_note_evaluation(current_source, current_target, True, False)
+          note_evaluations.append(note_evaluation)
       else:
         points.append(get_rhythmic_point(permutation_as_reltype, source, target))
   
-  return converted_permutations, points
+  if not harmonic_parts:
+    return converted_permutations, points
+  else:
+    return converted_permutations, points, note_evaluations
 
 def is_infinity(element):
   return element == np.inf
