@@ -175,19 +175,19 @@ print("Got all step permutations")
 converted_permutations_dtw, points, note_evaluations = convert_steps_with_points_dtw(all_step_permutations, expected_harmonic_part, given_harmonic_part, dtw_matrix, True)
 print("Converted steps, got points")
 
-print("All permutations:")
-for i in range(len(converted_permutations_dtw)):
-  print(i + 1)
-  draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[i])
-  print("Point:", points[i])
-  print()
+# print("All permutations:")
+# for i in range(len(converted_permutations_dtw)):
+#   print(i + 1)
+#   draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[i], note_evaluations[i])
+#   print("Point:", points[i])
+#   print()
 
 best_permutation_indices = get_best_permutation_indices(points)
 print("Got best permutation indices")
 
 print("Best permutation(s):\n")
 for index in best_permutation_indices:
-  draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[index])
+  draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[index], note_evaluations[index])
   print("Point:", points[index])
   print()
 
