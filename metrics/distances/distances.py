@@ -196,20 +196,27 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
         elif current_step == "D":
           dtw_matrix_i += 1
           dtw_matrix_j += 1
+          current_source = source[current_source_index]
+          current_target = target[current_target_index]
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
-          rhythms_are_equal = source[current_source_index].quarterLength == target[current_target_index].quarterLength
-          types_are_the_same = source[current_source_index].isNote == target[current_target_index].isNote
-          if rhythms_are_equal and types_are_the_same:
-            permutation_as_reltype.append(DistanceType.SAME)
-            current_note_eval.append(None)
-          else:
-            permutation_as_reltype.append(DistanceType.SUBSTITUTION)
-            current_source = source[current_source_index]
-            current_target = target[current_target_index]
-            if current_source.isRest or current_target.isRest:
+          rhythms_are_equal = current_source.quarterLength == current_target.quarterLength
+          types_are_the_same = (current_source.isNote == current_target.isNote) and (current_source.isChord == current_target.isChord)
+          
+          if harmonic_parts:
+            if current_source == current_target:
+              permutation_as_reltype.append(DistanceType.SAME)
               current_note_eval.append(None)
             else:
-              current_note_eval.append(get_best_note_evaluation(current_source, current_target, True, False))
+              permutation_as_reltype.append(DistanceType.SUBSTITUTION)
+              if current_source.isRest or current_target.isRest:
+                current_note_eval.append(None)
+              else:
+                current_note_eval.append(get_best_note_evaluation(current_source, current_target, True, False))
+          elif rhythms_are_equal and types_are_the_same:
+            permutation_as_reltype.append(DistanceType.SAME)
+          else:
+            permutation_as_reltype.append(DistanceType.SUBSTITUTION)
+
           current_source_index += 1
           current_target_index += 1
         if contains_infinity:

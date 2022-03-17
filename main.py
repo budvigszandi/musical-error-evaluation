@@ -152,11 +152,15 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/sna-short-onenote.mid")
+score = get_score_from_midi("../midi/rhythm-expected.mid")
 simplified_data = get_simplified_data_from_score(score)
-
-score_multinote = get_score_from_midi("../midi/sna-short-multinote.mid")
+score_multinote = get_score_from_midi("../midi/rhythm-given.mid")
 simplified_data_multinote = get_simplified_data_from_score(score_multinote)
+
+# score = get_score_from_midi("../midi/sna-short-onenote.mid")
+# simplified_data = get_simplified_data_from_score(score)
+# score_multinote = get_score_from_midi("../midi/sna-short-multinote.mid")
+# simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
 expected_harmonic_part = simplified_data
 given_harmonic_part    = simplified_data_multinote
