@@ -160,8 +160,8 @@ def convert_steps_with_points_levenshtein(step_permutations, source, target):
   return converted_permutations, points
 
 def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False):
-  all_step_permutations = list(step_permutations)
-  steps_of_same_amount = list(all_step_permutations[0])
+  all_step_permutations = step_permutations
+  steps_of_same_amount = all_step_permutations[0]
 
   converted_permutations = []
   points = [] # TODO: This is a separate array because of the weird indexing
@@ -169,19 +169,19 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
               # This needs further checking, maybe conversion to generator object.
   note_evaluations = []
 
-  for i in range(len(all_step_permutations)):
-    steps_of_same_amount = list(all_step_permutations[i])
-    for j in range(len(steps_of_same_amount)):
+  for i in all_step_permutations:
+    steps_of_same_amount = i
+    for j in steps_of_same_amount:
       contains_infinity = False
-      current_permutation = steps_of_same_amount[j]
+      current_permutation = j
       current_source_index = 0
       current_target_index = 0
       dtw_matrix_i = 0
       dtw_matrix_j = 0
       permutation_as_reltype = []
       current_note_eval = []
-      for k in range(len(current_permutation)):
-        current_step = current_permutation[k]
+      for k in current_permutation:
+        current_step = k
         if current_step == "L":
           dtw_matrix_i += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
