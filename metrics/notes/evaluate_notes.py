@@ -2,7 +2,7 @@ import metrics.notes.harmonics as harmonics
 from metrics.notes.note_relationship_type import NoteRelationshipType
 from metrics.notes.note_relationship import NoteRelationship
 from metrics.notes.note_points import NotePoints
-from itertools import combinations
+from metrics.combinations import *
 from collections import Counter
 
 # TODO: When there is a chance of a harmonic, it should be only up until the 16th harmonic
@@ -117,89 +117,6 @@ def get_scenarios(relationship_matrix, relationship_point_matrix):
     # sorted_scenarios = sort_scenarios(scenarios)
   # return sorted_scenarios
   return scenarios
-
-def get_index_variations(rows, columns):
-  '''
-  Returns a list of all the index combinations we can get from an (n x m) matrix
-  if we want to get exactly one value from every row.
-
-  Args:
-    rows: an integer (>=0) number of rows
-    columns: an integer (>=0) number of columns
-  '''
-  # -------- itertools.combinations approach --------
-  # indexes = list(range(columns))
-  # extended_indexes = []
-  # for i in range(rows):
-  #   extended_indexes += indexes
-  # # index_variations = list(set(combinations(extended_indexes, rows)))
-  # index_variations = combinations(extended_indexes, rows)
-  # unique_index_variations = remove_duplicate_index_variations(index_variations)
-  # return unique_index_variations
-  # return index_variations
-  # -------------------------------------------------
-
-  # -------- multivector approach --------
-  arr = [[] for i in range(rows)]
-  for i in range(rows):
-    for j in range(columns):
-      arr[i].append(j)
-  # print("starting indices", arr)
-  index_variations = build_index_variations(arr)
-  return index_variations
-  # --------------------------------------
-
-def build_index_variations(arr):
-  # -------- multivector approach --------
-  index_variations = []
-  # number of arrays
-  n = len(arr)
-
-  # to keep track of next element
-  # in each of the n arrays
-  indices = [0 for i in range(n)]
-
-  while (1):
-
-    # print current combination
-    current_combination = []
-    for i in range(n):
-      # print(arr[i][indices[i]], end = " ")
-      current_combination.append(arr[i][indices[i]])
-    index_variations.append(current_combination)
-    # print()
-
-    # find the rightmost array that has more
-    # elements left after the current element
-    # in that array
-    next = n - 1
-    while (next >= 0 and
-      (indices[next] + 1 >= len(arr[next]))):
-      next-=1
-
-    # no such array is found so no more
-    # combinations left
-    if (next < 0):
-      return index_variations
-
-    # if found move to next element in that
-    # array
-    indices[next] += 1
-
-    # for all arrays to the right of this
-    # array current index again points to
-    # first element
-    for i in range(next + 1, n):
-      indices[i] = 0
-  # --------------------------------------
-
-def remove_duplicate_index_variations(index_variations):
-	unique = set()
-	for x in index_variations:
-		if x not in unique:
-			yield x
-			unique.add(x)
-	return unique
 
 def get_current_scenario(relationship_matrix, index_list):
   '''
