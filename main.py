@@ -169,6 +169,8 @@ given_harmonic_part    = simplified_data_multinote
 # Melody evaluation
 # -----------------
 
+put_sheet_in_output_folder(score)
+
 print(simplified_data)
 print(simplified_data_multinote)
 dtw_matrix = dtw(simplified_data, simplified_data_multinote, 3, True)

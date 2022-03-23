@@ -1,4 +1,6 @@
 import music21 as m21
+import shutil
+from datetime import datetime
 
 def get_score_from_midi(file_path):
   # TODO: Exception when file doesn't exist
@@ -21,4 +23,14 @@ def get_simplified_data_from_score(score):
         except AttributeError as error:
           pass
   return simplified_data
-  
+
+def put_sheet_in_output_folder(score, given=False):
+  filename = score.write('musicxml.png')
+  now = datetime.now()
+  formatted_time = now.strftime("%Y-%d-%m-%H-%M-%S")
+  expected_filename = f"visualizer/output/expected-{formatted_time}.png"
+  given_filename = f"visualizer/output/given-{formatted_time}.png"
+  if not given:
+    shutil.copy(filename, expected_filename)
+  else:
+    shutil.copy(filename, given_filename)

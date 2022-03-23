@@ -1,4 +1,5 @@
 import music21 as m21
+from input.midi_reader import put_sheet_in_output_folder
 from metrics.distances.distance_type import DistanceType
 from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 from visualizer.harmonic_part_colors import HarmonicPartColors
@@ -208,7 +209,8 @@ def draw_sheet_music(notation_string):
   tnc.bracketStateMapping['chord'] = ChordState
   tnc.load(notation_string)
   tnc.parse()
-  tnc.stream.show("musicxml.png")
+  # tnc.stream.show("musicxml.png")
+  put_sheet_in_output_folder(tnc.stream, True)
 
 class ColorModifier(m21.tinyNotation.Modifier):
   def postParse(self, m21Obj):
