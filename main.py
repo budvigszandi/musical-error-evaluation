@@ -152,9 +152,9 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/rhythm-expected.mid")
+score = get_score_from_midi("../midi/sna-short-multinote.mid")
 simplified_data = get_simplified_data_from_score(score)
-score_multinote = get_score_from_midi("../midi/rhythm-given.mid")
+score_multinote = get_score_from_midi("../midi/sna-short-onenote.mid")
 simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
 # score = get_score_from_midi("../midi/sna-short-onenote.mid")
@@ -173,7 +173,7 @@ put_sheet_in_output_folder(score)
 
 print(simplified_data)
 print(simplified_data_multinote)
-dtw_matrix = dtw(simplified_data, simplified_data_multinote, 3, True)
+dtw_matrix = dtw(simplified_data, simplified_data_multinote, 0, True)
 print(dtw_matrix)
 
 all_step_permutations = get_all_step_permutations(expected_harmonic_part, given_harmonic_part)
