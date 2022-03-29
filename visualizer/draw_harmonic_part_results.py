@@ -113,7 +113,7 @@ def draw_harmonic_part_differences_from_steps(source, target, steps, note_evalua
           color = HarmonicPartColors.BLACK
         notation_string += get_current_notation(current_target, color, DistanceType.SUBSTITUTION, is_rhythm_different)
 
-      if current_target.isChord:
+      if current_source.isChord or current_target.isChord:
         notation_string += "} "
 
       if current_source_index < len(source) - 1:
@@ -150,7 +150,8 @@ def get_current_notation(note, color, distance_type, is_rhythm_different):
     color = HarmonicPartColors.ORANGE
     only_rhythm_difference = True
   
-  title = get_lyric_title(distance_type, is_rhythm_different, only_rhythm_difference)
+  # title = get_lyric_title(distance_type, is_rhythm_different, only_rhythm_difference)
+  title = " "
   length = get_notation_length(note)
 
   if note.isRest:
