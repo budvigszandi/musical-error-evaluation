@@ -84,7 +84,7 @@ def get_harmonic_part_distance(source, target):
     elif both_are_rests:
       rhythmic_distance = get_rhythmic_distance(source, target)
       distance += rhythmic_distance
-  return distance
+  return round(distance, 2)
 
 def get_best_note_evaluation(source, target, get_scenario, get_points):
   expected_notes = []
@@ -108,8 +108,8 @@ def get_best_note_evaluation(source, target, get_scenario, get_points):
   except AttributeError as error:
     given_notes.append(target)
 
-  print("expected", expected_notes)
-  print("given", given_notes)
+  # print("expected", expected_notes)
+  # print("given", given_notes)
   
   scenarios = get_note_scenarios(expected_notes, given_notes)
   best_scenario = get_best_scenario(scenarios)

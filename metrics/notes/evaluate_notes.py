@@ -31,13 +31,13 @@ def get_relationship_matrix(expected_notes, given_notes):
     for j in range(expected_notes_count):
       relationship_matrix[i][j] = compare_note_pair(given_notes[i], expected_notes[j])
   # Just testing here
-  for i in range(given_notes_count):
-    for j in range(expected_notes_count):
-      current = relationship_matrix[i][j]
-      print(f"Z[{i}][{j}]: {current.given_note} - {current.expected_note} {current.type} "
-            f"{current.cent_difference} {current.harmonic_info}")
-    if i < given_notes_count - 1:
-      print("---")
+  # for i in range(given_notes_count):
+  #   for j in range(expected_notes_count):
+  #     current = relationship_matrix[i][j]
+  #     print(f"Z[{i}][{j}]: {current.given_note} - {current.expected_note} {current.type} "
+  #           f"{current.cent_difference} {current.harmonic_info}")
+  #   if i < given_notes_count - 1:
+  #     print("---")
   return relationship_matrix
 
 def get_relationship_points(relationship_matrix):
@@ -64,11 +64,11 @@ def get_relationship_points(relationship_matrix):
       else:
         relationship_point_matrix[i][j] = get_current_point(current_relationship)
   # Just testing here
-  for i in range(rows):
-    for j in range(columns):
-      print(f"R[{i}][{j}]: {relationship_point_matrix[i][j]}")
-    if i < rows - 1:
-      print("---")
+  # for i in range(rows):
+  #   for j in range(columns):
+  #     print(f"R[{i}][{j}]: {relationship_point_matrix[i][j]}")
+  #   if i < rows - 1:
+  #     print("---")
   return relationship_point_matrix
 
 def get_current_point(relationship_type, harmonic_number = -1):
