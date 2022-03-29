@@ -7,6 +7,7 @@ from metrics.rhythms.evaluate_rhythms import *
 from input.midi_reader import *
 from visualizer.draw_harmonic_part_results import *
 from metrics.distances.compressed_dtw import *
+from metrics.distances.boyer_moore import *
 
 # ------------------------------
 # Expected and given note arrays
@@ -200,27 +201,46 @@ given_harmonic_part    = simplified_data_multinote
 
 # print(dtw_matrix)
 
-# -----------------
+# --------------
 # Compressed DTW
-# -----------------
-n = len(simplified_data)
-m = len(simplified_data_multinote)
-window = 2
-constraint = max(window, abs(n - m))
-print("n", n, "m", m, "constraint", constraint)
-print("dtw size", n + 1, "x", m + 1)
-dtw_matrix = dtw(simplified_data, simplified_data_multinote, constraint, True)
-print(dtw_matrix)
+# --------------
+# n = len(simplified_data)
+# m = len(simplified_data_multinote)
+# window = 2
+# constraint = max(window, abs(n - m))
+# print("n", n, "m", m, "constraint", constraint)
+# print("dtw size", n + 1, "x", m + 1)
+# dtw_matrix = dtw(simplified_data, simplified_data_multinote, constraint, True)
+# print(dtw_matrix)
 
-compressed_dtw = get_compressed_dtw(dtw_matrix, constraint)
-print("\ncompressed")
-print(compressed_dtw)
+# compressed_dtw = get_compressed_dtw(dtw_matrix, constraint)
+# print("\ncompressed")
+# print(compressed_dtw)
 
-print("step permutations for", compressed_dtw.shape[0], "rows", compressed_dtw.shape[1], "columns")
-count = 0
-step_permutations = get_all_step_permutations(compressed_dtw.shape[0], compressed_dtw.shape[1])
-print(step_permutations)
-for i in step_permutations:
-  for j in i:
-    count += 1
-print(count)
+# print("step permutations for", compressed_dtw.shape[0], "rows", compressed_dtw.shape[1], "columns")
+# count = 0
+# step_permutations = get_all_step_permutations(compressed_dtw.shape[0], compressed_dtw.shape[1])
+# print(step_permutations)
+# for i in step_permutations:
+#   for j in i:
+#     count += 1
+# print(count)
+
+# -----------
+# Boyer-Moore
+# -----------
+# song = [m21.note.Note('C4'), m21.chord.Chord('C4 E4 G4'), m21.note.Rest(quarterLength = 0.5), m21.note.Note('G4')]
+# pattern = [m21.note.Rest(), m21.note.Note('G4')]
+
+song = simplified_data_multinote
+pattern = [m21.note.Rest(), m21.note.Note('G4')]
+
+# txt = ["h","e","l","l","o"]
+# pat = "o"
+txt = m21_to_boyer_moore(song)
+pat = m21_to_boyer_moore(pattern)
+print("txt", txt, "pattern", pat)
+occurences = search(txt, pat)
+print(occurences)
+
+print(get_checkpoints(txt, 2))
