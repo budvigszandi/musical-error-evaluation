@@ -1,6 +1,8 @@
 from visualizer.draw_harmonic_part_results import get_notation_length
+import music21 as m21
 
 NO_OF_CHARS = 256
+REST_CHARACTER = "R"
 CHORD_BEGINNING_CHAR = "K"
 CHORD_NOTE_CHAR = "Q"
 CHORD_ENDING_CHAR = "Z"
@@ -76,24 +78,53 @@ def search(txt, pat):
   return occurences
 
 def m21_to_boyer_moore(m21_array):
-  notes = []
+  bm_array = []
   for element in m21_array:
     if element.isNote:
       for char in element.nameWithOctave:
-        notes.append(char)
+        bm_array.append(char)
     elif element.isChord:
-      notes.append(CHORD_BEGINNING_CHAR)
+      bm_array.append(CHORD_BEGINNING_CHAR)
       for note in element:
-        notes.append(CHORD_NOTE_CHAR)
+        bm_array.append(CHORD_NOTE_CHAR)
         for char in note.nameWithOctave:
-          notes.append(char)
-      notes.append(CHORD_ENDING_CHAR)
+          bm_array.append(char)
+      bm_array.append(CHORD_ENDING_CHAR)
     elif element.isRest:
       length = get_notation_length(element)
-      notes.append("R")
+      bm_array.append(REST_CHARACTER)
       for char in length:
-        notes.append(char)
-  return notes
+        bm_array.append(char)
+  return bm_array
+
+def boyer_moore_to_m21(bm_array):
+  m21_array = []
+  current = 0
+  while current < len(bm_array):
+    if bm_array[current] == CHORD_BEGINNING_CHAR:
+      chord_end_index = get_chord_end_index(bm_array[current:])
+      chord_notes = ""
+      current_beginning = current
+      while current != current_beginning + chord_end_index:
+        octave_index = get_next_number_index(bm_array[current:])
+        note_bm = ""
+        note_bm = note_bm.join(bm_array[current : current + octave_index + 1])
+        note_bm = note_bm.replace(CHORD_BEGINNING_CHAR, "")
+        note_bm = note_bm.replace(CHORD_NOTE_CHAR, "")
+        chord_notes += note_bm + " "
+        current += octave_index + 1
+      m21_array.append(m21.chord.Chord(chord_notes))
+      current += 1
+    else:
+      note = ""
+      octave_index = get_next_number_index(bm_array[current:])
+      note = note.join(bm_array[current : current + octave_index + 1])
+      if bm_array[current] == REST_CHARACTER:
+        m21_array.append(m21.note.Rest(note))
+      else:
+        m21_array.append(m21.note.Note(note))
+      current += octave_index + 1
+  return m21_array
 
 def get_possible_fixpoints(song, length):
   fixpoints = []

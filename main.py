@@ -156,9 +156,9 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
+score = get_score_from_midi("../midi/deja-vu.mid")
 simplified_data = get_simplified_data_from_score(score)
-score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
+score_multinote = get_score_from_midi("../midi/deja-vu-del-2.mid")
 simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
 # score = get_score_from_midi("../midi/sna-short-onenote.mid")
@@ -242,4 +242,7 @@ print("expected", bm_expected)
 print("given", bm_given)
 print()
 
-exp_rem, giv_rem = get_different_parts(bm_expected, bm_given)
+m21_expected = boyer_moore_to_m21(bm_expected)
+print(m21_expected)
+
+# exp_rem, giv_rem = get_different_parts(bm_expected, bm_given)
