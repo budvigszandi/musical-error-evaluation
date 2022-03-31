@@ -93,52 +93,40 @@ def m21_to_boyer_moore(m21_array):
         notes.append(char)
   return notes
 
-# TODO: When a chord is added, the length should be reconsidered
-# e.g. we want 2 long checkpoints, then 1 chord is not enough
-# TODO: Correct checkpoint when chord beginning (not ending) missing
 def get_checkpoints(song, length):
   checkpoints = []
-  current = 0
+  checkpoint = []
+  current, added, checkpoint_beginning, shift = 0, 0, 0, 0
   while True:
-    time.sleep(1)
-    if current + length * 2 > len(song):
-      break
-    checkpoint = song[current : current + length * 2] # length * 2 because a note consists of 2 things (letter, number)
-    print(f"chunk [{current} : {current + length * 2}]: {checkpoint}, song length: {len(song)}")
-    current += length * 2
-    second_to_last = get_second_to_last_letter(checkpoint)
-    last = get_last_letter(checkpoint)
-    if last == "K" or last == "Q" or second_to_last == "Q":
-      print("Chord chunk")
+    # --- add next ---
+    if song[current] == CHORD_BEGINNING_CHAR:
       chord_end_index = get_chord_end_index(song[current:])
       checkpoint.extend(song[current : current + chord_end_index + 1])
       print(f"  adding {song[current : current + chord_end_index + 1]}")
       current += chord_end_index + 1
-    elif (not last.isnumeric()) and (not last == CHORD_ENDING_CHAR):
-      print("Missed octave")
+      if added == 0:
+        shift = len(checkpoint)
+      added += 1
+    else:
       octave_index = get_next_number_index(song[current:])
       checkpoint.extend(song[current : current + octave_index + 1])
+      print(f"  adding {song[current : current + octave_index + 1]}")
       current += octave_index + 1
-    checkpoints.append(checkpoint)
+      if added == 0:
+        shift = len(checkpoint)
+      added += 1
+    # ----------------
+    if added == length:
+      checkpoints.append(checkpoint)
+      print("final chunk", checkpoint)
+      print(f"begin {checkpoint_beginning} len {len(checkpoint)} begin+len {checkpoint_beginning + len(checkpoint)} len(song) {len(song)}")
+      if checkpoint_beginning + len(checkpoint) >= len(song):
+        break
+      checkpoint = []
+      added = 0
+      checkpoint_beginning += shift
+      current = checkpoint_beginning
   return checkpoints
-
-def get_second_to_last_letter(list):
-  letter = ""
-  letter_occurences = 0
-  for i in range(len(list) - 1, 0, -1):
-    if list[i].isalpha():
-      letter = list[i]
-      letter_occurences += 1
-    if letter_occurences == 2:
-      break
-  return letter
-
-def get_last_letter(list):
-  letter = ""
-  for elem in list:
-    if elem.isalpha():
-      letter = elem
-  return letter
 
 def get_chord_end_index(song_chunk):
   for i in range(len(song_chunk)):
