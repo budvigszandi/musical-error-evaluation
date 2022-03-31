@@ -9,6 +9,8 @@ from visualizer.draw_harmonic_part_results import *
 from metrics.distances.compressed_dtw import *
 from metrics.distances.boyer_moore import *
 
+# TODO: Refactor main
+
 # ------------------------------
 # Expected and given note arrays
 # ------------------------------
@@ -154,9 +156,9 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
+score = get_score_from_midi("../midi/deja-vu.mid")
 simplified_data = get_simplified_data_from_score(score)
-score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
+score_multinote = get_score_from_midi("../midi/deja-vu-mod.mid")
 simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
 # score = get_score_from_midi("../midi/sna-short-onenote.mid")
@@ -229,18 +231,21 @@ given_harmonic_part    = simplified_data_multinote
 # -----------
 # Boyer-Moore
 # -----------
-# song = [m21.note.Note('C4'), m21.chord.Chord('C4 E4 G4'), m21.note.Rest(quarterLength = 0.5), m21.note.Note('G4')]
-# pattern = [m21.note.Rest(), m21.note.Note('G4')]
 
-song = simplified_data_multinote
+song = simplified_data
 pattern = [m21.note.Rest(), m21.note.Note('G4')]
 
-# txt = ["h","e","l","l","o"]
-# pat = "o"
 txt = m21_to_boyer_moore(song)
-pat = m21_to_boyer_moore(pattern)
-print("txt", txt, "pattern", pat)
-occurences = search(txt, pat)
-print(occurences)
+possible_fixpoints = get_possible_fixpoints(txt, 2)
+pat = possible_fixpoints[2]
+# print("txt", txt, "pattern", pat)
+# occurences = search(txt, pat)
+# print(occurences)
 
-print(get_checkpoints(txt, 2))
+expected = txt
+given = m21_to_boyer_moore(simplified_data_multinote)
+print("expected", expected)
+print("given", given)
+print()
+
+exp_rem, giv_rem = get_different_parts(expected, given)
