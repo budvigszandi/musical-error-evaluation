@@ -12,8 +12,8 @@ def draw_harmonic_part_differences_from_steps(source, target, steps, note_evalua
 
   for i in range(len(steps)):
     current_step = steps[i]
-    current_source = source[current_source_index]
-    current_target = target[current_target_index]
+    if len(source) > 0: current_source = source[current_source_index]
+    if len(target) > 0: current_target = target[current_target_index]
 
     if current_step == DistanceType.DELETION:
       print("deleted", current_source)

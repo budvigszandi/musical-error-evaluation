@@ -169,6 +169,26 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
               # This needs further checking, maybe conversion to generator object.
   note_evaluations = []
 
+  if source == [] or target == []:
+    permutation_as_reltype = []
+    if source == []:
+      for i in target:
+        permutation_as_reltype.append(DistanceType.INSERTION)
+      converted_permutations.append(permutation_as_reltype)
+    elif target == []:
+      for i in source:
+        permutation_as_reltype.append(DistanceType.DELETION)
+      converted_permutations.append(permutation_as_reltype)
+    note_evaluations.append(None)
+    if harmonic_parts:
+      points.append(get_harmonic_part_point(permutation_as_reltype, source, target))
+    else:
+      points.append(get_rhythmic_point(permutation_as_reltype, source, target))
+    if not harmonic_parts:
+      return converted_permutations, points
+    else:
+      return converted_permutations, points, note_evaluations
+
   for i in all_step_permutations:
     steps_of_same_amount = i
     for j in steps_of_same_amount:

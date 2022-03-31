@@ -1,4 +1,3 @@
-from ast import expr_context
 from visualizer.draw_harmonic_part_results import get_notation_length
 
 NO_OF_CHARS = 256
@@ -143,7 +142,7 @@ def get_next_number_index(song_chunk):
 def get_different_parts(expected, given):
   if expected == given:
     print("These two are the same")
-    return 0
+    return [], []
   fixpoints_by_length = get_possible_fixpoints_by_length(expected)
   expected_copy = expected
   given_copy = given
@@ -163,7 +162,7 @@ def get_different_parts(expected, given):
           print(f"Found biggest fixpoint {fp} at {occurences[0]}-{occurences[0] + len(fp)}")
           found_biggest = True
           exp_occurences = search(expected_copy, fp)
-          # TODO: compare occurences -> only blank the ones close to each other
+          # TODO: Chance for development: compare occurences -> only blank the ones close to each other
           expected_copy = make_fixpoint_blank(expected_copy, exp_occurences, fp)
           given_copy = make_fixpoint_blank(given_copy, occurences, fp)
           print("New expected", expected_copy)

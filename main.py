@@ -156,9 +156,9 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/deja-vu.mid")
+score = get_score_from_midi("../midi/melody-sample-sevennationarmy-onenote.mid")
 simplified_data = get_simplified_data_from_score(score)
-score_multinote = get_score_from_midi("../midi/deja-vu-mod.mid")
+score_multinote = get_score_from_midi("../midi/melody-sample-sevennationarmy-multinote.mid")
 simplified_data_multinote = get_simplified_data_from_score(score_multinote)
 
 # score = get_score_from_midi("../midi/sna-short-onenote.mid")
@@ -232,20 +232,14 @@ given_harmonic_part    = simplified_data_multinote
 # Boyer-Moore
 # -----------
 
-song = simplified_data
-pattern = [m21.note.Rest(), m21.note.Note('G4')]
+bm_expected = m21_to_boyer_moore(simplified_data)
+bm_given = m21_to_boyer_moore(simplified_data_multinote)
 
-txt = m21_to_boyer_moore(song)
-possible_fixpoints = get_possible_fixpoints(txt, 2)
-pat = possible_fixpoints[2]
-# print("txt", txt, "pattern", pat)
-# occurences = search(txt, pat)
-# print(occurences)
+# possible_fixpoints = get_possible_fixpoints(bm_expected, 2)
+# pattern = possible_fixpoints[2]
 
-expected = txt
-given = m21_to_boyer_moore(simplified_data_multinote)
-print("expected", expected)
-print("given", given)
+print("expected", bm_expected)
+print("given", bm_given)
 print()
 
-exp_rem, giv_rem = get_different_parts(expected, given)
+exp_rem, giv_rem = get_different_parts(bm_expected, bm_given)

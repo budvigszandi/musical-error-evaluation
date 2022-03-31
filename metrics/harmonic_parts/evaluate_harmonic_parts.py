@@ -13,8 +13,8 @@ def get_harmonic_part_point(step_permutation, source, target):
   current_target_index = 0
   for i in range(len(step_permutation)):
     current_step = step_permutation[i]
-    current_source = source[current_source_index]
-    current_target = target[current_target_index]
+    if len(source) > 0: current_source = source[current_source_index]
+    if len(target) > 0: current_target = target[current_target_index]
     print("source", current_source_index, "target", current_target_index, "step", current_step)
     if current_step == DistanceType.DELETION:
       point += HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT
@@ -27,9 +27,9 @@ def get_harmonic_part_point(step_permutation, source, target):
     elif current_step == DistanceType.INSERTION:
       point += RhythmPoints.INSERTED_RHYTHM_POINT
       point -= current_target.quarterLength * RhythmPoints.LENGTH_DIFFERENCE_WEIGHT
-      if current_source.isNote:
+      if current_target.isNote:
         point += HarmonicPartPoints.INSERTED_NOTE_POINT
-      elif current_source.isChord:
+      elif current_target.isChord:
         point += len(current_target) * HarmonicPartPoints.INSERTED_NOTE_POINT
       if current_target_index < len(target) - 1: current_target_index += 1
     elif current_step == DistanceType.SAME:
