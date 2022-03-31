@@ -6,6 +6,7 @@ CHORD_NOTE_CHAR = "Q"
 CHORD_ENDING_CHAR = "Z"
 MINIMUM_FIXPOINT_LENGTH = 2
 BLANK_CHARACTER = "$"
+EMPTY_CHUNK_CHARACTER = "@"
 
 def badCharHeuristic(string, size):
   '''
@@ -162,12 +163,14 @@ def get_different_parts(expected, given):
           print(f"Found biggest fixpoint {fp} at {occurences[0]}-{occurences[0] + len(fp)}")
           found_biggest = True
           exp_occurences = search(expected_copy, fp)
-          # TODO: Chance for development: compare occurences -> only blank the ones close to each other
-          expected_copy = make_fixpoint_blank(expected_copy, exp_occurences, fp)
-          given_copy = make_fixpoint_blank(given_copy, occurences, fp)
-          print("New expected", expected_copy)
-          print("New given", given_copy)
-          print()
+          if len(exp_occurences) == 1: # only getting unique fixpoints
+            exp_occurence = exp_occurences[0]
+            # TODO: Chance for development: compare occurences -> only blank the ones close to each other
+            expected_copy, given_copy = make_fixpoint_blank(expected_copy, given_copy, exp_occurence, occurences[0], fp)
+            # given_copy = make_fixpoint_blank(given_copy, occurences, fp)
+            print("New expected", expected_copy)
+            print("New given", given_copy)
+            print()
       fixpoints_by_length = fixpoints_by_length[:i]
       if found_biggest:
         break
@@ -191,13 +194,36 @@ def get_possible_fixpoints_by_length(expected):
     length += 1
   return fixpoints_by_length
 
-def make_fixpoint_blank(given_copy, occurences, fixpoint):
-  for occ in occurences:
-    begin = occ
-    end = occ + len(fixpoint)
-    for i in range(begin, end):
-      given_copy[i] = BLANK_CHARACTER
-  return given_copy
+def make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, giv_occurence, fixpoint):
+  exp_begin = exp_occurence
+  exp_end = exp_begin + len(fixpoint)
+  giv_begin = giv_occurence
+  giv_end = giv_begin + len(fixpoint)
+  for i in range(exp_begin, exp_end):
+    exp_copy[i] = BLANK_CHARACTER
+  for i in range(giv_begin, giv_end):
+    giv_copy[i] = BLANK_CHARACTER
+  exp_copy, giv_copy = insert_empty_chunks(exp_copy, giv_copy, exp_begin, exp_end, giv_begin, giv_end)
+  return exp_copy, giv_copy
+
+def insert_empty_chunks(exp_copy, giv_copy, exp_begin, exp_end, giv_begin, giv_end):
+  if exp_end == len(exp_copy):
+    exp_end -= 1
+  if giv_end == len(giv_copy):
+    giv_end -= 1
+  blank_before_exp = exp_copy[exp_begin - 1] == BLANK_CHARACTER
+  blank_after_exp = exp_copy[exp_end] == BLANK_CHARACTER
+  blank_before_giv = giv_copy[giv_begin - 1] == BLANK_CHARACTER
+  blank_after_giv = giv_copy[giv_end] == BLANK_CHARACTER
+  if blank_before_exp and not blank_before_giv:
+    exp_copy.insert(exp_begin, EMPTY_CHUNK_CHARACTER)
+  elif blank_before_giv and not blank_before_exp:
+    giv_copy.insert(giv_begin, EMPTY_CHUNK_CHARACTER)
+  elif blank_after_exp and not blank_after_giv:
+    exp_copy.insert(exp_end, EMPTY_CHUNK_CHARACTER)
+  elif blank_after_giv and not blank_after_exp:
+    giv_copy.insert(giv_end, EMPTY_CHUNK_CHARACTER)
+  return exp_copy, giv_copy
 
 def get_remaining_chunks(song):
   chunks = []
@@ -206,9 +232,16 @@ def get_remaining_chunks(song):
   in_chunk = False
   while True:
     if current == len(song):
+      if in_chunk:
+        chunks.append(chunk)
       break
     if song[current] == BLANK_CHARACTER and not in_chunk:
       pass
+    elif song[current] == EMPTY_CHUNK_CHARACTER:
+      if in_chunk:
+        chunks.append(chunk)
+      chunks.append([])
+      in_chunk = False
     elif song[current] == BLANK_CHARACTER and in_chunk:
       chunks.append(chunk)
       chunk = []
