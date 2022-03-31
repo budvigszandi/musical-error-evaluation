@@ -27,7 +27,7 @@ def get_simplified_data_from_score(score):
 def put_sheet_in_output_folder(score, given=False):
   filename = score.write('musicxml.png')
   now = datetime.now()
-  formatted_time = now.strftime("%Y-%d-%m-%H-%M-%S")
+  formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
   expected_filename = f"visualizer/output/expected-{formatted_time}.png"
   given_filename = f"visualizer/output/given-{formatted_time}.png"
   if not given:
