@@ -36,7 +36,7 @@ def get_compressed_dtw(dtw_matrix, constraint):
   
   return compressed_dtw
 
-def get_all_step_permutations(rows, columns):
+def get_all_step_permutations_compressed_dtw(rows, columns):
   number_of_rows = rows
   number_of_columns = columns
   allowed_down_steps = number_of_rows
