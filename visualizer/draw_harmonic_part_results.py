@@ -4,8 +4,75 @@ from metrics.distances.distance_type import DistanceType
 from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 from visualizer.harmonic_part_colors import HarmonicPartColors
 from metrics.notes.note_relationship_type import NoteRelationshipType
+from metrics.distances.boyer_moore import *
+from evaluate import get_melody_dtw_evaluation
 
-def draw_harmonic_part_differences_from_steps(source, target, steps, note_evaluation):
+NOTATION_CHORD_BEGINNING = "chord{"
+NOTATION_CHORD_ENDING = "} "
+NOTATION_REST = "r"
+
+def draw_harmonic_part_differences_from_boyer_moore(given, giv_copy, exp_chunks, giv_chunks):
+  notation_string = ""
+  current = 0
+  unmatched_chunk_count = 0
+  inserted_empty_chunks = 0
+  while current < len(given):    
+    if giv_copy[current] == BLANK_CHARACTER:
+      print("\nmatch")
+      print("start", giv_copy[current])
+      print("prev char", giv_copy[current - 1])
+      next_letter_index = get_next_letter_index(giv_copy[current:])
+      print("current", current, "next letter index", current + next_letter_index)
+      matched_chunk = given[current - inserted_empty_chunks : current + next_letter_index - inserted_empty_chunks]
+      print("Matched chunk", matched_chunk)
+      notation_string = add_matched_chunk_to_notation_string(notation_string, matched_chunk)
+      if next_letter_index != None:
+        current += next_letter_index
+      else:
+        current = len(giv_copy)
+      # print("next", giv_copy[current])
+      print()
+    else:
+      print("\nnot match")
+      print("start", giv_copy[current])
+      if giv_copy[current] == EMPTY_CHUNK_CHARACTER:
+        inserted_empty_chunks += 1
+      next_blank_letter_index = get_next_blank_letter_index(giv_copy[current:])
+      dtw_expected = boyer_moore_to_m21(exp_chunks[unmatched_chunk_count])
+      dtw_given = boyer_moore_to_m21(giv_chunks[unmatched_chunk_count])
+      steps, note_eval = get_melody_dtw_evaluation(dtw_expected, dtw_given)
+      notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
+      if next_blank_letter_index != None:
+        current += next_blank_letter_index
+      else:
+        current = len(giv_copy)
+      unmatched_chunk_count += 1
+      # print("next", giv_copy[current])
+      print()
+    print("\nunmatched max", len(exp_chunks), len(giv_chunks), "count", unmatched_chunk_count)
+    print("--- current", current, "len", len(given))
+    print()
+  print("Final notation string")
+  print(notation_string)
+  draw_sheet_music(notation_string)
+
+def add_matched_chunk_to_notation_string(notation_string, matched_chunk):
+  m21_array = boyer_moore_to_m21(matched_chunk)
+  for elem in m21_array:
+    if elem.isNote:
+      notation_string += get_current_notation(elem, HarmonicPartColors.BLACK, DistanceType.SAME, False)
+    elif elem.isChord:
+      notation_string += NOTATION_CHORD_BEGINNING
+      for note in elem:
+        notation_string += get_current_notation(note, HarmonicPartColors.BLACK, DistanceType.SAME, False)
+      notation_string += NOTATION_CHORD_ENDING
+    elif elem.isRest:
+      notation_string += NOTATION_REST + HarmonicPartColors.BLACK.value + " "
+  return notation_string
+
+# TODO: Separate notation_string generating from full drawing
+# New functions: draw_harmonic_part_differences, get_notation_string_from_steps
+def get_notation_string_from_steps(source, target, steps, note_evaluation):
   current_source_index = 0
   current_target_index = 0
   notation_string = ""
@@ -16,52 +83,52 @@ def draw_harmonic_part_differences_from_steps(source, target, steps, note_evalua
     if len(target) > 0: current_target = target[current_target_index]
 
     if current_step == DistanceType.DELETION:
-      print("deleted", current_source)
-      print()
+      # print("deleted", current_source)
+      # print()
 
       if current_source.isNote:
         notation_string += get_current_notation(current_source, HarmonicPartColors.RED, DistanceType.DELETION, False)
       elif current_source.isChord:
-        notation_string += "chord{"
+        notation_string += NOTATION_CHORD_BEGINNING
         for note in current_source:
           notation_string += get_current_notation(note, HarmonicPartColors.RED, DistanceType.DELETION, False)
-        notation_string += "} "
+        notation_string += NOTATION_CHORD_ENDING
       elif current_source.isRest:
-        notation_string += "r" + HarmonicPartColors.RED.value + " "
+        notation_string += NOTATION_REST + HarmonicPartColors.RED.value + " "
       
       if current_source_index < len(source) - 1:
         current_source_index += 1
 
     elif current_step == DistanceType.INSERTION:
-      print("inserted", current_target)
-      print()
+      # print("inserted", current_target)
+      # print()
 
       if current_target.isNote:
         notation_string += get_current_notation(current_target, HarmonicPartColors.BLUE, DistanceType.INSERTION, False)
       elif current_target.isChord:
-        notation_string += "chord{"
+        notation_string += NOTATION_CHORD_BEGINNING
         for note in current_target:
           notation_string += get_current_notation(note, HarmonicPartColors.BLUE, DistanceType.INSERTION, False)
-        notation_string += "} "
+        notation_string += NOTATION_CHORD_ENDING
       elif current_target.isRest:
-        notation_string += "r" + HarmonicPartColors.BLUE.value + " "
+        notation_string += NOTATION_REST + HarmonicPartColors.BLUE.value + " "
 
       if current_target_index < len(target) - 1:
         current_target_index += 1
 
     elif current_step == DistanceType.SAME:
-      print("got match", current_source)
-      print()
+      # print("got match", current_source)
+      # print()
 
       if current_source.isNote:
         notation_string += get_current_notation(current_source, HarmonicPartColors.BLACK, DistanceType.SAME, False)
       elif current_source.isChord:
-        notation_string += "chord{"
+        notation_string += NOTATION_CHORD_BEGINNING
         for note in current_source:
           notation_string += get_current_notation(note, HarmonicPartColors.BLACK, DistanceType.SAME, False)
-        notation_string += "} "
+        notation_string += NOTATION_CHORD_ENDING
       elif current_source.isRest:
-        notation_string += "r" + HarmonicPartColors.BLACK.value + " "
+        notation_string += NOTATION_REST + HarmonicPartColors.BLACK.value + " "
 
       if current_source_index < len(source) - 1:
         current_source_index += 1
@@ -69,14 +136,14 @@ def draw_harmonic_part_differences_from_steps(source, target, steps, note_evalua
         current_target_index += 1
 
     elif current_step == DistanceType.SUBSTITUTION:
-      print("wanted", current_source, "got", current_target)
-      print("difference:")
+      # print("wanted", current_source, "got", current_target)
+      # print("difference:")
       note_eval = note_evaluation[current_source_index]
       rhythmic_distance = get_rhythmic_distance(current_source, current_target)
       is_rhythm_different = rhythmic_distance > 0
 
       if current_source.isChord or current_target.isChord:
-        notation_string += "chord{"
+        notation_string += NOTATION_CHORD_BEGINNING
       
       if note_eval != None and not (current_source.isRest or current_target.isRest):
         uncovered_notes = get_uncovered_notes(current_source, note_eval)
@@ -114,7 +181,7 @@ def draw_harmonic_part_differences_from_steps(source, target, steps, note_evalua
         notation_string += get_current_notation(current_target, color, DistanceType.SUBSTITUTION, is_rhythm_different)
 
       if current_source.isChord or current_target.isChord:
-        notation_string += "} "
+        notation_string += NOTATION_CHORD_ENDING
 
       if current_source_index < len(source) - 1:
         current_source_index += 1
@@ -122,7 +189,8 @@ def draw_harmonic_part_differences_from_steps(source, target, steps, note_evalua
         current_target_index += 1
   
   print("notation string", notation_string)
-  draw_sheet_music(notation_string)
+  # draw_sheet_music(notation_string)
+  return notation_string
 
 def get_uncovered_notes(source, note_evaluation):
   expected_notes = []
@@ -155,7 +223,7 @@ def get_current_notation(note, color, distance_type, is_rhythm_different):
   length = get_notation_length(note)
 
   if note.isRest:
-    return "r" + length + color.value + title
+    return NOTATION_REST + length + color.value + title
   else:
     octave = note.octave
     if octave == 3:

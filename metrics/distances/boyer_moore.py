@@ -1,5 +1,5 @@
-from visualizer.draw_harmonic_part_results import get_notation_length
 import music21 as m21
+import copy
 
 NO_OF_CHARS = 256
 REST_CHARACTER = "R"
@@ -91,6 +91,8 @@ def m21_to_boyer_moore(m21_array):
           bm_array.append(char)
       bm_array.append(CHORD_ENDING_CHAR)
     elif element.isRest:
+      # This import is here to dodge circular import
+      from visualizer.draw_harmonic_part_results import get_notation_length
       length = get_notation_length(element)
       bm_array.append(REST_CHARACTER)
       for char in length:
@@ -171,13 +173,23 @@ def get_next_number_index(song_chunk):
     if song_chunk[i].isnumeric():
       return i
 
+def get_next_letter_index(song_chunk):
+  for i in range(len(song_chunk)):
+    if song_chunk[i] != BLANK_CHARACTER:
+      return i
+
+def get_next_blank_letter_index(song_chunk):
+  for i in range(len(song_chunk)):
+    if song_chunk[i] == BLANK_CHARACTER:
+      return i
+
 def get_different_parts(expected, given):
   if expected == given:
     print("These two are the same")
     return [], []
   fixpoints_by_length = get_possible_fixpoints_by_length(expected)
-  expected_copy = expected
-  given_copy = given
+  exp_copy = copy.copy(expected)
+  giv_copy = copy.copy(given)
   found_all = False
   found_biggest = True
   while not found_all:
@@ -189,29 +201,29 @@ def get_different_parts(expected, given):
     found_biggest = False
     for i in range(len(fixpoints_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
       for fp in fixpoints_by_length[i]:
-        occurences = search(given_copy, fp)
+        occurences = search(giv_copy, fp)
         if len(occurences) == 1: # only getting unique fixpoints
           print(f"Found biggest fixpoint {fp} at {occurences[0]}-{occurences[0] + len(fp)}")
           found_biggest = True
-          exp_occurences = search(expected_copy, fp)
+          exp_occurences = search(exp_copy, fp)
           if len(exp_occurences) == 1: # only getting unique fixpoints
             exp_occurence = exp_occurences[0]
             # TODO: Chance for development: compare occurences -> only blank the ones close to each other
-            expected_copy, given_copy = make_fixpoint_blank(expected_copy, given_copy, exp_occurence, occurences[0], fp)
+            exp_copy, giv_copy = make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
             # given_copy = make_fixpoint_blank(given_copy, occurences, fp)
-            print("New expected", expected_copy)
-            print("New given", given_copy)
+            print("New expected", exp_copy)
+            print("New given", giv_copy)
             print()
       fixpoints_by_length = fixpoints_by_length[:i]
       if found_biggest:
         break
   
-  exp_rem = get_remaining_chunks(expected_copy)
-  giv_rem = get_remaining_chunks(given_copy)
+  exp_chunks = get_remaining_chunks(exp_copy)
+  giv_chunks = get_remaining_chunks(giv_copy)
   print()
-  print("Expected remaining chunks", exp_rem)
-  print("Given remaining chunks", giv_rem)
-  return exp_rem, giv_rem
+  print("Expected remaining chunks", exp_chunks)
+  print("Given remaining chunks", giv_chunks)
+  return exp_copy, giv_copy, exp_chunks, giv_chunks
 
 def get_possible_fixpoints_by_length(expected):
   fixpoints_by_length = [] # every row is a list of possible fixpoints of the same length

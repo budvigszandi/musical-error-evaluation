@@ -173,7 +173,7 @@ given_harmonic_part    = simplified_data_multinote
 # Melody evaluation
 # -----------------
 
-# put_sheet_in_output_folder(score)
+# put_sheet_in_output_folder(score) # TODO: Maybe needs a conversion before drawing
 
 # print(simplified_data)
 # print(simplified_data_multinote)
@@ -245,4 +245,5 @@ print()
 m21_expected = boyer_moore_to_m21(bm_expected)
 print(m21_expected)
 
-# exp_rem, giv_rem = get_different_parts(bm_expected, bm_given)
+exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
+draw_harmonic_part_differences_from_boyer_moore(bm_given, giv_copy, exp_chunks, giv_chunks)

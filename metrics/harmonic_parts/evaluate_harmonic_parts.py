@@ -15,7 +15,7 @@ def get_harmonic_part_point(step_permutation, source, target):
     current_step = step_permutation[i]
     if len(source) > 0: current_source = source[current_source_index]
     if len(target) > 0: current_target = target[current_target_index]
-    print("source", current_source_index, "target", current_target_index, "step", current_step)
+    # print("source", current_source_index, "target", current_target_index, "step", current_step)
     if current_step == DistanceType.DELETION:
       point += HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT
       point -= current_source.quarterLength * RhythmPoints.LENGTH_DIFFERENCE_WEIGHT
@@ -44,7 +44,6 @@ def get_harmonic_part_point(step_permutation, source, target):
   return point
 
 # TODO: Continue point system
-# TODO: Consider music21.Voice object as well
 def get_harmonic_part_distance(source, target):
   distance = 0
   if source != target:

@@ -160,6 +160,8 @@ def convert_steps_with_points_levenshtein(step_permutations, source, target):
   return converted_permutations, points
 
 def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False):
+  print("STEPS W POINTS source", source)
+  print("STEPS W POINTS target", target)
   all_step_permutations = step_permutations
   steps_of_same_amount = all_step_permutations[0]
 
@@ -206,12 +208,12 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
           dtw_matrix_i += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
           permutation_as_reltype.append(DistanceType.INSERTION)
-          current_target_index += 1
+          if current_target_index < len(target) - 1: current_target_index += 1
         elif current_step == "R":
           dtw_matrix_j += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
           permutation_as_reltype.append(DistanceType.DELETION)
-          current_source_index += 1
+          if current_source_index < len(source) - 1: current_source_index += 1
           current_note_eval.append(None)
         elif current_step == "D":
           dtw_matrix_i += 1
@@ -237,8 +239,8 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
           else:
             permutation_as_reltype.append(DistanceType.SUBSTITUTION)
 
-          current_source_index += 1
-          current_target_index += 1
+          if current_source_index < len(source) - 1: current_source_index += 1
+          if current_target_index < len(target) - 1: current_target_index += 1
         if contains_infinity:
           break
       if contains_infinity:
