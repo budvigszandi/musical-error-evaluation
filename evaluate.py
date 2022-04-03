@@ -58,11 +58,11 @@ def get_melody_evaluation(expected, given):
     print("Should draw the same sheet")
   else:
     print("--------------------------------- Evaluation ----------------------------------")
-    draw_harmonic_part_differences_from_boyer_moore(bm_given, giv_copy, exp_chunks, giv_chunks)
+    draw_harmonic_part_differences_from_boyer_moore(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
 
 def print_song(song):
   if len(song) == 0:
     print("[]")
   for i in range(len(song)):
-    print(f"[{i}] {str(song[i])} - {song[i].duration.type}")
+    print(f"[{i}] {str(song[i])} - {song[i].duration.fullName}")
   print()

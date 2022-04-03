@@ -99,35 +99,6 @@ def m21_to_boyer_moore(m21_array):
         bm_array.append(char)
   return bm_array
 
-def boyer_moore_to_m21(bm_array):
-  m21_array = []
-  current = 0
-  while current < len(bm_array):
-    if bm_array[current] == CHORD_BEGINNING_CHAR:
-      chord_end_index = get_chord_end_index(bm_array[current:])
-      chord_notes = ""
-      current_beginning = current
-      while current != current_beginning + chord_end_index:
-        octave_index = get_next_number_index(bm_array[current:])
-        note_bm = ""
-        note_bm = note_bm.join(bm_array[current : current + octave_index + 1])
-        note_bm = note_bm.replace(CHORD_BEGINNING_CHAR, "")
-        note_bm = note_bm.replace(CHORD_NOTE_CHAR, "")
-        chord_notes += note_bm + " "
-        current += octave_index + 1
-      m21_array.append(m21.chord.Chord(chord_notes))
-      current += 1
-    else:
-      note = ""
-      octave_index = get_next_number_index(bm_array[current:])
-      note = note.join(bm_array[current : current + octave_index + 1])
-      if bm_array[current] == REST_CHARACTER:
-        m21_array.append(m21.note.Rest(note))
-      else:
-        m21_array.append(m21.note.Note(note))
-      current += octave_index + 1
-  return m21_array
-
 def get_possible_fixpoints(song, length):
   fixpoints = []
   fixpoint = []
@@ -304,3 +275,34 @@ def print_remaining_chunks(chunks):
   for i in range(len(chunks)):
     print(f"[{i}] {chunks[i]}")
   print()
+
+def get_m21_chunk(orig, bm_array, bm_chunk_begin, bm_chunk_end, expected=False):
+  if expected:
+    print(f"\nGetting original chunk from expected Boyer-Moore array [{bm_chunk_begin}]-[{bm_chunk_end}]:\n{bm_array[bm_chunk_begin:bm_chunk_end]}")
+  else:
+    print(f"\nGetting original chunk from given Boyer-Moore array [{bm_chunk_begin}]-[{bm_chunk_end}]:\n{bm_array[bm_chunk_begin:bm_chunk_end]}")
+  current = 0
+  orig_begin, current = get_orig_index(bm_array, current, bm_chunk_begin)
+  next_frame, current = get_orig_index(bm_array, current, bm_chunk_end)
+  orig_end = orig_begin + next_frame
+  from evaluate import print_song
+  if expected:
+    print(f"\nOriginal expected chunk [{orig_begin}]-[{orig_end}]")
+  else:
+    print(f"\nOriginal given chunk [{orig_begin}]-[{orig_end}]")
+    print(f"(Moved expected chunk index by {orig_end - orig_begin} steps)")
+  print_song(orig[orig_begin : orig_end])
+  return orig[orig_begin : orig_end]
+
+def get_orig_index(bm_array, current, border):
+  index = 0
+  while current < border:
+    if bm_array[current] == CHORD_BEGINNING_CHAR:
+      chord_end_index = get_chord_end_index(bm_array[current:])
+      current += chord_end_index + 1
+      index += 1
+    else:
+      octave_index = get_next_number_index(bm_array[current:])
+      current += octave_index + 1
+      index += 1
+  return index, current

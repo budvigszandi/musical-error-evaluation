@@ -10,66 +10,72 @@ NOTATION_CHORD_BEGINNING = "chord{"
 NOTATION_CHORD_ENDING = "} "
 NOTATION_REST = "r"
 
-def draw_harmonic_part_differences_from_boyer_moore(given, giv_copy, exp_chunks, giv_chunks):
+def draw_harmonic_part_differences_from_boyer_moore(orig_exp, orig_giv, bm_exp, bm_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
   notation_string = ""
   current = 0
+  current_exp = 0
   unmatched_chunk_count = 0
-  inserted_empty_chunks = 0
-  while current < len(given):    
+  exp_ins_empty_chunks = 0
+  giv_ins_empty_chunks = 0
+  while current < len(bm_giv):    
     if giv_copy[current] == BLANK_CHARACTER:
       print("\n------ Matched chunk ------")
-      # print("start", giv_copy[current])
-      # print("prev char", giv_copy[current - 1])
       next_letter_index = get_next_letter_index(giv_copy[current:])
-      matched_chunk = given[current - inserted_empty_chunks : current + next_letter_index - inserted_empty_chunks]
+      matched_chunk = bm_giv[current - giv_ins_empty_chunks : current + next_letter_index - giv_ins_empty_chunks]
       print(f"Matched chunk at {current}-{current + next_letter_index}")
       print(matched_chunk)
-      # TODO: Rhythm is lost here somehow!
-      notation_string = add_matched_chunk_to_notation_string(notation_string, matched_chunk)
+      if next_letter_index != None:
+        notation_string = add_matched_chunk_to_notation_string(notation_string, orig_giv, bm_giv, current - giv_ins_empty_chunks, current + next_letter_index - giv_ins_empty_chunks)
+        current += next_letter_index
+        current_exp += next_letter_index
+      else:
+        notation_string = add_matched_chunk_to_notation_string(notation_string, orig_giv, bm_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1)
+        current = len(giv_copy)
+        current_exp = len(exp_copy)
       print("\nCurrent full notation string:")
       print(notation_string)
-      if next_letter_index != None:
-        current += next_letter_index
-      else:
-        current = len(giv_copy)
     else:
       print("\n------ Unmatched chunkpair ------")
       print("Expected chunk:")
       print(exp_chunks[unmatched_chunk_count], end="\n\n")
       print("Given chunk:")
       print(giv_chunks[unmatched_chunk_count])
-      # print("start", giv_copy[current])
+      if exp_copy[current_exp] == EMPTY_CHUNK_CHARACTER:
+        exp_ins_empty_chunks += 1
       if giv_copy[current] == EMPTY_CHUNK_CHARACTER:
-        inserted_empty_chunks += 1
+        giv_ins_empty_chunks += 1
       next_blank_letter_index = get_next_blank_letter_index(giv_copy[current:])
-      dtw_expected = boyer_moore_to_m21(exp_chunks[unmatched_chunk_count])
-      dtw_given = boyer_moore_to_m21(giv_chunks[unmatched_chunk_count])
+      exp_chunk_length = len(exp_chunks[unmatched_chunk_count])
+      orig_exp_chunk = get_m21_chunk(orig_exp, bm_exp, current_exp - exp_ins_empty_chunks, current_exp + exp_chunk_length - exp_ins_empty_chunks, True)
+      if next_blank_letter_index != None:
+        orig_giv_chunk = get_m21_chunk(orig_giv, bm_giv, current - giv_ins_empty_chunks, current + next_blank_letter_index - giv_ins_empty_chunks)
+        current += next_blank_letter_index
+      else:
+        orig_giv_chunk = get_m21_chunk(orig_giv, bm_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1)
+        current = len(giv_copy)
+      current_exp += exp_chunk_length
+      dtw_expected = orig_exp_chunk
+      dtw_given = orig_giv_chunk
       # This import is here to dodge circular import
       from evaluate import get_melody_dtw_evaluation
       steps, note_eval = get_melody_dtw_evaluation(dtw_expected, dtw_given)
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
       print("\nCurrent full notation string:")
       print(notation_string)
-      if next_blank_letter_index != None:
-        current += next_blank_letter_index
-      else:
-        current = len(giv_copy)
       unmatched_chunk_count += 1
-      # print("next", giv_copy[current])
       print()
     print("\nUnmatched expected chunk total:", len(exp_chunks))
     print("Unmatched given chunks total:", len(giv_chunks))
     print("Unmatched chunk pairs evaluated:", unmatched_chunk_count)
     print("Unmatched chunk pairs remaining:", len(exp_chunks) - unmatched_chunk_count)
-    # print("--- current", current, "len", len(given))
-    # print()
   print("\n------ Final notation string ------")
   print(notation_string)
   draw_sheet_music(notation_string)
 
-def add_matched_chunk_to_notation_string(notation_string, matched_chunk):
+def add_matched_chunk_to_notation_string(notation_string, orig, bm_array, bm_chunk_begin, bm_chunk_end):
   notation_string_length = len(notation_string)
-  m21_array = boyer_moore_to_m21(matched_chunk)
+  orig_chunk = get_m21_chunk(orig, bm_array, bm_chunk_begin, bm_chunk_end)
+  m21_array = orig_chunk
   for elem in m21_array:
     if elem.isNote:
       notation_string += get_current_notation(elem, HarmonicPartColors.BLACK, DistanceType.SAME, False)
