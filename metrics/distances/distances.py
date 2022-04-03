@@ -160,8 +160,8 @@ def convert_steps_with_points_levenshtein(step_permutations, source, target):
   return converted_permutations, points
 
 def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False):
-  print("STEPS W POINTS source", source)
-  print("STEPS W POINTS target", target)
+  # print("STEPS W POINTS source", source)
+  # print("STEPS W POINTS target", target)
   all_step_permutations = step_permutations
   steps_of_same_amount = all_step_permutations[0]
 

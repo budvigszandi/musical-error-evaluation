@@ -32,5 +32,7 @@ def put_sheet_in_output_folder(score, given=False):
   given_filename = f"visualizer/output/given-{formatted_time}.png"
   if not given:
     shutil.copy(filename, expected_filename)
+    print(f"Drawn expected sheet to [{expected_filename}]")
   else:
     shutil.copy(filename, given_filename)
+    print(f"Drawn given sheet to [{given_filename}]")

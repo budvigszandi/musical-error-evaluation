@@ -5,7 +5,6 @@ from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 from visualizer.harmonic_part_colors import HarmonicPartColors
 from metrics.notes.note_relationship_type import NoteRelationshipType
 from metrics.distances.boyer_moore import *
-from evaluate import get_melody_dtw_evaluation
 
 NOTATION_CHORD_BEGINNING = "chord{"
 NOTATION_CHORD_ENDING = "} "
@@ -18,30 +17,39 @@ def draw_harmonic_part_differences_from_boyer_moore(given, giv_copy, exp_chunks,
   inserted_empty_chunks = 0
   while current < len(given):    
     if giv_copy[current] == BLANK_CHARACTER:
-      print("\nmatch")
-      print("start", giv_copy[current])
-      print("prev char", giv_copy[current - 1])
+      print("\n------ Matched chunk ------")
+      # print("start", giv_copy[current])
+      # print("prev char", giv_copy[current - 1])
       next_letter_index = get_next_letter_index(giv_copy[current:])
-      print("current", current, "next letter index", current + next_letter_index)
       matched_chunk = given[current - inserted_empty_chunks : current + next_letter_index - inserted_empty_chunks]
-      print("Matched chunk", matched_chunk)
+      print(f"Matched chunk at {current}-{current + next_letter_index}")
+      print(matched_chunk)
+      # TODO: Rhythm is lost here somehow!
       notation_string = add_matched_chunk_to_notation_string(notation_string, matched_chunk)
+      print("\nCurrent full notation string:")
+      print(notation_string)
       if next_letter_index != None:
         current += next_letter_index
       else:
         current = len(giv_copy)
-      # print("next", giv_copy[current])
-      print()
     else:
-      print("\nnot match")
-      print("start", giv_copy[current])
+      print("\n------ Unmatched chunkpair ------")
+      print("Expected chunk:")
+      print(exp_chunks[unmatched_chunk_count], end="\n\n")
+      print("Given chunk:")
+      print(giv_chunks[unmatched_chunk_count])
+      # print("start", giv_copy[current])
       if giv_copy[current] == EMPTY_CHUNK_CHARACTER:
         inserted_empty_chunks += 1
       next_blank_letter_index = get_next_blank_letter_index(giv_copy[current:])
       dtw_expected = boyer_moore_to_m21(exp_chunks[unmatched_chunk_count])
       dtw_given = boyer_moore_to_m21(giv_chunks[unmatched_chunk_count])
+      # This import is here to dodge circular import
+      from evaluate import get_melody_dtw_evaluation
       steps, note_eval = get_melody_dtw_evaluation(dtw_expected, dtw_given)
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
+      print("\nCurrent full notation string:")
+      print(notation_string)
       if next_blank_letter_index != None:
         current += next_blank_letter_index
       else:
@@ -49,14 +57,18 @@ def draw_harmonic_part_differences_from_boyer_moore(given, giv_copy, exp_chunks,
       unmatched_chunk_count += 1
       # print("next", giv_copy[current])
       print()
-    print("\nunmatched max", len(exp_chunks), len(giv_chunks), "count", unmatched_chunk_count)
-    print("--- current", current, "len", len(given))
-    print()
-  print("Final notation string")
+    print("\nUnmatched expected chunk total:", len(exp_chunks))
+    print("Unmatched given chunks total:", len(giv_chunks))
+    print("Unmatched chunk pairs evaluated:", unmatched_chunk_count)
+    print("Unmatched chunk pairs remaining:", len(exp_chunks) - unmatched_chunk_count)
+    # print("--- current", current, "len", len(given))
+    # print()
+  print("\n------ Final notation string ------")
   print(notation_string)
   draw_sheet_music(notation_string)
 
 def add_matched_chunk_to_notation_string(notation_string, matched_chunk):
+  notation_string_length = len(notation_string)
   m21_array = boyer_moore_to_m21(matched_chunk)
   for elem in m21_array:
     if elem.isNote:
@@ -68,6 +80,8 @@ def add_matched_chunk_to_notation_string(notation_string, matched_chunk):
       notation_string += NOTATION_CHORD_ENDING
     elif elem.isRest:
       notation_string += NOTATION_REST + HarmonicPartColors.BLACK.value + " "
+  print("Generated notation string:")
+  print(notation_string[notation_string_length:])
   return notation_string
 
 # TODO: Separate notation_string generating from full drawing
@@ -151,7 +165,7 @@ def get_notation_string_from_steps(source, target, steps, note_evaluation):
           note = get_note_from_pitch(current_source, pitch)
           notation_string += get_current_notation(note, HarmonicPartColors.RED, DistanceType.DELETION, is_rhythm_different)
         for relationship in note_eval:
-          print(relationship)
+          # print(relationship)
           note = get_note_from_pitch(current_target, relationship.given_note)
           if relationship.type == NoteRelationshipType.PERFECT_MATCH:
             notation_string += get_current_notation(note, HarmonicPartColors.BLACK, DistanceType.SUBSTITUTION, is_rhythm_different)
@@ -188,7 +202,8 @@ def get_notation_string_from_steps(source, target, steps, note_evaluation):
       if current_target_index < len(target) - 1:
         current_target_index += 1
   
-  print("notation string", notation_string)
+  print("Generated notation string:")
+  print(notation_string)
   # draw_sheet_music(notation_string)
   return notation_string
 
@@ -273,6 +288,7 @@ def get_notation_length(note):
   return length
 
 def draw_sheet_music(notation_string):
+  print("\n------ Drawing sheet music ------")
   tnc = m21.tinyNotation.Converter('')
   tnc.modifierAngle = ColorModifier
   tnc.bracketStateMapping['chord'] = ChordState

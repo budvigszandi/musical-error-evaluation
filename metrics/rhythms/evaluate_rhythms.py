@@ -8,7 +8,7 @@ def get_rhythmic_point(step_permutation, source, target):
   current_target_index = 0
   for i in range(len(step_permutation)):
     current_step = step_permutation[i]
-    print("source", current_source_index, "target", current_target_index, "step", current_step)
+    # print("source", current_source_index, "target", current_target_index, "step", current_step)
     if current_step == DistanceType.DELETION:
       point += RhythmPoints.DELETED_RHYTHM_POINT
       point -= source[current_source_index].quarterLength * RhythmPoints.LENGTH_DIFFERENCE_WEIGHT

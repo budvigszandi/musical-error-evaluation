@@ -185,8 +185,8 @@ def get_next_blank_letter_index(song_chunk):
 
 def get_different_parts(expected, given):
   if expected == given:
-    print("These two are the same")
-    return [], []
+    print("The expected and given songs are exactly the same.")
+    return [], [], [], []
   fixpoints_by_length = get_possible_fixpoints_by_length(expected)
   exp_copy = copy.copy(expected)
   giv_copy = copy.copy(given)
@@ -196,33 +196,38 @@ def get_different_parts(expected, given):
     if not found_biggest:
       found_all = True
     if found_all:
-      print("Found all")
+      print("\n------------ All fixpoints found ------------")
+      print("Found all unique fixpoints.")
       break
     found_biggest = False
     for i in range(len(fixpoints_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
       for fp in fixpoints_by_length[i]:
         occurences = search(giv_copy, fp)
         if len(occurences) == 1: # only getting unique fixpoints
-          print(f"Found biggest fixpoint {fp} at {occurences[0]}-{occurences[0] + len(fp)}")
           found_biggest = True
           exp_occurences = search(exp_copy, fp)
           if len(exp_occurences) == 1: # only getting unique fixpoints
+            print("\n------ Fixpoint found ------")
+            print(f"Found a unique fixpoint: {fp}\nat {occurences[0]}-{occurences[0] + len(fp)} in the given song.\n")
             exp_occurence = exp_occurences[0]
             # TODO: Chance for development: compare occurences -> only blank the ones close to each other
             exp_copy, giv_copy = make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
             # given_copy = make_fixpoint_blank(given_copy, occurences, fp)
-            print("New expected", exp_copy)
-            print("New given", giv_copy)
-            print()
+            print("New expected:")
+            print(exp_copy, end="\n\n")
+            print("New given:")
+            print(giv_copy, end="\n\n")
       fixpoints_by_length = fixpoints_by_length[:i]
       if found_biggest:
         break
   
   exp_chunks = get_remaining_chunks(exp_copy)
   giv_chunks = get_remaining_chunks(giv_copy)
-  print()
-  print("Expected remaining chunks", exp_chunks)
-  print("Given remaining chunks", giv_chunks)
+  print("\n------------ Remaining chunks ------------")
+  print("Expected remaining chunks:")
+  print_remaining_chunks(exp_chunks)
+  print("Given remaining chunks:")
+  print_remaining_chunks(giv_chunks)
   return exp_copy, giv_copy, exp_chunks, giv_chunks
 
 def get_possible_fixpoints_by_length(expected):
@@ -294,3 +299,8 @@ def get_remaining_chunks(song):
       chunk.append(song[current])
     current += 1
   return chunks
+
+def print_remaining_chunks(chunks):
+  for i in range(len(chunks)):
+    print(f"[{i}] {chunks[i]}")
+  print()

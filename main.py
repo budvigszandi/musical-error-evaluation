@@ -1,4 +1,5 @@
 import music21 as m21
+from evaluate import get_melody_evaluation
 from metrics.notes.evaluate_notes import *
 from visualizer.draw_note_results import *
 from metrics.distances.distances import *
@@ -232,18 +233,4 @@ given_harmonic_part    = simplified_data_multinote
 # Boyer-Moore
 # -----------
 
-bm_expected = m21_to_boyer_moore(simplified_data)
-bm_given = m21_to_boyer_moore(simplified_data_multinote)
-
-# possible_fixpoints = get_possible_fixpoints(bm_expected, 2)
-# pattern = possible_fixpoints[2]
-
-print("expected", bm_expected)
-print("given", bm_given)
-print()
-
-m21_expected = boyer_moore_to_m21(bm_expected)
-print(m21_expected)
-
-exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
-draw_harmonic_part_differences_from_boyer_moore(bm_given, giv_copy, exp_chunks, giv_chunks)
+get_melody_evaluation(simplified_data, simplified_data_multinote)
