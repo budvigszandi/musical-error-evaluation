@@ -3,6 +3,7 @@ from metrics.distances.distances import *
 from metrics.distances.boyer_moore import *
 from visualizer.draw_harmonic_part_results import *
 
+# TODO: Give warning if the DTW matrix dimensions are too big
 def get_melody_dtw_evaluation(expected, given):
   print("\n--- DTW evaluation ---")
   print("Expected:")
@@ -55,6 +56,7 @@ def get_melody_evaluation(expected, given):
   print("---------------------------- Boyer-Moore fixpoints ----------------------------")
   exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
   if exp_copy == [] and giv_copy == []:
+    # TODO: Draw the same sheet
     print("Should draw the same sheet")
   else:
     print("--------------------------------- Evaluation ----------------------------------")

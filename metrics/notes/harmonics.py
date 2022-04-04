@@ -1,10 +1,5 @@
 import music21 as m21
 
-# TODO: Create a universal response object and make sure that all functions
-#       use it properly
-
-# TODO: Exception handling all around
-
 # Important notes from music21 documentation
 # Note that the tritone is given as diminished fifth, not augmented fourth.
 # Simple will reduce an octave to a unison, semiSimple treats octaves as

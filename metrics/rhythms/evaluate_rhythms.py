@@ -30,7 +30,6 @@ def get_rhythmic_point(step_permutation, source, target):
 
 # requires two m21.note.Note objects
 # TODO: Points should consider other rhythmic points as well
-# TODO: Consider m21.stream.Voice behaviour
 def get_rhythmic_distance(source, target):
   distance = 0
   if source.isNote != target.isNote and source.isChord != target.isChord and source.isRest != target.isRest:

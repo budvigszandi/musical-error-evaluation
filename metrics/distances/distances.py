@@ -4,7 +4,6 @@ from metrics.rhythms.evaluate_rhythms import *
 from metrics.distances.distance_type import *
 from metrics.harmonic_parts.evaluate_harmonic_parts import *
 
-# TODO: Documenting comments
 # TODO: Correct the +1s in size_of_source and size_of_target in functions
 
 def get_levenshtein_distance(source, target):

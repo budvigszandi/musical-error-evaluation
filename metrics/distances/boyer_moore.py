@@ -181,7 +181,7 @@ def get_different_parts(expected, given):
             print("\n------ Fixpoint found ------")
             print(f"Found a unique fixpoint: {fp}\nat {occurences[0]}-{occurences[0] + len(fp)} in the given song.\n")
             exp_occurence = exp_occurences[0]
-            # TODO: Chance for development: compare occurences -> only blank the ones close to each other
+            # Development idea: compare occurences -> only blank the ones close to each other
             exp_copy, giv_copy = make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
             # given_copy = make_fixpoint_blank(given_copy, occurences, fp)
             print("New expected:")
