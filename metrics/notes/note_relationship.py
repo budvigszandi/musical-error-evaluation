@@ -7,8 +7,8 @@ class NoteRelationship:
     self.harmonic_info = harmonic_info
   
   def __str__(self):
-    return str(self.given_note) + " - " + \
-           str(self.expected_note) + ": " + \
-           str(self.type) + " " + \
-           str(self.cent_difference) + " " + \
-           str(self.harmonic_info)
+    return "Expected [" + str(self.expected_note) + "] " + \
+           "Given [" + str(self.given_note) + "]:" + \
+           "\n  Relationship: " + str(self.type.name) + \
+           "\n  Cent difference: " + str(self.cent_difference) + \
+           "\n  Harmonic info: " + str(self.harmonic_info)

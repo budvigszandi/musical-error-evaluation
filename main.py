@@ -1,5 +1,5 @@
 import music21 as m21
-from evaluate import get_melody_evaluation
+from evaluate import draw_note_evaluation, get_note_evaluation, run_melody_evaluation
 from metrics.notes.evaluate_notes import *
 from visualizer.draw_note_results import *
 from metrics.distances.distances import *
@@ -40,34 +40,6 @@ given_notes = [m21.pitch.Pitch('d-3'), m21.pitch.Pitch('d1'),  m21.pitch.Pitch('
 # expected_notes = [m21.pitch.Pitch('c4')]
 # given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
 
-# -----------------
-# Getting scenarios
-# -----------------
-
-# rel_matrix = get_relationship_matrix(expected_notes, given_notes)
-# print("------------------------------")
-# rel_points_matrix = get_relationship_points(rel_matrix)
-# print("------------------------------")
-# scenarios = get_scenarios(rel_matrix, rel_points_matrix)
-
-# ------------------
-# Drawing a scenario
-# ------------------
-
-# print("Got scenarios, now drawing")
-# fig, ax = plt.subplots()
-# graph = nx.Graph()
-# add_nodes(graph, expected_notes, given_notes)
-# group_expected_nodes(expected_notes)
-# # scenario = list(scenarios.keys())[0]
-# scenario = get_best_scenario(scenarios)
-# for rel in scenario:
-#   print(str(rel))
-# print(scenarios[scenario], "points")
-# group_related_nodes_with_edge_creation(graph, expected_notes, scenario)
-# group_isolated_expected_nodes(graph)
-# draw_graph(graph, ax)
-
 # ----------------------------------
 # Expected and given rhythmic arrays
 # ----------------------------------
@@ -92,6 +64,15 @@ rest_half.duration.quarterLength = 2
 expected_rhythm = [d_quarter, d_quarter, d_half,    rest_half,    d_quarter]
 given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 
+# ---------------------------
+# Expected and given melodies
+# ---------------------------
+
+score = get_score_from_midi("../midi/deja-vu.mid")
+exp_harmonic_part = get_simplified_data_from_score(score)
+score_multinote = get_score_from_midi("../midi/deja-vu-del-2.mid")
+giv_harmonic_part = get_simplified_data_from_score(score_multinote)
+
 # --------------------
 # Levenshtein distance
 # --------------------
@@ -115,36 +96,6 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # distance_matrix = fill_distance_matrix(source, target)
 # draw_rhythmic_differences_from_matrix(source, target, distance_matrix)
 
-# --------------------
-# Dynamic time warping
-# --------------------
-# source = expected_rhythm
-# target = given_rhythm
-
-# dtw_matrix = dtw(expected_rhythm, given_rhythm, 3)
-
-# all_step_permutations = get_all_step_permutations(source, target)
-# # print(all_step_permutations)
-# converted_permutations_dtw, points = convert_steps_with_points_dtw(all_step_permutations, source, target, dtw_matrix)
-# # print(len(permutations_as_reltypes), permutations_as_reltypes)
-
-# print("All permutations:")
-# for i in range(len(converted_permutations_dtw)):
-#   print(i + 1)
-#   draw_rhythmic_differences_from_steps(source, target, converted_permutations_dtw[i])
-#   print("Point:", points[i])
-#   print()
-
-# best_permutation_indices = get_best_permutation_indices(points)
-
-# print("Best permutation(s):\n")
-# for index in best_permutation_indices:
-#   draw_rhythmic_differences_from_steps(source, target, converted_permutations_dtw[index])
-#   print("Point:", points[index])
-#   print()
-
-# print(dtw_matrix)
-
 # ----------------------------
 # DTW - Levenshtein statistics
 # ----------------------------
@@ -153,67 +104,16 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # print("DTW permutations:", len(converted_permutations_dtw))
 # print(f"DTW permutations / Levenshtein permutations: {((len(converted_permutations_dtw) / len(converted_permutations_lev)) * 100):.2f} %")
 
-# ---------------------------
-# Expected and given melodies
-# ---------------------------
-
-score = get_score_from_midi("../midi/deja-vu.mid")
-simplified_data = get_simplified_data_from_score(score)
-score_multinote = get_score_from_midi("../midi/deja-vu-del-2.mid")
-simplified_data_multinote = get_simplified_data_from_score(score_multinote)
-
-# score = get_score_from_midi("../midi/sna-short-onenote.mid")
-# simplified_data = get_simplified_data_from_score(score)
-# score_multinote = get_score_from_midi("../midi/sna-short-multinote.mid")
-# simplified_data_multinote = get_simplified_data_from_score(score_multinote)
-
-expected_harmonic_part = simplified_data
-given_harmonic_part    = simplified_data_multinote
-
-# -----------------
-# Melody evaluation
-# -----------------
-
-# put_sheet_in_output_folder(score) # TODO: Maybe needs a conversion before drawing
-
-# print(simplified_data)
-# print(simplified_data_multinote)
-# dtw_matrix = dtw(simplified_data, simplified_data_multinote, 2, True)
-# print(dtw_matrix)
-
-# all_step_permutations = get_all_step_permutations(expected_harmonic_part, given_harmonic_part)
-# print("Got all step permutations")
-# converted_permutations_dtw, points, note_evaluations = convert_steps_with_points_dtw(all_step_permutations, expected_harmonic_part, given_harmonic_part, dtw_matrix, True)
-# print("Converted steps, got points")
-
-# # print("All permutations:")
-# # for i in range(len(converted_permutations_dtw)):
-# #   print(i + 1)
-# #   draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[i], note_evaluations[i])
-# #   print("Point:", points[i])
-# #   print()
-
-# best_permutation_indices = get_best_permutation_indices(points)
-# print("Got best permutation indices")
-
-# print("Best permutation(s):\n")
-# for index in best_permutation_indices:
-#   draw_harmonic_part_differences_from_steps(expected_harmonic_part, given_harmonic_part, converted_permutations_dtw[index], note_evaluations[index])
-#   print("Point:", points[index])
-#   print()
-
-# print(dtw_matrix)
-
 # --------------
 # Compressed DTW
 # --------------
-# n = len(simplified_data)
-# m = len(simplified_data_multinote)
+# n = len(exp_harmonic_part)
+# m = len(giv_harmonic_part)
 # window = 2
 # constraint = max(window, abs(n - m))
 # print("n", n, "m", m, "constraint", constraint)
 # print("dtw size", n + 1, "x", m + 1)
-# dtw_matrix = dtw(simplified_data, simplified_data_multinote, constraint, True)
+# dtw_matrix = dtw(exp_harmonic_part, giv_harmonic_part, constraint, True)
 # print(dtw_matrix)
 
 # compressed_dtw = get_compressed_dtw(dtw_matrix, constraint)
@@ -229,8 +129,15 @@ given_harmonic_part    = simplified_data_multinote
 #     count += 1
 # print(count)
 
-# -----------
-# Boyer-Moore
-# -----------
+# ---------------
+# Note evaluation
+# ---------------
 
-get_melody_evaluation(simplified_data, simplified_data_multinote)
+# note_eval = get_note_evaluation(expected_notes, given_notes)
+# draw_note_evaluation(expected_notes, given_notes, note_eval)
+
+# ------------------------------------------
+# Melody evaluation with Boyer-Moore and DTW
+# ------------------------------------------
+
+# run_melody_evaluation(exp_harmonic_part, giv_harmonic_part)

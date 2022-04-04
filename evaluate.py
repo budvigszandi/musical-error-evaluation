@@ -2,6 +2,7 @@ from input.midi_reader import *
 from metrics.distances.distances import *
 from metrics.distances.boyer_moore import *
 from visualizer.draw_harmonic_part_results import *
+from visualizer.draw_note_results import *
 
 # TODO: Give warning if the DTW matrix dimensions are too big
 def get_melody_dtw_evaluation(expected, given):
@@ -10,6 +11,10 @@ def get_melody_dtw_evaluation(expected, given):
   print_song(expected)
   print("Given:")
   print_song(given)
+
+  # TODO: Draw expected sheet into output folder after conversion
+  # put_sheet_in_output_folder(score)
+
   dtw_matrix = dtw(expected, given, 3, True)
 
   print("DTW matrix")
@@ -38,7 +43,7 @@ def get_melody_dtw_evaluation(expected, given):
 
   return best_permutation, note_evaluation
 
-def get_melody_evaluation(expected, given):
+def run_melody_evaluation(expected, given):
   print("-------------------------------- Original data --------------------------------")
   print("Expected song:")
   print_song(expected)
@@ -62,9 +67,60 @@ def get_melody_evaluation(expected, given):
     print("--------------------------------- Evaluation ----------------------------------")
     draw_harmonic_part_differences_from_boyer_moore(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
 
+def get_note_evaluation(expected_notes, given_notes):
+  print("------------------------------- Note evaluation -------------------------------")
+
+  # TODO: Warning when evaluation is going to be slow
+
+  print("Expected notes:")
+  print_notes(expected_notes)
+  print("Given notes:")
+  print_notes(given_notes)
+
+  print("[-] Building relationship matrix...")
+  rel_matrix = get_relationship_matrix(expected_notes, given_notes)
+  print("[X] Built relationship matrix.")
+
+  print("[-] Building relationship point matrix...")
+  rel_points_matrix = get_relationship_points(rel_matrix)
+  print("[X] Built relationship point matrix.")
+
+  print("[-] Getting scenarios...")
+  scenarios = get_scenarios(rel_matrix, rel_points_matrix)
+  print("[-] Got scenarios.")
+
+  print("[-] Getting best scenario...")
+  best_scenario = get_best_scenario(scenarios)
+  print("[X] Got best scenario...")
+
+  print("\n------ Chosen best scenario ------")
+  for rel in best_scenario:
+    print(rel)
+  print("Points:", scenarios[best_scenario], end="\n\n")
+
+  return best_scenario
+
+def draw_note_evaluation(expected_notes, given_notes, note_eval):
+  print("[-] Assembling result graph...")
+  fig, ax = plt.subplots()
+  graph = nx.Graph()
+  add_nodes(graph, expected_notes, given_notes)
+  group_expected_nodes(expected_notes)
+  group_related_nodes_with_edge_creation(graph, expected_notes, note_eval)
+  group_isolated_expected_nodes(graph)
+  print("[X] Assembled result graph, now drawing.")
+  draw_graph(graph, ax)
+
 def print_song(song):
   if len(song) == 0:
     print("[]")
   for i in range(len(song)):
     print(f"[{i}] {str(song[i])} - {song[i].duration.fullName}")
+  print()
+
+def print_notes(notes):
+  if len(notes) == 0:
+    print("[]")
+  for i in range(len(notes)):
+    print(f"[{i}] {notes[i].nameWithOctave}")
   print()
