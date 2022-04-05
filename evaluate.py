@@ -12,9 +12,6 @@ def get_melody_dtw_evaluation(expected, given):
   print("Given:")
   print_song(given)
 
-  # TODO: Draw expected sheet into output folder after conversion
-  # put_sheet_in_output_folder(score)
-
   dtw_matrix = dtw(expected, given, 3, True)
 
   print("DTW matrix")
@@ -43,7 +40,15 @@ def get_melody_dtw_evaluation(expected, given):
 
   return best_permutation, note_evaluation
 
-def run_melody_evaluation(expected, given):
+def run_melody_evaluation(exp_score, giv_score):
+  print("------ Drawing sheet music ------")
+  put_sheet_in_output_folder(exp_score)
+
+  print("[-] Simplifying MIDI data...")
+  expected = get_simplified_data_from_score(exp_score)
+  given = get_simplified_data_from_score(giv_score)
+  print("[X] Simplified MIDI data")
+
   print("-------------------------------- Original data --------------------------------")
   print("Expected song:")
   print_song(expected)
@@ -61,8 +66,8 @@ def run_melody_evaluation(expected, given):
   print("---------------------------- Boyer-Moore fixpoints ----------------------------")
   exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
   if exp_copy == [] and giv_copy == []:
-    # TODO: Draw the same sheet
-    print("Should draw the same sheet")
+    print("\n------ Drawing sheet music ------")
+    put_sheet_in_output_folder(giv_score, True)
   else:
     print("--------------------------------- Evaluation ----------------------------------")
     draw_harmonic_part_differences_from_boyer_moore(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
