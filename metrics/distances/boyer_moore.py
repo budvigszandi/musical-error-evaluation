@@ -1,5 +1,11 @@
-import music21 as m21
 import copy
+
+# This module didn't use the rhythmic info correctly. It can be worked out in
+# the future if needed, the idea is good, but now we're using the logic from
+# boyer_moore_m21 instead. I also kept the drawing functions that work with
+# this logic in case of further development in the future:
+# draw_harmonic_part_results.draw_from_bm_chars,
+# draw_harmonic_part_results.add_matched_chunk_to_notation_string_bm_chars
 
 NO_OF_CHARS = 256
 REST_CHARACTER = "R"
@@ -144,7 +150,7 @@ def get_next_number_index(song_chunk):
     if song_chunk[i].isnumeric():
       return i
 
-def get_next_letter_index(song_chunk):
+def get_non_blank_letter_index(song_chunk):
   for i in range(len(song_chunk)):
     if song_chunk[i] != BLANK_CHARACTER:
       return i

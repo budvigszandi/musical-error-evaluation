@@ -1,6 +1,7 @@
 from input.midi_reader import *
 from metrics.distances.distances import *
 from metrics.distances.boyer_moore import *
+from metrics.distances.boyer_moore_m21 import get_different_parts as get_different_parts_bm_m21
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 
@@ -40,7 +41,21 @@ def get_melody_dtw_evaluation(expected, given):
 
   return best_permutation, note_evaluation
 
-def run_melody_evaluation(exp_score, giv_score):
+def get_only_dtw_evaluation(exp_score, giv_score):
+  print("------ Drawing sheet music ------")
+  put_sheet_in_output_folder(exp_score)
+
+  print("[-] Simplifying MIDI data...")
+  expected = get_simplified_data_from_score(exp_score)
+  given = get_simplified_data_from_score(giv_score)
+  print("[X] Simplified MIDI data")
+
+  best_permutation, note_evaluation = get_melody_dtw_evaluation(expected, given)
+
+  notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluation)
+  draw_sheet_music(notation_string)
+
+def run_main_melody_evaluation(exp_score, giv_score, m21=False):
   print("------ Drawing sheet music ------")
   put_sheet_in_output_folder(exp_score)
 
@@ -55,22 +70,34 @@ def run_melody_evaluation(exp_score, giv_score):
   print("Given song:")
   print_song(given)
 
-  print("--------------------------- Boyer-Moore initializing --------------------------")
-  bm_expected = m21_to_boyer_moore(expected)
-  bm_given = m21_to_boyer_moore(given)
-  print("Expected:")
-  print(bm_expected, end="\n\n")
-  print("Given:")
-  print(bm_given, end="\n\n")
+  if not m21:
+    print("--------------------------- Boyer-Moore initializing --------------------------")
+    bm_expected = m21_to_boyer_moore(expected)
+    bm_given = m21_to_boyer_moore(given)
+    print("Expected:")
+    print(bm_expected, end="\n\n")
+    print("Given:")
+    print(bm_given, end="\n\n")
 
-  print("---------------------------- Boyer-Moore fixpoints ----------------------------")
-  exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
-  if exp_copy == [] and giv_copy == []:
-    print("\n------ Drawing sheet music ------")
-    put_sheet_in_output_folder(giv_score, True)
+    print("---------------------------- Boyer-Moore fixpoints ----------------------------")
+    exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
+    if exp_copy == [] and giv_copy == []:
+      print("\n------ Drawing sheet music ------")
+      put_sheet_in_output_folder(giv_score, True)
+    else:
+      print("--------------------------------- Evaluation ----------------------------------")
+      draw_from_bm_chars(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
   else:
-    print("--------------------------------- Evaluation ----------------------------------")
-    draw_harmonic_part_differences_from_boyer_moore(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
+    print("--------------------------- Boyer-Moore initializing --------------------------")
+
+    print("---------------------------- Boyer-Moore fixpoints ----------------------------")
+    exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts_bm_m21(expected, given)
+    if exp_copy == [] and giv_copy == []:
+      print("\n------ Drawing sheet music ------")
+      put_sheet_in_output_folder(giv_score, True)
+    else:
+      print("--------------------------------- Evaluation ----------------------------------")
+      draw_from_bm_m21(given, exp_copy, giv_copy, exp_chunks, giv_chunks)
 
 def get_note_evaluation(expected_notes, given_notes):
   print("------------------------------- Note evaluation -------------------------------")

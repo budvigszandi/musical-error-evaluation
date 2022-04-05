@@ -1,5 +1,6 @@
 import music21 as m21
-from evaluate import draw_note_evaluation, get_note_evaluation, run_melody_evaluation
+from dtw_boundaries import get_dtw_runtimes
+from evaluate import get_melody_dtw_evaluation, get_only_dtw_evaluation, run_main_melody_evaluation
 from metrics.notes.evaluate_notes import *
 from visualizer.draw_note_results import *
 from metrics.distances.distances import *
@@ -68,10 +69,8 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-score = get_score_from_midi("../midi/deja-vu.mid")
-exp_harmonic_part = get_simplified_data_from_score(score)
-score_multinote = get_score_from_midi("../midi/deja-vu-del-2.mid")
-giv_harmonic_part = get_simplified_data_from_score(score_multinote)
+exp_score = get_score_from_midi("../midi/deja-vu.mid")
+giv_score = get_score_from_midi("../midi/deja-vu-1csuszas-1felharm.mid")
 
 # --------------------
 # Levenshtein distance
@@ -136,8 +135,25 @@ giv_harmonic_part = get_simplified_data_from_score(score_multinote)
 # note_eval = get_note_evaluation(expected_notes, given_notes)
 # draw_note_evaluation(expected_notes, given_notes, note_eval)
 
+# --------------------------------
+# Melody evaluation using only DTW 
+# --------------------------------
+
+# get_only_dtw_evaluation(exp_score, giv_score)
+
 # ------------------------------------------
 # Melody evaluation with Boyer-Moore and DTW
 # ------------------------------------------
 
-# run_melody_evaluation(exp_harmonic_part, giv_harmonic_part)
+run_main_melody_evaluation(exp_score, giv_score, True)
+
+# -----------------
+# DTW runtime check
+# -----------------
+
+# runtimes = get_dtw_runtimes()
+# for elem in runtimes:
+#   if float(runtimes[elem]) > 15:
+#     print(elem, runtimes[elem], "seconds - LONG TIME")
+#   else:
+#     print(elem, runtimes[elem], "seconds")
