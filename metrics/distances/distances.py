@@ -203,13 +203,13 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
       current_note_eval = []
       for k in current_permutation:
         current_step = k
-        if current_step == "L":
-          dtw_matrix_i += 1
+        if current_step == "R":
+          dtw_matrix_j += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
           permutation_as_reltype.append(DistanceType.INSERTION)
           if current_target_index < len(target) - 1: current_target_index += 1
-        elif current_step == "R":
-          dtw_matrix_j += 1
+        elif current_step == "L":
+          dtw_matrix_i += 1
           contains_infinity = is_infinity(dtw_matrix[dtw_matrix_i][dtw_matrix_j])
           permutation_as_reltype.append(DistanceType.DELETION)
           if current_source_index < len(source) - 1: current_source_index += 1
