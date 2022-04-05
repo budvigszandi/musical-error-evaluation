@@ -21,14 +21,17 @@ def draw_harmonic_part_differences_from_boyer_moore(orig_exp, orig_giv, bm_exp, 
     if giv_copy[current] == BLANK_CHARACTER:
       print("\n------ Matched chunk ------")
       next_letter_index = get_next_letter_index(giv_copy[current:])
-      matched_chunk = bm_giv[current - giv_ins_empty_chunks : current + next_letter_index - giv_ins_empty_chunks]
-      print(f"Matched chunk at {current}-{current + next_letter_index}")
-      print(matched_chunk)
       if next_letter_index != None:
+        matched_chunk = bm_giv[current - giv_ins_empty_chunks : current + next_letter_index - giv_ins_empty_chunks]
+        print(f"Matched chunk at {current}-{current + next_letter_index}")
+        print(matched_chunk)
         notation_string = add_matched_chunk_to_notation_string(notation_string, orig_giv, bm_giv, current - giv_ins_empty_chunks, current + next_letter_index - giv_ins_empty_chunks)
         current += next_letter_index
         current_exp += next_letter_index
       else:
+        matched_chunk = bm_giv[current - giv_ins_empty_chunks :]
+        print(f"Matched chunk at {current}-{len(giv_copy)}")
+        print(matched_chunk)
         notation_string = add_matched_chunk_to_notation_string(notation_string, orig_giv, bm_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1)
         current = len(giv_copy)
         current_exp = len(exp_copy)
