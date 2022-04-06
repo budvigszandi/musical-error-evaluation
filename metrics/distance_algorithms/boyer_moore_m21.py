@@ -1,5 +1,5 @@
 import copy
-from metrics.distances.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, make_fixpoint_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_FIXPOINT_LENGTH
+from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, make_fixpoint_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_FIXPOINT_LENGTH
 from input.midi_reader import *
 
 def m21_bm_search(txt, pat):

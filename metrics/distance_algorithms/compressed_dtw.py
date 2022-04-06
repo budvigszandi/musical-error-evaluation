@@ -1,4 +1,4 @@
-from metrics.distances.distances import *
+from metrics.distance_algorithms.distances import *
 from input.midi_reader import *
 import numpy as np
 

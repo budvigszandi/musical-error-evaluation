@@ -2,7 +2,7 @@ from metrics.notes.evaluate_notes import *
 from metrics.harmonic_parts.harmonic_part_points import HarmonicPartPoints
 from metrics.notes.note_points import NotePoints
 from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
-from metrics.distances.distance_type import DistanceType
+from metrics.distance_algorithms.distance_type import DistanceType
 from metrics.rhythms.rhythm_points import RhythmPoints
 from metrics.notes.note_points import NotePoints
 

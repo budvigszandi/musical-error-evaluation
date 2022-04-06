@@ -1,10 +1,10 @@
 import music21 as m21
 from input.midi_reader import put_sheet_in_output_folder
-from metrics.distances.distance_type import DistanceType
+from metrics.distance_algorithms.distance_type import DistanceType
 from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 from visualizer.harmonic_part_colors import HarmonicPartColors
 from metrics.notes.note_relationship_type import NoteRelationshipType
-from metrics.distances.boyer_moore import *
+from metrics.distance_algorithms.boyer_moore import *
 
 NOTATION_CHORD_BEGINNING = "chord{"
 NOTATION_CHORD_ENDING = "} "
@@ -91,7 +91,7 @@ def add_matched_chunk_to_notation_string_bm_m21(notation_string, orig, bm_chunk_
   print(notation_string[notation_string_length:])
   return notation_string
 
-# This is a drawing function for metrics.distances.boyer_moore, which is not
+# This is a drawing function for metrics.distance_algorithms.boyer_moore, which is not
 # used, but kept for chance of future development
 def draw_from_bm_chars(orig_exp, orig_giv, bm_exp, bm_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
   notation_string = ""
@@ -158,7 +158,7 @@ def draw_from_bm_chars(orig_exp, orig_giv, bm_exp, bm_giv, exp_copy, giv_copy, e
   print(notation_string)
   draw_sheet_music(notation_string)
 
-# This is a drawing function for metrics.distances.boyer_moore, which is not
+# This is a drawing function for metrics.distance_algorithms.boyer_moore, which is not
 # used, but kept for chance of future development
 def add_matched_chunk_to_notation_string_bm_chars(notation_string, orig, bm_array, bm_chunk_begin, bm_chunk_end):
   notation_string_length = len(notation_string)

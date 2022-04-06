@@ -1,7 +1,7 @@
 from input.midi_reader import *
-from metrics.distances.distances import *
-from metrics.distances.boyer_moore import *
-from metrics.distances.boyer_moore_m21 import get_different_parts as get_different_parts_bm_m21
+from metrics.distance_algorithms.distances import *
+from metrics.distance_algorithms.boyer_moore import *
+from metrics.distance_algorithms.boyer_moore_m21 import get_different_parts as get_different_parts_bm_m21
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 

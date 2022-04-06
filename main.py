@@ -3,13 +3,13 @@ from dtw_boundaries import get_dtw_runtimes
 from evaluate import get_melody_dtw_evaluation, get_only_dtw_evaluation, run_main_melody_evaluation
 from metrics.notes.evaluate_notes import *
 from visualizer.draw_note_results import *
-from metrics.distances.distances import *
+from metrics.distance_algorithms.distances import *
 from visualizer.draw_rhythmic_results import *
 from metrics.rhythms.evaluate_rhythms import *
 from input.midi_reader import *
 from visualizer.draw_harmonic_part_results import *
-from metrics.distances.compressed_dtw import *
-from metrics.distances.boyer_moore import *
+from metrics.distance_algorithms.compressed_dtw import *
+from metrics.distance_algorithms.boyer_moore import *
 
 # TODO: Refactor main
 
@@ -92,7 +92,7 @@ giv_score = get_score_from_midi("../midi/deja-vu-1csuszas-1felharm.mid")
 
 # print("Levenshtein scenario:")
 # get_levenshtein_distance(source, target)
-# distance_matrix = fill_distance_matrix(source, target)
+# distance_matrix = fill_levenshtein_distance_matrix(source, target)
 # draw_rhythmic_differences_from_matrix(source, target, distance_matrix)
 
 # ----------------------------

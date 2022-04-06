@@ -1,4 +1,4 @@
-from metrics.distances.distance_type import DistanceType
+from metrics.distance_algorithms.distance_type import DistanceType
 from metrics.rhythms.rhythm_points import RhythmPoints
 
 def get_rhythmic_point(step_permutation, source, target):
