@@ -1,4 +1,5 @@
 from metrics.distance_algorithms.distance_type import DistanceType
+from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 from visualizer.background_colors import *
 from visualizer.rhythm_difference_string import *
 
@@ -22,26 +23,22 @@ def draw_rhythmic_differences_from_matrix(source, target, distance_matrix):
       compared_target_string.add_to_front(current_target, backgroundColors.INSERTION)
       j -= 1
       continue
-    # print(f"Source: {current_source}, Target: {current_target}")
-    if current == 0 or source[i - 1] == target [j - 1]:
-      # print("same character")
+    rhythmic_distance = get_rhythmic_distance(source[i - 1], target[j - 1])
+    if current == 0 or rhythmic_distance == 0:
       i = i - 1
       j = j - 1
       compared_source_string.add_to_front(current_source, backgroundColors.SAME)
       compared_target_string.add_to_front(current_target, backgroundColors.SAME)
     elif current > 0:
       if current == distance_matrix[i - 1, j] + 1:
-        # print("deletion")
         i = i - 1
         compared_source_string.add_to_front(current_source, backgroundColors.DELETION)
         compared_target_string.add_to_front(" " * len(current_source), backgroundColors.DELETION)
       elif current == distance_matrix[i, j - 1] + 1:
-        # print("insertion")
         j = j - 1
         compared_source_string.add_to_front(" " * len(current_target), backgroundColors.INSERTION)
         compared_target_string.add_to_front(current_target, backgroundColors.INSERTION)
       elif current == distance_matrix[i - 1, j - 1] + 1:
-        # print("substitution")
         i = i - 1
         j = j - 1
         compared_source_string.add_to_front(current_source, backgroundColors.SUBSTITUTION)
@@ -60,25 +57,19 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
 
   for i in range(len(steps)):
     current_step = steps[i]
-    # print("si", current_source_index, "ti", current_target_index)
-    # current_source = source[current_source_index]
-    # current_target = target[current_target_index]
     current_source = get_current_element_string(source, current_source_index)
     current_target = get_current_element_string(target, current_target_index)
     if current_step == DistanceType.DELETION:
-      # print("deletion", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.DELETION)
       compared_target_string.add_to_back(" " * len(current_source), backgroundColors.DELETION)
       if current_source_index < len(source) - 1:
         current_source_index += 1
     elif current_step == DistanceType.INSERTION:
-      # print("insertion", current_source, current_target)
       compared_source_string.add_to_back(" " * len(current_target), backgroundColors.INSERTION)
       compared_target_string.add_to_back(current_target, backgroundColors.INSERTION)
       if current_target_index < len(target) - 1:
         current_target_index += 1
     elif current_step == DistanceType.SAME:
-      # print("same", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.SAME)
       compared_target_string.add_to_back(current_target, backgroundColors.SAME)
       if current_source_index < len(source) - 1:
@@ -86,7 +77,6 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
       if current_target_index < len(target) - 1:
         current_target_index += 1
     elif current_step == DistanceType.SUBSTITUTION:
-      # print("substitution", current_source, current_target)
       compared_source_string.add_to_back(current_source, backgroundColors.SUBSTITUTION)
       compared_target_string.add_to_back(current_target, backgroundColors.SUBSTITUTION)
       if current_source_index < len(source) - 1:
@@ -100,15 +90,12 @@ def draw_rhythmic_differences_from_steps(source, target, steps):
 def get_current_element_string(elements, index):
   current_element = ""
   for i in range(len(elements)):
-    # Comment here to testing with simple strings instead of notes
-    # and rests until the logic is ready
     if elements[i].isNote:
       type = "N"
     elif elements[i].isRest:
       type = "R"
     if i == index:
       current_element = type + " - " + str(elements[i].duration.quarterLength)
-      # current_element = str(elements[i])
   return current_element
 
   # ---

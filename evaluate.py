@@ -4,6 +4,7 @@ from metrics.distance_algorithms.boyer_moore import *
 from metrics.distance_algorithms.boyer_moore_m21 import get_different_parts as get_different_parts_bm_m21
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
+from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps
 
 # TODO: Give warning if the DTW matrix dimensions are too big
 def get_melody_dtw_evaluation(expected, given):
@@ -142,6 +143,40 @@ def draw_note_evaluation(expected_notes, given_notes, note_eval):
   group_isolated_expected_nodes(graph)
   print("[X] Assembled result graph, now drawing.")
   draw_graph(graph, ax)
+
+def get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm):
+  print("------------------------ Levenshtein rhythm evaluation ------------------------")
+
+  print("[-] Getting Levenshtein distance matrix...")
+  distance_matrix = fill_levenshtein_distance_matrix(expected_rhythm, given_rhythm)
+  print("[X] Got Levenshtein distance matrix:")
+  print(distance_matrix)
+
+  print("[-] Getting all step permuations for Levenshtein distance matrix...")
+  all_step_permutations = get_all_step_permutations(expected_rhythm, given_rhythm)
+  print("[X] Got all step permutations")
+
+  print("[-] Converting steps, counting permutation points...")
+  converted_permutations_lev, points = convert_steps_with_points_levenshtein(all_step_permutations, expected_rhythm, given_rhythm)
+  print("[X] Converted steps, got permutation points")
+
+  print("[-] Getting best permutations...")
+  best_permutation_indices = get_best_permutation_indices(points)
+  print("[X] Got best permutations")
+
+  print("\nAmount of best permutations:", len(best_permutation_indices))
+
+  print("\n--- Chosen best permutation (Levenshtein distance with points) ---")
+  i = 0
+  for index in best_permutation_indices:
+    i += 1
+    print(i)
+    draw_rhythmic_differences_from_steps(expected_rhythm, given_rhythm, converted_permutations_lev[index])
+    print("Point:", points[index])
+    print()
+
+  print("\n--- Permutation based on Levenshtein distance matrix without points ---")
+  draw_rhythmic_differences_from_matrix(expected_rhythm, given_rhythm, distance_matrix)
 
 def print_song(song):
   if len(song) == 0:

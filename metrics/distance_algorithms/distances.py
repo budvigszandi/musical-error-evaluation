@@ -10,10 +10,6 @@ def get_levenshtein_distance(source, target):
   size_of_source = len(source) + 1
   size_of_target = len(target) + 1
   distance_matrix = fill_levenshtein_distance_matrix(source, target)
-  # Just testing output here
-  print(distance_matrix)
-  print("Levenshtein distance:", distance_matrix[size_of_source - 1][size_of_target - 1])
-  #print(f"Distance between {source} and {target} is {distance_matrix[size_of_source - 1][size_of_target - 1]}") 
   return distance_matrix[size_of_source - 1][size_of_target - 1]
 
 # len(source) number of rows, len(target) number of columns
@@ -43,33 +39,6 @@ def initiate_levenshtein_distance_matrix(size_of_source, size_of_target):
   for j in range(size_of_target):
     distance_matrix[0, j] = j
   return distance_matrix
-
-def dtw(s, t, window, harmonic_parts = False):
-  n, m = len(s), len(t)
-  w = np.max([window, abs(n - m)])
-  dtw_matrix = np.zeros((n + 1, m + 1))
-  
-  for i in range(n + 1):
-    for j in range(m + 1):
-      dtw_matrix[i, j] = np.inf
-  dtw_matrix[0, 0] = 0
-  
-  for i in range(1, n + 1):
-    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
-      dtw_matrix[i, j] = 0
-  
-  for i in range(1, n + 1):
-    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
-      if harmonic_parts:
-        cost = abs(get_harmonic_part_distance(s[i - 1], t[j - 1]))
-      else:
-        cost = abs(get_rhythmic_distance(s[i - 1], t[j - 1]))
-      # take last min from a square box
-      last_min = np.min([dtw_matrix[i - 1, j],       # insertion
-                         dtw_matrix[i, j - 1],       # deletion
-                         dtw_matrix[i - 1, j - 1]])  # match
-      dtw_matrix[i, j] = cost + last_min
-  return dtw_matrix
 
 def get_all_step_permutations(source, target):
   number_of_rows = len(source)
@@ -106,68 +75,79 @@ def get_all_step_permutations(source, target):
   return step_permutations
 
 def convert_steps_with_points_levenshtein(step_permutations, source, target):
-  all_step_permutations = list(step_permutations)
-  # print("Amount of different step quantities (8 steps, 6 steps etc.)", len(all_step_permutations))
-
-  # print("Permutations in X amount of steps", len(all_step_permutations[0]))
-
-  steps_of_same_amount = list(all_step_permutations[0])
-  # print("One permutation of steps", len(steps_of_same_amount[1]))
-
-  # sum = 0
-  # for i in range(len(all_step_permutations)):
-  #   sum += len(all_step_permutations[i])
-  # print(sum, "permutations")
-
+  all_step_permutations = step_permutations
+  steps_of_same_amount = all_step_permutations[0]
+  
   converted_permutations = []
-  points = [] # TODO: This is a separate array because of the weird indexing
-              # in the lower for loop 'for j in range(len(steps_of_same_amount)):'
-              # This needs further checking.
+  points = []
 
-  for i in range(len(all_step_permutations)):
-    steps_of_same_amount = list(all_step_permutations[i])
-    for j in range(len(steps_of_same_amount)):
-      current_permutation = steps_of_same_amount[j]
-      # print(j, current_permutation)
+  for i in all_step_permutations:
+    steps_of_same_amount = i
+    for j in steps_of_same_amount:
+      current_permutation = j
       current_source_index = 0
       current_target_index = 0
       permutation_as_reltype = []
-      for k in range(len(current_permutation)):
-        current_step = current_permutation[k]
-        # print(current_step)
+      for k in current_permutation:
+        current_step = k
         if current_step == "L":
-          # print("L")
           permutation_as_reltype.append(DistanceType.DELETION)
           current_source_index += 1
         elif current_step == "R":
-          # print("R")
           permutation_as_reltype.append(DistanceType.INSERTION)
           current_target_index += 1
         elif current_step == "D":
-          # print("D")
-          if source[current_source_index] == target[current_target_index]:
-            permutation_as_reltype.append(DistanceType.SAME)
+          current_source = source[current_source_index]
+          current_target = target[current_target_index]
+          types_are_the_same = (current_source.isNote == current_target.isNote) and (current_source.isChord == current_target.isChord)
+          rhythms_are_equal = current_source.quarterLength == current_target.quarterLength
+          if types_are_the_same:
+            if rhythms_are_equal:
+              permutation_as_reltype.append(DistanceType.SAME)
+            else:
+              permutation_as_reltype.append(DistanceType.SUBSTITUTION)
           else:
             permutation_as_reltype.append(DistanceType.SUBSTITUTION)
           current_source_index += 1
           current_target_index += 1
       converted_permutations.append(permutation_as_reltype)
       points.append(get_rhythmic_point(permutation_as_reltype, source, target))
-      # print(permutation_as_reltype)
-  # print(len(permutations_as_reltypes), permutations_as_reltypes)
   
   return converted_permutations, points
 
+def dtw(s, t, window, harmonic_parts = False):
+  n, m = len(s), len(t)
+  w = np.max([window, abs(n - m)])
+  dtw_matrix = np.zeros((n + 1, m + 1))
+  
+  for i in range(n + 1):
+    for j in range(m + 1):
+      dtw_matrix[i, j] = np.inf
+  dtw_matrix[0, 0] = 0
+  
+  for i in range(1, n + 1):
+    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
+      dtw_matrix[i, j] = 0
+  
+  for i in range(1, n + 1):
+    for j in range(np.max([1, i - w]), np.min([m, i + w]) + 1):
+      if harmonic_parts:
+        cost = abs(get_harmonic_part_distance(s[i - 1], t[j - 1]))
+      else:
+        cost = abs(get_rhythmic_distance(s[i - 1], t[j - 1]))
+      # take last min from a square box
+      last_min = np.min([dtw_matrix[i - 1, j],       # insertion
+                         dtw_matrix[i, j - 1],       # deletion
+                         dtw_matrix[i - 1, j - 1]])  # match
+      dtw_matrix[i, j] = cost + last_min
+  return dtw_matrix
+
 def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False):
-  # print("STEPS W POINTS source", source)
-  # print("STEPS W POINTS target", target)
   all_step_permutations = step_permutations
   steps_of_same_amount = all_step_permutations[0]
 
   converted_permutations = []
-  points = [] # TODO: This is a separate array because of the weird indexing
-              # in the lower for loop 'for j in range(len(steps_of_same_amount)):'
-              # This needs further checking, maybe conversion to generator object.
+  points = []
   note_evaluations = []
 
   if source == [] or target == []:

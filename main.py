@@ -1,7 +1,7 @@
 import music21 as m21
-from dtw_boundaries import get_dtw_runtimes
-from evaluate import get_melody_dtw_evaluation, get_only_dtw_evaluation, run_main_melody_evaluation
+from evaluate import get_levenshtein_rhythm_evaluation, get_melody_dtw_evaluation, get_only_dtw_evaluation, run_main_melody_evaluation
 from metrics.notes.evaluate_notes import *
+from statistics import get_dtw_boundaries, get_dtw_levenshtein_stats
 from visualizer.draw_note_results import *
 from metrics.distance_algorithms.distances import *
 from visualizer.draw_rhythmic_results import *
@@ -69,39 +69,39 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 # Expected and given melodies
 # ---------------------------
 
-exp_score = get_score_from_midi("../midi/deja-vu.mid")
-giv_score = get_score_from_midi("../midi/deja-vu-1csuszas-1felharm.mid")
+exp_score = get_score_from_midi("../midi/rhythm-expected.mid")
+giv_score = get_score_from_midi("../midi/rhythm-given.mid")
 
-# --------------------
-# Levenshtein distance
-# --------------------
-# source = expected_rhythm
-# target = given_rhythm
+# ------------------------------------------
+# Melody evaluation with Boyer-Moore and DTW
+# ------------------------------------------
 
-# all_step_permutations = get_all_step_permutations(source, target)
-# # print(all_step_permutations)
-# converted_permutations_lev, points = convert_steps_with_points_levenshtein(all_step_permutations, source, target)
-# # print(len(permutations_as_reltypes), permutations_as_reltypes)
+# run_main_melody_evaluation(exp_score, giv_score, True)
 
-# print("All permutations:")
-# for i in range(len(converted_permutations_lev)):
-#   print(i + 1)
-#   draw_rhythmic_differences_from_steps(source, target, converted_permutations_lev[i])
-#   print("Point:", points[i])
-#   print()
+# --------------------------------
+# Melody evaluation using only DTW 
+# --------------------------------
 
-# print("Levenshtein scenario:")
-# get_levenshtein_distance(source, target)
-# distance_matrix = fill_levenshtein_distance_matrix(source, target)
-# draw_rhythmic_differences_from_matrix(source, target, distance_matrix)
+# get_only_dtw_evaluation(exp_score, giv_score)
+
+# ---------------
+# Note evaluation
+# ---------------
+
+# note_eval = get_note_evaluation(expected_notes, given_notes)
+# draw_note_evaluation(expected_notes, given_notes, note_eval)
+
+# -------------------------------------------
+# Rhythm evaluation with Levenshtein distance
+# -------------------------------------------
+
+# get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm)
 
 # ----------------------------
 # DTW - Levenshtein statistics
 # ----------------------------
 
-# print("Levenshtein permutations:", len(converted_permutations_lev))
-# print("DTW permutations:", len(converted_permutations_dtw))
-# print(f"DTW permutations / Levenshtein permutations: {((len(converted_permutations_dtw) / len(converted_permutations_lev)) * 100):.2f} %")
+get_dtw_levenshtein_stats(1, 7)
 
 # --------------
 # Compressed DTW
@@ -128,32 +128,8 @@ giv_score = get_score_from_midi("../midi/deja-vu-1csuszas-1felharm.mid")
 #     count += 1
 # print(count)
 
-# ---------------
-# Note evaluation
-# ---------------
-
-# note_eval = get_note_evaluation(expected_notes, given_notes)
-# draw_note_evaluation(expected_notes, given_notes, note_eval)
-
-# --------------------------------
-# Melody evaluation using only DTW 
-# --------------------------------
-
-# get_only_dtw_evaluation(exp_score, giv_score)
-
-# ------------------------------------------
-# Melody evaluation with Boyer-Moore and DTW
-# ------------------------------------------
-
-run_main_melody_evaluation(exp_score, giv_score, True)
-
 # -----------------
 # DTW runtime check
 # -----------------
 
-# runtimes = get_dtw_runtimes()
-# for elem in runtimes:
-#   if float(runtimes[elem]) > 15:
-#     print(elem, runtimes[elem], "seconds - LONG TIME")
-#   else:
-#     print(elem, runtimes[elem], "seconds")
+# get_dtw_boundaries(1, 10)
