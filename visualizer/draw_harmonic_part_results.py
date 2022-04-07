@@ -10,68 +10,6 @@ NOTATION_CHORD_BEGINNING = "chord{"
 NOTATION_CHORD_ENDING = "} "
 NOTATION_REST = "r"
 
-def draw_from_bm_m21(orig_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
-  notation_string = ""
-  current = 0
-  current_exp = 0
-  unmatched_chunk_count = 0
-  exp_ins_empty_chunks = 0
-  giv_ins_empty_chunks = 0
-  while current < len(orig_giv):    
-    if giv_copy[current] == BLANK_CHARACTER:
-      print("\n------ Matched chunk ------")
-      next_non_blank_letter_index = get_non_blank_letter_index(giv_copy[current:])
-      if next_non_blank_letter_index != None:
-        matched_chunk = orig_giv[current - giv_ins_empty_chunks : current + next_non_blank_letter_index - giv_ins_empty_chunks]
-        print(f"Matched chunk at {current}-{current + next_non_blank_letter_index}")
-        print(matched_chunk)
-        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, current + next_non_blank_letter_index - giv_ins_empty_chunks, giv_ins_empty_chunks)
-        current += next_non_blank_letter_index
-        current_exp += next_non_blank_letter_index
-      else:
-        matched_chunk = orig_giv[current - giv_ins_empty_chunks :]
-        print(f"Matched chunk at {current}-{len(giv_copy)}")
-        print(matched_chunk)
-        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1, giv_ins_empty_chunks)
-        current = len(giv_copy)
-        current_exp = len(exp_copy)
-      print("\nCurrent full notation string:")
-      print(notation_string)
-    else:
-      print("\n------ Unmatched chunkpair ------")
-      print("Expected chunk:")
-      print(exp_chunks[unmatched_chunk_count], end="\n\n")
-      print("Given chunk:")
-      print(giv_chunks[unmatched_chunk_count])
-      if exp_copy[current_exp] == EMPTY_CHUNK_CHARACTER:
-        exp_ins_empty_chunks += 1
-      if giv_copy[current] == EMPTY_CHUNK_CHARACTER:
-        giv_ins_empty_chunks += 1
-      next_blank_letter_index = get_next_blank_letter_index(giv_copy[current:])
-      exp_chunk_length = len(exp_chunks[unmatched_chunk_count])
-      if next_blank_letter_index != None:
-        current += next_blank_letter_index
-      else:
-        current = len(giv_copy)
-      current_exp += exp_chunk_length
-      dtw_expected = exp_chunks[unmatched_chunk_count]
-      dtw_given = giv_chunks[unmatched_chunk_count]
-      # This import is here to dodge circular import
-      from evaluate import get_melody_dtw_evaluation
-      steps, note_eval = get_melody_dtw_evaluation(dtw_expected, dtw_given)
-      notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
-      print("\nCurrent full notation string:")
-      print(notation_string)
-      unmatched_chunk_count += 1
-      print()
-    print("\nUnmatched expected chunk total:", len(exp_chunks))
-    print("Unmatched given chunks total:", len(giv_chunks))
-    print("Unmatched chunk pairs evaluated:", unmatched_chunk_count)
-    print("Unmatched chunk pairs remaining:", len(exp_chunks) - unmatched_chunk_count)
-  print("\n------ Final notation string ------")
-  print(notation_string)
-  draw_sheet_music(notation_string)
-
 def add_matched_chunk_to_notation_string_bm_m21(notation_string, orig, bm_chunk_begin, bm_chunk_end, ins_empty_chunks):
   notation_string_length = len(notation_string)
   orig_chunk = orig[bm_chunk_begin - ins_empty_chunks : bm_chunk_end - ins_empty_chunks]
@@ -143,8 +81,8 @@ def draw_from_bm_chars(orig_exp, orig_giv, bm_exp, bm_giv, exp_copy, giv_copy, e
       dtw_expected = orig_exp_chunk
       dtw_given = orig_giv_chunk
       # This import is here to dodge circular import
-      from evaluate import get_melody_dtw_evaluation
-      steps, note_eval = get_melody_dtw_evaluation(dtw_expected, dtw_given)
+      from evaluate import get_song_dtw_evaluation
+      steps, note_eval, point = get_song_dtw_evaluation(dtw_expected, dtw_given)
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
       print("\nCurrent full notation string:")
       print(notation_string)

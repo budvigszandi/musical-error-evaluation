@@ -1,6 +1,9 @@
 import copy
-from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, make_fixpoint_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_FIXPOINT_LENGTH
+from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, get_next_blank_letter_index, get_non_blank_letter_index, make_fixpoint_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_FIXPOINT_LENGTH
 from input.midi_reader import *
+from metrics.harmonic_parts.harmonic_part_points import HarmonicPartPoints
+from metrics.normalize_points import NORMALIZE_MAXIMUM, NORMALIZE_MINIMUM, normalize
+from visualizer.draw_harmonic_part_results import add_matched_chunk_to_notation_string_bm_m21, get_notation_string_from_steps
 
 def m21_bm_search(txt, pat):
   '''
@@ -176,3 +179,83 @@ def get_possible_fixpoints(song, length):
       fixpoint_beginning += shift
       current = fixpoint_beginning
   return fixpoints
+
+def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
+  notation_string = ""
+  current = 0
+  current_exp = 0
+  unmatched_chunk_count = 0
+  exp_ins_empty_chunks = 0
+  giv_ins_empty_chunks = 0
+  matched_length = 0
+  unmatched_point_sum = 0
+
+  while current < len(orig_giv):    
+    if giv_copy[current] == BLANK_CHARACTER:
+      print("\n------ Matched chunk ------")
+      next_non_blank_letter_index = get_non_blank_letter_index(giv_copy[current:])
+      if next_non_blank_letter_index != None:
+        matched_chunk = orig_giv[current - giv_ins_empty_chunks : current + next_non_blank_letter_index - giv_ins_empty_chunks]
+        print(f"Matched chunk at {current}-{current + next_non_blank_letter_index}")
+        print(matched_chunk)
+        matched_length += current + next_non_blank_letter_index - current
+        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, current + next_non_blank_letter_index - giv_ins_empty_chunks, giv_ins_empty_chunks)
+        current += next_non_blank_letter_index
+        current_exp += next_non_blank_letter_index
+      else:
+        matched_chunk = orig_giv[current - giv_ins_empty_chunks :]
+        print(f"Matched chunk at {current}-{len(giv_copy)}")
+        print(matched_chunk)
+        matched_length += len(giv_copy) - current
+        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1, giv_ins_empty_chunks)
+        current = len(giv_copy)
+        current_exp = len(exp_copy)
+      print("\nCurrent full notation string:")
+      print(notation_string)
+    else:
+      print("\n------ Unmatched chunkpair ------")
+      print("Expected chunk:")
+      print(exp_chunks[unmatched_chunk_count], end="\n\n")
+      print("Given chunk:")
+      print(giv_chunks[unmatched_chunk_count])
+      if exp_copy[current_exp] == EMPTY_CHUNK_CHARACTER:
+        exp_ins_empty_chunks += 1
+      if giv_copy[current] == EMPTY_CHUNK_CHARACTER:
+        giv_ins_empty_chunks += 1
+      next_blank_letter_index = get_next_blank_letter_index(giv_copy[current:])
+      exp_chunk_length = len(exp_chunks[unmatched_chunk_count])
+      if next_blank_letter_index != None:
+        current += next_blank_letter_index
+      else:
+        current = len(giv_copy)
+      current_exp += exp_chunk_length
+      dtw_expected = exp_chunks[unmatched_chunk_count]
+      dtw_given = giv_chunks[unmatched_chunk_count]
+      # This import is here to dodge circular import
+      from evaluate import get_song_dtw_evaluation
+      steps, note_eval, point = get_song_dtw_evaluation(dtw_expected, dtw_given)
+      unmatched_point_sum += point
+      notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
+      print("\nCurrent full notation string:")
+      print(notation_string)
+      unmatched_chunk_count += 1
+      print()
+    print("\nUnmatched expected chunk total:", len(exp_chunks))
+    print("Unmatched given chunks total:", len(giv_chunks))
+    print("Unmatched chunk pairs evaluated:", unmatched_chunk_count)
+    print("Unmatched chunk pairs remaining:", len(exp_chunks) - unmatched_chunk_count)
+  print("\n------ Final notation string ------")
+  print(notation_string)
+  final_point = get_final_song_point(len(orig_exp), len(orig_giv), matched_length, unmatched_point_sum)
+  return notation_string, final_point
+
+def get_final_song_point(exp_length, giv_length, matched_length, unmatched_point_sum):
+  matched_point_sum = matched_length * NORMALIZE_MAXIMUM
+
+  final_minimum = exp_length * HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT + \
+                  giv_length * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
+  final_maximum = exp_length * NORMALIZE_MAXIMUM
+
+  final_point_sum = matched_point_sum + unmatched_point_sum
+  final_point_normalized = normalize(final_point_sum, final_minimum, final_maximum)
+  return final_point_normalized

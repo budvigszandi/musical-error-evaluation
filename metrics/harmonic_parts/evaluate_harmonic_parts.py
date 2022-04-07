@@ -5,8 +5,13 @@ from metrics.rhythms.evaluate_rhythms import get_rhythmic_distance
 from metrics.distance_algorithms.distance_type import DistanceType
 from metrics.rhythms.rhythm_points import RhythmPoints
 from metrics.notes.note_points import NotePoints
+from metrics.normalize_points import normalize
 
 def get_harmonic_part_point(step_permutation, source, target):
+  minimum_points = len(source) * HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT - \
+                   len(target) * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
+  maximum_points = len(source) * HarmonicPartPoints.CORRECT_HARMONIC_ELEMENT_POINT
+
   # Starting from the maximum possible amount of points
   point = len(source) * HarmonicPartPoints.CORRECT_HARMONIC_ELEMENT_POINT
   current_source_index = 0
@@ -41,9 +46,10 @@ def get_harmonic_part_point(step_permutation, source, target):
       point -= abs(get_harmonic_part_distance(current_source, current_target))
       if current_source_index < len(source) - 1: current_source_index += 1
       if current_target_index < len(target) - 1: current_target_index += 1
-  return point
+  
+  normalized_point = normalize(point, minimum_points, maximum_points)
+  return normalized_point
 
-# TODO: Continue point system
 def get_harmonic_part_distance(source, target):
   distance = 0
   if source != target:
@@ -53,7 +59,7 @@ def get_harmonic_part_distance(source, target):
     both_are_rests = source.isRest and target.isRest
     if neither_is_rest:
       if is_chord_note_switch:
-        distance += HarmonicPartPoints.CHORD_NOTE_SWITCH_POINT
+        distance -= HarmonicPartPoints.CHORD_NOTE_SWITCH_POINT
       if source.isNote:
         maximum_point = NotePoints.PERFECT_MATCH_POINT
         points = get_best_note_evaluation(source, target, False, True)
@@ -61,25 +67,9 @@ def get_harmonic_part_distance(source, target):
         maximum_point = len(source) * NotePoints.PERFECT_MATCH_POINT
         points = get_best_note_evaluation(source, target, False, True)
       distance += maximum_point - points
-
-      #   if source.isNote and target.isChord:
-      #     maximum_point = NotePoints.PERFECT_MATCH_POINT
-      #     points = get_best_note_evaluation(source, target, False, True)
-      #   elif source.isChord and target.isNote:
-      #     maximum_point = len(source) * NotePoints.PERFECT_MATCH_POINT
-      #     points = get_best_note_evaluation(source, target, False, True)
-      #   distance += maximum_point - points
-      # elif source.isNote and target.isNote:
-      #   maximum_point = NotePoints.PERFECT_MATCH_POINT
-      #   points = get_best_note_evaluation(source, target, False, True)
-      # elif source.isChord and target.isChord:
-      #   maximum_point = len(source) * NotePoints.PERFECT_MATCH_POINT
-      #   points = get_best_note_evaluation(source, target, False, True)
-      # distance += maximum_point - points
-
     elif is_rest_sound_switch:
-      # TODO: Maybe the distance should be even bigger if more sounds are expected
-      distance += HarmonicPartPoints.REST_SOUND_SWITCH_POINT
+      # Development idea: the distance could be even bigger if more sounds are expected (if necessary)
+      distance -= HarmonicPartPoints.REST_SOUND_SWITCH_POINT
     elif both_are_rests:
       rhythmic_distance = get_rhythmic_distance(source, target)
       distance += rhythmic_distance
@@ -106,9 +96,6 @@ def get_best_note_evaluation(source, target, get_scenario, get_points):
         given_notes.append(note.pitch)
   except AttributeError as error:
     given_notes.append(target)
-
-  # print("expected", expected_notes)
-  # print("given", given_notes)
   
   scenarios = get_note_scenarios(expected_notes, given_notes)
   best_scenario = get_best_scenario(scenarios)

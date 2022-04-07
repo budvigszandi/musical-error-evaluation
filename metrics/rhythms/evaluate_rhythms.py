@@ -1,7 +1,11 @@
 from metrics.distance_algorithms.distance_type import DistanceType
+from metrics.normalize_points import normalize
 from metrics.rhythms.rhythm_points import RhythmPoints
 
 def get_rhythmic_point(step_permutation, source, target):
+  minimum_points = len(source) * RhythmPoints.DELETED_RHYTHM_POINT + len(target) * RhythmPoints.INSERTED_RHYTHM_POINT
+  maximum_points = len(source) * RhythmPoints.CORRECT_RHYTHM_POINT
+
   # Starting from the maximum possible amount of points
   point = len(source) * RhythmPoints.CORRECT_RHYTHM_POINT
   current_source_index = 0
@@ -26,14 +30,15 @@ def get_rhythmic_point(step_permutation, source, target):
       point -= abs(get_rhythmic_distance(source[current_source_index], target[current_target_index]))
       if current_source_index < len(source) - 1: current_source_index += 1
       if current_target_index < len(target) - 1: current_target_index += 1
-  return point
+  
+  normalized_point = normalize(point, minimum_points, maximum_points)
+  return normalized_point
 
 # requires two m21.note.Note objects
-# TODO: Points should consider other rhythmic points as well
 def get_rhythmic_distance(source, target):
   distance = 0
   if source.isNote != target.isNote and source.isChord != target.isChord and source.isRest != target.isRest:
-    distance += RhythmPoints.DIFFERENT_TYPE_POINT
+    distance -= RhythmPoints.DIFFERENT_TYPE_POINT
   if source.quarterLength != target.quarterLength:
     if source.quarterLength > target.quarterLength:
       distance += (source.quarterLength - target.quarterLength) * RhythmPoints.LENGTH_DIFFERENCE_WEIGHT

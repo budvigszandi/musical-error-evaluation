@@ -6,7 +6,7 @@ class NotePoints(IntEnum):
   HARMONIC_POINT = 1
   UNRELATED_POINT = 0
   COVERED_NOTE_POINT = 1
-  DUPLICATE_COVER_POINT = 1
+  DUPLICATE_COVER_POINT = -1 # Gets reducted for each added harmonic complexity
 
   RELATIONSHIP_POINT_WEIGHT = 1
   COVERED_NOTE_POINT_WEIGHT = 1

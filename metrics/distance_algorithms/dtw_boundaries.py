@@ -8,8 +8,8 @@ def get_dtw_runtimes(min_matrix_size, max_matrix_size):
   for d in data:
     count = str(len(d[0])) + "x" + str(len(d[1]))
     start = time.time()
-    from evaluate import get_melody_dtw_evaluation
-    get_melody_dtw_evaluation(d[0], d[1])
+    from evaluate import get_song_dtw_evaluation
+    get_song_dtw_evaluation(d[0], d[1])
     end = time.time()
     runtimes[count] = "{:.2f}".format(end - start)
   return runtimes

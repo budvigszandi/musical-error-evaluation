@@ -1,5 +1,5 @@
 import music21 as m21
-from evaluate import get_levenshtein_rhythm_evaluation, get_melody_dtw_evaluation, get_only_dtw_evaluation, run_main_melody_evaluation
+from evaluate import *
 from metrics.notes.evaluate_notes import *
 from statistics import get_dtw_boundaries, get_dtw_levenshtein_stats
 from visualizer.draw_note_results import *
@@ -72,15 +72,15 @@ given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
 exp_score = get_score_from_midi("../midi/rhythm-expected.mid")
 giv_score = get_score_from_midi("../midi/rhythm-given.mid")
 
-# ------------------------------------------
-# Melody evaluation with Boyer-Moore and DTW
-# ------------------------------------------
+# ----------------------------------------
+# Song evaluation with Boyer-Moore and DTW
+# ----------------------------------------
 
-# run_main_melody_evaluation(exp_score, giv_score, True)
+run_main_song_evaluation(exp_score, giv_score, True)
 
-# --------------------------------
-# Melody evaluation using only DTW 
-# --------------------------------
+# ------------------------------
+# Song evaluation using only DTW 
+# ------------------------------
 
 # get_only_dtw_evaluation(exp_score, giv_score)
 
@@ -101,7 +101,7 @@ giv_score = get_score_from_midi("../midi/rhythm-given.mid")
 # DTW - Levenshtein statistics
 # ----------------------------
 
-get_dtw_levenshtein_stats(1, 7)
+# get_dtw_levenshtein_stats(1, 7)
 
 # --------------
 # Compressed DTW

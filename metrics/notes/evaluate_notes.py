@@ -1,3 +1,4 @@
+from metrics.normalize_points import normalize
 import metrics.notes.harmonics as harmonics
 from metrics.notes.note_relationship_type import NoteRelationshipType
 from metrics.notes.note_relationship import NoteRelationship
@@ -147,15 +148,22 @@ def get_sum_of_scenario(index_list, relationship_point_matrix):
     relationship_point_matrix: a 2-d array of the points relating to the
                                relationship matrix.
   '''
+  expected_notes_count = len(relationship_point_matrix[0])
+  minimum_points = 0
+  maximum_points = expected_notes_count * NotePoints.PERFECT_MATCH_POINT * NotePoints.RELATIONSHIP_POINT_WEIGHT + \
+                   expected_notes_count * NotePoints.COVERED_NOTE_POINT * NotePoints.COVERED_NOTE_POINT_WEIGHT
+  
   sum = 0
   for i in range(len(index_list)):
     sum += relationship_point_matrix[i][index_list[i]]
   sum *= NotePoints.RELATIONSHIP_POINT_WEIGHT
   covered_notes_count = get_covered_notes_count(index_list)
   sum += covered_notes_count * NotePoints.COVERED_NOTE_POINT_WEIGHT
-  duplicate_covers_count = get_duplicated_count(index_list)
-  sum -= duplicate_covers_count * NotePoints.DUPLICATE_POINT_WEIGHT
-  return sum
+  duplicate_reduction_point = get_duplicated_reduction_point(index_list)
+  sum += duplicate_reduction_point * NotePoints.DUPLICATE_POINT_WEIGHT
+
+  normalized_sum = normalize(sum, minimum_points, maximum_points)
+  return normalized_sum
 
 def get_covered_notes_count(index_list):
   '''
@@ -169,7 +177,7 @@ def get_covered_notes_count(index_list):
   '''
   return len(Counter(index_list).keys()) * NotePoints.COVERED_NOTE_POINT
 
-def get_duplicated_count(index_list):
+def get_duplicated_reduction_point(index_list):
   '''
   Returns a number representing how many duplications are in the coverage.
   E.g. we have 3 notes, the first covered once, the second covered twice,
@@ -227,6 +235,9 @@ def compare_note_pair(given_note, expected_note):
   else:
     harmonic_info = harmonics.get_harmonic_info(given_note, expected_note)
     if harmonic_info != 0:
-      return NoteRelationship(NoteRelationshipType.HARMONIC, given_note, expected_note, None, harmonic_info)
+      if harmonic_info[0] >= NotePoints.MAXIMUM_HARMONIC_NUMBER:
+        return NoteRelationship(NoteRelationshipType.UNRELATED, given_note, expected_note)
+      else:
+        return NoteRelationship(NoteRelationshipType.HARMONIC, given_note, expected_note, None, harmonic_info)
     else:
       return NoteRelationship(NoteRelationshipType.UNRELATED, given_note, expected_note)
