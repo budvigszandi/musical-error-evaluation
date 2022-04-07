@@ -45,40 +45,67 @@ def get_song_dtw_evaluation(expected, given):
   return best_permutation, note_evaluation, point
 
 def get_only_dtw_evaluation(exp_score, giv_score):
+  if len(exp_score.parts) != len(giv_score.parts):
+    raise ValueError(f"These scores have different amount of parts. Expected {len(exp_score.parts)} parts, given {len(giv_score.parts)} parts.")
+
   print("------ Drawing sheet music ------")
-  put_sheet_in_output_folder(exp_score)
+  for i in range(len(exp_score.parts)):
+    put_sheet_in_output_folder(exp_score.parts[i])
 
   print("[-] Simplifying MIDI data...")
-  expected = get_simplified_data_from_score(exp_score)
-  given = get_simplified_data_from_score(giv_score)
+  expected_data = get_simplified_data_from_score(exp_score)
+  given_data = get_simplified_data_from_score(giv_score)
   print("[X] Simplified MIDI data")
 
-  best_permutation, note_evaluation = get_song_dtw_evaluation(expected, given)
+  print(f"[-] Examining {len(expected_data)} part(s) of music")
 
-  notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluation)
-  draw_sheet_music(notation_string)
+  for i in range(len(expected_data)):
+    print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
+    expected = expected_data[i]
+    given = given_data[i]
+    best_permutation, note_evaluation, point = get_song_dtw_evaluation(expected, given)
+    notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluation)
+    draw_sheet_music(notation_string)
+    print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
+  
+  print("\n[X] Examined all parts of the music")
 
 def run_main_song_evaluation(exp_score, giv_score, m21=False):
+  if len(exp_score.parts) != len(giv_score.parts):
+    raise ValueError(f"These scores have different amount of parts. Expected {len(exp_score.parts)} parts, given {len(giv_score.parts)} parts.")
+  
   print("------ Drawing sheet music ------")
   put_sheet_in_output_folder(exp_score)
+  for i in range(len(exp_score.parts)):
+    put_sheet_in_output_folder(exp_score.parts[i])
 
   print("[-] Simplifying MIDI data...")
-  expected = get_simplified_data_from_score(exp_score)
-  given = get_simplified_data_from_score(giv_score)
+  expected_data = get_simplified_data_from_score(exp_score)
+  given_data = get_simplified_data_from_score(giv_score)
   print("[X] Simplified MIDI data")
 
-  print("-------------------------------- Original data --------------------------------")
-  print("Expected song:")
-  print_song(expected)
-  print("Given song:")
-  print_song(given)
+  print(f"[-] Examining {len(expected_data)} part(s) of music")
 
-  if not m21:
-    # Here we call the logic of metrics.distance_algorithms.boyer_moore, which is not
-    # used now, but kept for chance of future development
-    get_bm_char_evaluation(expected, given, giv_score)
-  else:
-    get_bm_m21_evaluation(expected, given, giv_score)
+  for i in range(len(expected_data)):
+    print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
+    expected = expected_data[i]
+    given = given_data[i]
+
+    print("-------------------------------- Original data --------------------------------")
+    print("Expected song:")
+    print_song(expected)
+    print("Given song:")
+    print_song(given)
+
+    if not m21:
+      # Here we call the logic of metrics.distance_algorithms.boyer_moore, which is not
+      # used now, but kept for chance of future development
+      get_bm_char_evaluation(expected, given, giv_score)
+    else:
+      get_bm_m21_evaluation(expected, given, giv_score)
+    print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
+  
+  print("\n[X] Examined all parts of the music")
 
 # This is a function for metrics.distance_algorithms.boyer_moore, which is not
 # used, but kept for chance of future development
