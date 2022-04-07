@@ -8,8 +8,8 @@ from metrics.notes.note_points import NotePoints
 from metrics.normalize_points import normalize
 
 def get_harmonic_part_point(step_permutation, source, target):
-  minimum_points = len(source) * HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT - \
-                   len(target) * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
+  minimum_points = len(source) * HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT + \
+                   + len(target) * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
   maximum_points = len(source) * HarmonicPartPoints.CORRECT_HARMONIC_ELEMENT_POINT
 
   # Starting from the maximum possible amount of points

@@ -253,7 +253,7 @@ def get_final_song_point(exp_length, giv_length, matched_length, unmatched_point
   matched_point_sum = matched_length * NORMALIZE_MAXIMUM
 
   final_minimum = exp_length * HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT + \
-                  giv_length * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
+                  + giv_length * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
   final_maximum = exp_length * NORMALIZE_MAXIMUM
 
   final_point_sum = matched_point_sum + unmatched_point_sum
