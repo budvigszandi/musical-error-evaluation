@@ -2,6 +2,7 @@ import music21 as m21
 from evaluate import *
 from metrics.notes.evaluate_notes import *
 from statistics import get_dtw_boundaries, get_dtw_levenshtein_stats
+from metrics.notes.note_eval_boundaries import get_note_eval_runtimes
 from visualizer.draw_note_results import *
 from metrics.distance_algorithms.distances import *
 from visualizer.draw_rhythmic_results import *
@@ -76,7 +77,7 @@ giv_score = get_score_from_midi("../midi/rhythm-given.mid")
 # Song evaluation with Boyer-Moore and DTW
 # ----------------------------------------
 
-run_main_song_evaluation(exp_score, giv_score, True)
+# run_main_song_evaluation(exp_score, giv_score, True)
 
 # ------------------------------
 # Song evaluation using only DTW 
@@ -132,4 +133,10 @@ run_main_song_evaluation(exp_score, giv_score, True)
 # DTW runtime check
 # -----------------
 
-# get_dtw_boundaries(1, 10)
+# runtimes = get_dtw_boundaries(1, 10)
+
+# -----------------------------
+# Note evaluation runtime check
+# -----------------------------
+
+# runtimes = get_note_eval_runtimes(1, 8)

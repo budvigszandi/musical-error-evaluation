@@ -6,12 +6,6 @@ from metrics.notes.note_points import NotePoints
 from metrics.combinations import *
 from collections import Counter
 
-# TODO: When there is a chance of a harmonic, it should be only up until the 16th harmonic
-# TODO: Scale points according to each other
-# TODO: Declaring a maximum point (perfect match * number of expected notes) and
-#       making statistics with the gotten points
-# TODO: Can the points be the values of the relationship enumerator class?
-
 def get_relationship_matrix(expected_notes, given_notes):
   '''
   Returns the relationship matrix of the expected and given notes. Each row is
@@ -108,7 +102,6 @@ def get_scenarios(relationship_matrix, relationship_point_matrix):
   scenarios = {}
   rows = len(relationship_point_matrix)
   columns = len(relationship_point_matrix[0])
-  #print(f"{rows} rows {columns} columns")
   index_variations = get_index_variations(rows, columns)
   for index_list in index_variations:
     sum = get_sum_of_scenario(index_list, relationship_point_matrix)

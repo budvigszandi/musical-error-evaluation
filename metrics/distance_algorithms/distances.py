@@ -1,5 +1,6 @@
 import numpy as np
 from more_itertools import distinct_permutations
+from metrics.distance_algorithms.dtw_boundaries import get_permutation_count_for_matrix
 from metrics.rhythms.evaluate_rhythms import *
 from metrics.distance_algorithms.distance_type import *
 from metrics.harmonic_parts.evaluate_harmonic_parts import *
@@ -170,6 +171,9 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
     else:
       return converted_permutations, points, note_evaluations
 
+  total_perm_count = get_permutation_count_for_matrix(len(source), len(target))
+  actual_perm_count = 0
+
   for i in all_step_permutations:
     steps_of_same_amount = i
     for j in steps_of_same_amount:
@@ -230,7 +234,9 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
         points.append(get_harmonic_part_point(permutation_as_reltype, source, target))
       else:
         points.append(get_rhythmic_point(permutation_as_reltype, source, target))
-  
+      actual_perm_count += 1
+      print(f"  Counting all step permutation points... {((actual_perm_count / total_perm_count) * 100):.2f}%", end="\r")
+
   if not harmonic_parts:
     return converted_permutations, points
   else:

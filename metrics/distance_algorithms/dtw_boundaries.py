@@ -1,5 +1,6 @@
 import time
 import music21 as m21
+import math
 
 def get_dtw_runtimes(min_matrix_size, max_matrix_size):
   runtimes = {}
@@ -25,3 +26,24 @@ def get_dtw_dummy_data(min_matrix_size, max_matrix_size):
       giv = j * [note_c]
       dummy_data.append([exp, giv])
   return dummy_data
+
+def get_permutation_count_for_matrix(number_of_rows, number_of_columns):
+  allowed_down_steps = number_of_rows - 1
+  allowed_right_steps = number_of_columns - 1
+  if number_of_rows < number_of_columns:
+    max_diagonal_steps = number_of_rows - 1
+  else:
+    max_diagonal_steps = number_of_columns - 1
+
+  permutation_count = 0
+
+  for i in range(max_diagonal_steps + 1):
+    if i > 0:
+      allowed_down_steps -= 1
+      allowed_right_steps -= 1
+    allowed_diagonal_steps = i
+    amount_of_steps = math.factorial(allowed_down_steps + allowed_right_steps + allowed_diagonal_steps)
+    repetition_divisor = math.factorial(allowed_down_steps) * math.factorial(allowed_right_steps) * math.factorial(allowed_diagonal_steps)
+    permutation_count += amount_of_steps / repetition_divisor
+  
+  return permutation_count

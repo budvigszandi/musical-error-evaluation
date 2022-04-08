@@ -7,7 +7,6 @@ from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps
 
-# TODO: Give warning if the DTW matrix dimensions are too big
 def get_song_dtw_evaluation(expected, given):
   print("\n--- DTW evaluation ---")
   print("Expected:")
@@ -149,8 +148,6 @@ def get_bm_m21_evaluation(expected, given, giv_score):
 def get_note_evaluation(expected_notes, given_notes):
   print("------------------------------- Note evaluation -------------------------------")
 
-  # TODO: Warning when evaluation is going to be slow
-
   print("Expected notes:")
   print_notes(expected_notes)
   print("Given notes:")
@@ -163,6 +160,9 @@ def get_note_evaluation(expected_notes, given_notes):
   print("[-] Building relationship point matrix...")
   rel_points_matrix = get_relationship_points(rel_matrix)
   print("[X] Built relationship point matrix.")
+
+  if (len(expected_notes) >= 6 and len(given_notes) >= 8) or (len(expected_notes) >= 8 and len(given_notes) >= 7):
+    print("Note evaluations this big can take a very long time (from 45 seconds [exp:8, got:7] to 6 minutes [exp:8, got:8] and beyond)!")
 
   print("[-] Getting scenarios...")
   scenarios = get_scenarios(rel_matrix, rel_points_matrix)

@@ -1,4 +1,4 @@
 __pycache__
 profiling
 output.txt
-dtw_boundaries.txt
+*_boundaries.txt
