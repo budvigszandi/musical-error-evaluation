@@ -5,10 +5,10 @@ from metrics.distance_algorithms.boyer_moore_m21 import get_bm_m21_notation_with
 from metrics.normalize_points import NORMALIZE_MAXIMUM
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
-from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps
+from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps, get_color_map
 
-def get_song_dtw_evaluation(expected, given):
-  print("\n--- DTW evaluation ---")
+def get_song_chunk_dtw_evaluation(expected, given):
+  print("\n--- DTW song chunk evaluation ---")
   print("Expected:")
   print_song(expected)
   print("Given:")
@@ -62,7 +62,7 @@ def get_only_dtw_evaluation(exp_score, giv_score):
     print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
     expected = expected_data[i]
     given = given_data[i]
-    best_permutation, note_evaluation, point = get_song_dtw_evaluation(expected, given)
+    best_permutation, note_evaluation, point = get_song_chunk_dtw_evaluation(expected, given)
     notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluation)
     draw_sheet_music(notation_string)
     print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
@@ -227,6 +227,43 @@ def get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm):
   print("\n--- Permutation based on Levenshtein distance matrix without points ---")
   draw_rhythmic_differences_from_matrix(expected_rhythm, given_rhythm, distance_matrix)
 
+def get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm):
+  print("---------------------------- DTW rhythm evaluation ----------------------------")
+  print("Expected:")
+  print_rhythms(expected_rhythm)
+  print("Given:")
+  print_rhythms(given_rhythm)
+
+  dtw_matrix = dtw(expected_rhythm, given_rhythm, 3)
+
+  print("DTW matrix")
+  print(dtw_matrix, end="\n\n")
+
+  print("[-] Getting all step permuations for DTW matrix...")
+  all_step_permutations = get_all_step_permutations(expected_rhythm, given_rhythm)
+  print("[X] Got all step permutations")
+
+  print("[-] Converting steps, counting permutation points...")
+  converted_permutations_dtw, points = convert_steps_with_points_dtw(all_step_permutations, expected_rhythm, given_rhythm, dtw_matrix)
+  print("[X] Converted steps, got permutation points")
+
+  print("[-] Getting best permutations...")
+  best_permutation_indices = get_best_permutation_indices(points)
+  print("[X] Got best permutations")
+
+  print("\nAmount of best permutations:", len(best_permutation_indices))
+
+  print("\n--- Chosen best permutation ---")
+  best_permutation = converted_permutations_dtw[best_permutation_indices[0]]
+  point = points[best_permutation_indices[0]]
+  # print(best_permutation)
+  percentage = f"{((point / NORMALIZE_MAXIMUM) * 100):.2f}%"
+  draw_rhythmic_differences_from_steps(expected_rhythm, given_rhythm, converted_permutations_dtw[best_permutation_indices[0]])
+  print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
+  print(get_color_map())
+
+  return best_permutation, point
+
 def print_song(song):
   if len(song) == 0:
     print("[]")
@@ -239,4 +276,14 @@ def print_notes(notes):
     print("[]")
   for i in range(len(notes)):
     print(f"[{i}] {notes[i].nameWithOctave}")
+  print()
+
+def print_rhythms(rhythms):
+  if len(rhythms) == 0:
+    print("[]")
+  for i in range(len(rhythms)):
+    if rhythms[i].isRest:
+      print(f"[{i}] Rest - {rhythms[i].duration.fullName}")
+    else:
+      print(f"[{i}] Note/Chord - {rhythms[i].duration.fullName}")
   print()

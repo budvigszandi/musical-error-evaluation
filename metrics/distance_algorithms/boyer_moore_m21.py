@@ -232,8 +232,8 @@ def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_
       dtw_expected = exp_chunks[unmatched_chunk_count]
       dtw_given = giv_chunks[unmatched_chunk_count]
       # This import is here to dodge circular import
-      from evaluate import get_song_dtw_evaluation
-      steps, note_eval, point = get_song_dtw_evaluation(dtw_expected, dtw_given)
+      from evaluate import get_song_chunk_dtw_evaluation
+      steps, note_eval, point = get_song_chunk_dtw_evaluation(dtw_expected, dtw_given)
       unmatched_point_sum += point
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
       print("\nCurrent full notation string:")

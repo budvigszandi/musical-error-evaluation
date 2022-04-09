@@ -98,6 +98,12 @@ giv_score = get_score_from_midi("../midi/rhythm-given.mid")
 
 # get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm)
 
+# --------------------------
+# Rhythm evaluation with DTW
+# --------------------------
+
+get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
+
 # ----------------------------
 # DTW - Levenshtein statistics
 # ----------------------------
