@@ -3,6 +3,7 @@ from metrics.distance_algorithms.distances import *
 from metrics.distance_algorithms.boyer_moore import *
 from metrics.distance_algorithms.boyer_moore_m21 import get_bm_m21_notation_with_points, get_different_parts as get_different_parts_bm_m21
 from metrics.normalize_points import NORMALIZE_MAXIMUM
+from statistics import get_note_eval_stats
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps, get_color_map
@@ -178,6 +179,8 @@ def get_note_evaluation(expected_notes, given_notes):
   points = scenarios[best_scenario]
   percentage = f"{((points / NORMALIZE_MAXIMUM) * 100):.2f}%"
   print("Points:", points, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
+
+  get_note_eval_stats(expected_notes, given_notes, best_scenario, points)
 
   return best_scenario
 
