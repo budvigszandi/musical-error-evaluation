@@ -16,7 +16,7 @@ class NoteEvaluationStats:
                                               # key = expected note, value = list distribution of harmonics (e.g. value[5] = amount of 5th harmonics)
     self.multiply_covered_notes = {}          # Dictionary of expected notes that were covered by multiple given notes
                                               # key = expected note, value = list of NoteRelationships
-    self.points = 0                           # Amount of points for this scenario out of 10
+    self.points = 0                           # Amount of points for this scenario
 
   def __str__(self):
     harmonic_string = get_harmonic_distribution_string(self)
@@ -41,7 +41,7 @@ class NoteEvaluationStats:
 
 def get_harmonic_distribution_string(self):
   if sum(self.harmonics) == 0:
-    return "    None"
+    return "    None\n"
   
   h_string = ""
   for i in range(len(self.harmonics)):
@@ -51,7 +51,7 @@ def get_harmonic_distribution_string(self):
 
 def get_uncovered_notes_string(self):
   if len(self.uncovered_notes) == 0:
-    return "None"
+    return "None\n"
   
   u_string = ""
   for i in range(len(self.uncovered_notes)):
@@ -63,7 +63,7 @@ def get_uncovered_notes_string(self):
 
 def get_covered_only_with_harmonics_string(self):
   if len(self.covered_only_with_harmonics) == 0:
-    return "    None"
+    return "    None\n"
   
   h_string = ""
   for note in self.covered_only_with_harmonics:
@@ -75,7 +75,7 @@ def get_covered_only_with_harmonics_string(self):
 
 def get_multiply_covered_string(self):
   if len(self.multiply_covered_notes) == 0:
-    return "    None"
+    return "    None\n"
   
   m_string = ""
   for note in self.multiply_covered_notes:

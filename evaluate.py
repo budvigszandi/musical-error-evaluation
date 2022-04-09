@@ -3,7 +3,7 @@ from metrics.distance_algorithms.distances import *
 from metrics.distance_algorithms.boyer_moore import *
 from metrics.distance_algorithms.boyer_moore_m21 import get_bm_m21_notation_with_points, get_different_parts as get_different_parts_bm_m21
 from metrics.normalize_points import NORMALIZE_MAXIMUM
-from statistics import get_note_eval_stats
+from statistics import get_note_eval_stats, get_rhythm_eval_stats
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps, get_color_map
@@ -216,16 +216,15 @@ def get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm):
   print("[X] Got best permutations")
 
   print("\nAmount of best permutations:", len(best_permutation_indices))
+  best_permutation = converted_permutations_lev[best_permutation_indices[0]]
 
   print("\n--- Chosen best permutation (Levenshtein distance with points) ---")
-  i = 0
-  for index in best_permutation_indices:
-    i += 1
-    print(i)
-    draw_rhythmic_differences_from_steps(expected_rhythm, given_rhythm, converted_permutations_lev[index])
-    point = points[index]
-    percentage = f"{((point / NORMALIZE_MAXIMUM) * 100):.2f}%"
-    print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
+  draw_rhythmic_differences_from_steps(expected_rhythm, given_rhythm, best_permutation)
+  point = points[best_permutation_indices[0]]
+  percentage = f"{((point / NORMALIZE_MAXIMUM) * 100):.2f}%"
+  print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
+
+  get_rhythm_eval_stats(expected_rhythm, given_rhythm, best_permutation, point)
 
   print("\n--- Permutation based on Levenshtein distance matrix without points ---")
   draw_rhythmic_differences_from_matrix(expected_rhythm, given_rhythm, distance_matrix)
@@ -264,6 +263,8 @@ def get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm):
   draw_rhythmic_differences_from_steps(expected_rhythm, given_rhythm, converted_permutations_dtw[best_permutation_indices[0]])
   print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
   print(get_color_map())
+
+  get_rhythm_eval_stats(expected_rhythm, given_rhythm, best_permutation, point)
 
   return best_permutation, point
 
