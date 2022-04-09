@@ -144,7 +144,6 @@ def get_bm_m21_evaluation(expected, given, giv_score):
     percentage = f"{((points / NORMALIZE_MAXIMUM) * 100):.2f}%"
     print("Points:", points, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n")
     draw_sheet_music(notation_string)
-    # draw_from_bm_m21(given, exp_copy, giv_copy, exp_chunks, giv_chunks)
 
 def get_note_evaluation(expected_notes, given_notes):
   print("------------------------------- Note evaluation -------------------------------")
