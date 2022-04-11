@@ -8,21 +8,40 @@ from metrics.rhythms.rhythm_evaluation_stats import RhythmEvaluationStats
 
 def get_note_eval_stats(expected_notes, given_notes, scenario, points):
   note_eval_stats = NoteEvaluationStats(len(expected_notes), len(given_notes))
+  perfect_match_notes = []
+  cent_diff_notes = []
+  harmonic_exp_notes = []
+
   for rel in scenario:
     rel_type = rel.type
     if rel_type == NoteRelationshipType.PERFECT_MATCH:
       note_eval_stats.perfect_matches += 1
+      if rel.expected_note not in perfect_match_notes:
+        perfect_match_notes.append(rel.expected_note)
     if rel_type == NoteRelationshipType.CENT_DIFFERENCE:
       note_eval_stats.cent_differences += 1
+      if rel.expected_note not in cent_diff_notes:
+        cent_diff_notes.append(rel.expected_note)
     if rel_type == NoteRelationshipType.HARMONIC:
       note_eval_stats.harmonics[rel.harmonic_info[0]] += 1
+      if rel.expected_note not in harmonic_exp_notes:
+        harmonic_exp_notes.append(rel.expected_note)
     if rel_type == NoteRelationshipType.UNRELATED:
       note_eval_stats.unrelated += 1
     if rel.expected_note == expected_notes[0] and rel_type == NoteRelationshipType.PERFECT_MATCH:
       note_eval_stats.got_lowest = True
+  
+  note_eval_stats.perfect_match_percentage = "{:.2f}".format((len(perfect_match_notes) / len(expected_notes)) * 100)
+  note_eval_stats.cent_diff_percentage = "{:.2f}".format((len(cent_diff_notes) / len(expected_notes)) * 100)
+  note_eval_stats.harmonic_exp_percentage = "{:.2f}".format((len(harmonic_exp_notes) / len(expected_notes)) * 100)
+  note_eval_stats.harmonic_giv_percentage = "{:.2f}".format((sum(note_eval_stats.harmonics) / len(given_notes)) * 100)
+  note_eval_stats.unrelated_percentage = "{:.2f}".format((note_eval_stats.unrelated / len(given_notes)) * 100)
   note_eval_stats.uncovered_notes = get_uncovered_notes(expected_notes, scenario)
+  note_eval_stats.uncovered_percentage = "{:.2f}".format((len(note_eval_stats.uncovered_notes) / len(expected_notes)) * 100)
   note_eval_stats.covered_only_with_harmonics = get_covered_only_with_harmonics(expected_notes, scenario)
+  note_eval_stats.covered_only_with_harmonics_percentage = "{:.2f}".format((len(note_eval_stats.covered_only_with_harmonics) / len(expected_notes)) * 100)
   note_eval_stats.multiply_covered_notes = get_multiply_covered_notes(expected_notes, scenario)
+  note_eval_stats.multiply_covered_percentage = "{:.2f}".format((len(note_eval_stats.multiply_covered_notes) / len(expected_notes)) * 100)
   note_eval_stats.points = points
 
   print("\n------------ Statistics ------------")

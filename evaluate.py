@@ -162,7 +162,8 @@ def get_note_evaluation(expected_notes, given_notes):
   print("[X] Built relationship point matrix.")
 
   if (len(expected_notes) >= 6 and len(given_notes) >= 8) or (len(expected_notes) >= 8 and len(given_notes) >= 7):
-    print("Note evaluations this big can take a very long time (from 45 seconds [exp:8, got:7] to 6 minutes [exp:8, got:8] and beyond)!")
+    print("[!] Note evaluations this big can take a very long time")
+    print("[!] (from 45 seconds [exp:8, got:7] to 6 minutes [exp:8, got:8] and beyond)!")
 
   print("[-] Getting scenarios...")
   scenarios = get_scenarios(rel_matrix, rel_points_matrix)
