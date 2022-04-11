@@ -1,8 +1,10 @@
 import copy
 from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, get_next_blank_letter_index, get_non_blank_letter_index, make_fixpoint_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_FIXPOINT_LENGTH
 from input.midi_reader import *
+from metrics.harmonic_parts.harmonic_part_evaluation_stats import HarmonicPartEvaluationStats
 from metrics.harmonic_parts.harmonic_part_points import HarmonicPartPoints
-from metrics.normalize_points import NORMALIZE_MAXIMUM, NORMALIZE_MINIMUM, normalize
+from metrics.normalize_points import NORMALIZE_MAXIMUM, normalize
+from statistics import get_final_song_stats, get_rhythmic_length, get_stat_elem_count
 from visualizer.draw_harmonic_part_results import add_matched_chunk_to_notation_string_bm_m21, get_notation_string_from_steps
 
 def m21_bm_search(txt, pat):
@@ -180,7 +182,7 @@ def get_possible_fixpoints(song, length):
       current = fixpoint_beginning
   return fixpoints
 
-def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
+def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
   notation_string = ""
   current = 0
   current_exp = 0
@@ -189,6 +191,14 @@ def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_
   giv_ins_empty_chunks = 0
   matched_length = 0
   unmatched_point_sum = 0
+
+  exp_count = get_stat_elem_count(orig_exp)
+  giv_count = get_stat_elem_count(orig_giv)
+  song_stats = HarmonicPartEvaluationStats(exp_count, giv_count)
+  stats_exp_total_rhythmic_length = get_rhythmic_length(orig_exp)
+  stats_giv_total_rhythmic_length = get_rhythmic_length(orig_giv)
+  stats_matched_length = 0
+  stats_unmatched_length = 0
 
   while current < len(orig_giv):    
     if giv_copy[current] == BLANK_CHARACTER:
@@ -212,6 +222,7 @@ def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_
         current_exp = len(exp_copy)
       print("\nCurrent full notation string:")
       print(notation_string)
+      stats_matched_length += get_rhythmic_length(matched_chunk)
     else:
       print("\n------ Unmatched chunkpair ------")
       print("Expected chunk:")
@@ -233,13 +244,16 @@ def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_
       dtw_given = giv_chunks[unmatched_chunk_count]
       # This import is here to dodge circular import
       from evaluate import get_song_chunk_dtw_evaluation
-      steps, note_eval, point = get_song_chunk_dtw_evaluation(dtw_expected, dtw_given)
+      steps, note_eval, point, note_stat, rhythm_stat = get_song_chunk_dtw_evaluation(dtw_expected, dtw_given)
       unmatched_point_sum += point
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
       print("\nCurrent full notation string:")
       print(notation_string)
       unmatched_chunk_count += 1
       print()
+      stats_unmatched_length += get_rhythmic_length(dtw_expected)
+      song_stats.note_eval_stats.append(note_stat)
+      song_stats.rhythm_eval_stats.append(rhythm_stat)
     print("\nUnmatched expected chunk total:", len(exp_chunks))
     print("Unmatched given chunks total:", len(giv_chunks))
     print("Unmatched chunk pairs evaluated:", unmatched_chunk_count)
@@ -247,7 +261,8 @@ def get_bm_m21_notation_with_points(orig_exp, orig_giv, exp_copy, giv_copy, exp_
   print("\n------ Final notation string ------")
   print(notation_string)
   final_point = get_final_song_point(len(orig_exp), len(orig_giv), matched_length, unmatched_point_sum)
-  return notation_string, final_point
+  song_stats = get_final_song_stats(song_stats, stats_exp_total_rhythmic_length, stats_giv_total_rhythmic_length, stats_matched_length, stats_unmatched_length)
+  return notation_string, song_stats
 
 def get_final_song_point(exp_length, giv_length, matched_length, unmatched_point_sum):
   matched_point_sum = matched_length * NORMALIZE_MAXIMUM

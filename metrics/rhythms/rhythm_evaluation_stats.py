@@ -49,6 +49,7 @@ class RhythmEvaluationStats:
     string_rep += f"    These make it {self.vastly_longer_rhythm_percentage}% longer.\n"
     string_rep += f"  The given length is {self.total_length_difference_percentage}% of the expected length.\n"
     string_rep += f"  Points: {self.points} / {NORMALIZE_MAXIMUM} = {percentage}\n"
+    string_rep += f"    (these points are only relevant when checking only rhythms, not harmonic parts)"
 
     return string_rep
 

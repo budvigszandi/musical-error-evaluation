@@ -1,9 +1,10 @@
 from input.midi_reader import *
 from metrics.distance_algorithms.distances import *
 from metrics.distance_algorithms.boyer_moore import *
-from metrics.distance_algorithms.boyer_moore_m21 import get_bm_m21_notation_with_points, get_different_parts as get_different_parts_bm_m21
+from metrics.distance_algorithms.boyer_moore_m21 import get_bm_m21_notation_with_stats, get_different_parts as get_different_parts_bm_m21
+from metrics.harmonic_parts.harmonic_part_evaluation_stats import HarmonicPartEvaluationStats
 from metrics.normalize_points import NORMALIZE_MAXIMUM
-from statistics import get_note_eval_stats, get_rhythm_eval_stats
+from statistics import get_final_song_stats, get_song_chunk_note_eval_stats, get_note_eval_stats, get_rhythm_eval_stats, get_stat_elem_count
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps, get_color_map
@@ -42,7 +43,14 @@ def get_song_chunk_dtw_evaluation(expected, given):
   percentage = f"{((point / NORMALIZE_MAXIMUM) * 100):.2f}%"
   print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
 
-  return best_permutation, note_evaluation, point
+  song_chunk_note_eval_stats = get_song_chunk_note_eval_stats(expected, given, best_permutation, note_evaluation)
+  rhythm_eval_stats = get_rhythm_eval_stats(expected, given, best_permutation, points)
+  print("\n------------ Song chunk note statistics ------------")
+  print(song_chunk_note_eval_stats)
+  print("\n------------ Song chunk rhythm statistics ------------")
+  print(rhythm_eval_stats)
+
+  return best_permutation, note_evaluation, point, song_chunk_note_eval_stats, rhythm_eval_stats
 
 def get_only_dtw_evaluation(exp_score, giv_score):
   if len(exp_score.parts) != len(giv_score.parts):
@@ -59,14 +67,29 @@ def get_only_dtw_evaluation(exp_score, giv_score):
 
   print(f"[-] Examining {len(expected_data)} part(s) of music")
 
+  exp_count = 0
+  giv_count = 0
+  points = 0
+  for i in range(len(expected_data)):
+    exp_count += get_stat_elem_count(expected[i])
+    giv_count += get_stat_elem_count(given[i])
+  song_stats = HarmonicPartEvaluationStats(exp_count, giv_count)
+
   for i in range(len(expected_data)):
     print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
     expected = expected_data[i]
     given = given_data[i]
-    best_permutation, note_evaluation, point = get_song_chunk_dtw_evaluation(expected, given)
-    notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluation)
+    best_permutation, note_evaluations, point, note_stat, rhythm_stat = get_song_chunk_dtw_evaluation(expected, given)
+    notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluations)
     draw_sheet_music(notation_string)
+    song_stats.note_eval_stats.append(note_stat)
+    song_stats.rhythm_eval_stats.append(rhythm_stat)
+    points += point
     print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
+  
+  # TODO: Harmonic part statistics
+  song_stats.point = "{:.2f}".format(points / len(expected_data))
+  # song_stats = get_final_song_stats(song_stats, exp_total_rhythmic_length, giv_total_rhythmic_length, matched_length, unmatched_length)
   
   print("\n[X] Examined all parts of the music")
 
@@ -97,35 +120,36 @@ def run_main_song_evaluation(exp_score, giv_score, m21=False):
     print("Given song:")
     print_song(given)
 
-    if not m21:
-      # Here we call the logic of metrics.distance_algorithms.boyer_moore, which is not
-      # used now, but kept for chance of future development
-      get_bm_char_evaluation(expected, given, giv_score)
-    else:
-      get_bm_m21_evaluation(expected, given, giv_score)
+    # if not m21:
+    #   # Here we call the logic of metrics.distance_algorithms.boyer_moore, which is not
+    #   # used now, but kept for chance of future development
+    #   get_bm_char_evaluation(expected, given, giv_score)
+    # else:
+    #   get_bm_m21_evaluation(expected, given, giv_score)
+    get_bm_m21_evaluation(expected, given, giv_score)
     print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
   
   print("\n[X] Examined all parts of the music")
 
 # This is a function for metrics.distance_algorithms.boyer_moore, which is not
 # used, but kept for chance of future development
-def get_bm_char_evaluation(expected, given, giv_score):
-  print("--------------------------- Boyer-Moore initializing --------------------------")
-  bm_expected = m21_to_boyer_moore(expected)
-  bm_given = m21_to_boyer_moore(given)
-  print("Expected:")
-  print(bm_expected, end="\n\n")
-  print("Given:")
-  print(bm_given, end="\n\n")
+# def get_bm_char_evaluation(expected, given, giv_score):
+#   print("--------------------------- Boyer-Moore initializing --------------------------")
+#   bm_expected = m21_to_boyer_moore(expected)
+#   bm_given = m21_to_boyer_moore(given)
+#   print("Expected:")
+#   print(bm_expected, end="\n\n")
+#   print("Given:")
+#   print(bm_given, end="\n\n")
 
-  print("---------------------------- Boyer-Moore fixpoints ----------------------------")
-  exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
-  if exp_copy == [] and giv_copy == []:
-    print("\n------ Drawing sheet music ------")
-    put_sheet_in_output_folder(giv_score, True)
-  else:
-    print("--------------------------------- Evaluation ----------------------------------")
-    draw_from_bm_chars(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
+#   print("---------------------------- Boyer-Moore fixpoints ----------------------------")
+#   exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
+#   if exp_copy == [] and giv_copy == []:
+#     print("\n------ Drawing sheet music ------")
+#     put_sheet_in_output_folder(giv_score, True)
+#   else:
+#     print("--------------------------------- Evaluation ----------------------------------")
+#     draw_from_bm_chars(expected, given, bm_expected, bm_given, exp_copy, giv_copy, exp_chunks, giv_chunks)
 
 def get_bm_m21_evaluation(expected, given, giv_score):
   print("--------------------------- Boyer-Moore initializing --------------------------")
@@ -138,11 +162,15 @@ def get_bm_m21_evaluation(expected, given, giv_score):
     print("\n------ Drawing sheet music ------")
     put_sheet_in_output_folder(giv_score, True)
     print("Points:", NORMALIZE_MAXIMUM, "/", NORMALIZE_MAXIMUM, "= 100%", end="\n")
+    # TODO: Print song stats
   else:
-    notation_string, points = get_bm_m21_notation_with_points(expected, given, exp_copy, giv_copy, exp_chunks, giv_chunks)
-    print("\n------ Points ------")
-    percentage = f"{((points / NORMALIZE_MAXIMUM) * 100):.2f}%"
-    print("Points:", points, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n")
+    notation_string, song_stats = get_bm_m21_notation_with_stats(expected, given, exp_copy, giv_copy, exp_chunks, giv_chunks)
+    # print("\n------ Points ------")
+    # percentage = f"{((points / NORMALIZE_MAXIMUM) * 100):.2f}%"
+    # print("Points:", points, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n")
+    # TODO: Song stat points
+    print("\n------------ Song statistics ------------")
+    print(song_stats)
     draw_sheet_music(notation_string)
 
 def get_note_evaluation(expected_notes, given_notes):
@@ -180,7 +208,9 @@ def get_note_evaluation(expected_notes, given_notes):
   percentage = f"{((points / NORMALIZE_MAXIMUM) * 100):.2f}%"
   print("Points:", points, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
 
-  get_note_eval_stats(expected_notes, given_notes, best_scenario, points)
+  note_eval_stats = get_note_eval_stats(expected_notes, given_notes, best_scenario, points)
+  print("\n------------ Statistics ------------")
+  print(note_eval_stats)
 
   return best_scenario
 
@@ -224,7 +254,9 @@ def get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm):
   percentage = f"{((point / NORMALIZE_MAXIMUM) * 100):.2f}%"
   print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
 
-  get_rhythm_eval_stats(expected_rhythm, given_rhythm, best_permutation, point)
+  rhythm_eval_stats = get_rhythm_eval_stats(expected_rhythm, given_rhythm, best_permutation, point)
+  print("\n------------ Statistics ------------")
+  print(rhythm_eval_stats)
 
   print("\n--- Permutation based on Levenshtein distance matrix without points ---")
   draw_rhythmic_differences_from_matrix(expected_rhythm, given_rhythm, distance_matrix)
@@ -264,7 +296,9 @@ def get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm):
   print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
   print(get_color_map())
 
-  get_rhythm_eval_stats(expected_rhythm, given_rhythm, best_permutation, point)
+  rhythm_eval_stats = get_rhythm_eval_stats(expected_rhythm, given_rhythm, best_permutation, point)
+  print("\n------------ Statistics ------------")
+  print(rhythm_eval_stats)
 
   return best_permutation, point
 

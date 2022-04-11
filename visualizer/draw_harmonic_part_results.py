@@ -82,7 +82,7 @@ def draw_from_bm_chars(orig_exp, orig_giv, bm_exp, bm_giv, exp_copy, giv_copy, e
       dtw_given = orig_giv_chunk
       # This import is here to dodge circular import
       from evaluate import get_song_chunk_dtw_evaluation
-      steps, note_eval, point = get_song_chunk_dtw_evaluation(dtw_expected, dtw_given)
+      steps, note_eval, point, note_stat, rhtyhm_stat = get_song_chunk_dtw_evaluation(dtw_expected, dtw_given)
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
       print("\nCurrent full notation string:")
       print(notation_string)
