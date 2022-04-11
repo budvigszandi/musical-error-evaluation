@@ -116,7 +116,7 @@ def add_matched_chunk_to_notation_string_bm_chars(notation_string, orig, bm_arra
   print(notation_string[notation_string_length:])
   return notation_string
 
-def get_notation_string_from_steps(source, target, steps, note_evaluation):
+def get_notation_string_from_steps(source, target, steps, note_evaluations):
   current_source_index = 0
   current_target_index = 0
   notation_string = ""
@@ -174,7 +174,7 @@ def get_notation_string_from_steps(source, target, steps, note_evaluation):
         current_target_index += 1
 
     elif current_step == DistanceType.SUBSTITUTION:
-      note_eval = note_evaluation[current_source_index]
+      note_eval = note_evaluations[current_source_index]
       rhythmic_distance = get_rhythmic_distance(current_source, current_target)
       is_rhythm_different = rhythmic_distance > 0
 
