@@ -1,7 +1,7 @@
 import music21 as m21
 from evaluate import *
 from metrics.notes.evaluate_notes import *
-from statistics import get_dtw_boundaries, get_dtw_levenshtein_stats
+from statistics import get_compressed_dtw_dtw_stats, get_dtw_boundaries, get_dtw_levenshtein_stats
 from metrics.notes.note_eval_boundaries import get_note_eval_runtimes
 from visualizer.draw_note_results import *
 from metrics.distance_algorithms.distances import *
@@ -102,7 +102,7 @@ giv_score = get_score_from_midi("../midi/rhythm-given.mid")
 # Rhythm evaluation with DTW
 # --------------------------
 
-get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
+# get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
 
 # ----------------------------
 # DTW - Levenshtein statistics
@@ -113,27 +113,8 @@ get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
 # --------------
 # Compressed DTW
 # --------------
-# n = len(exp_harmonic_part)
-# m = len(giv_harmonic_part)
-# window = 2
-# constraint = max(window, abs(n - m))
-# print("n", n, "m", m, "constraint", constraint)
-# print("dtw size", n + 1, "x", m + 1)
-# dtw_matrix = dtw(exp_harmonic_part, giv_harmonic_part, constraint, True)
-# print(dtw_matrix)
 
-# compressed_dtw = get_compressed_dtw(dtw_matrix, constraint)
-# print("\ncompressed")
-# print(compressed_dtw)
-
-# print("step permutations for", compressed_dtw.shape[0], "rows", compressed_dtw.shape[1], "columns")
-# count = 0
-# step_permutations = get_all_step_permutations(compressed_dtw.shape[0], compressed_dtw.shape[1])
-# print(step_permutations)
-# for i in step_permutations:
-#   for j in i:
-#     count += 1
-# print(count)
+get_compressed_dtw_dtw_stats(1, 7)
 
 # -----------------
 # DTW runtime check
