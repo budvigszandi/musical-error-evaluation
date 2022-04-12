@@ -11,19 +11,21 @@ class HarmonicPartEvaluationStats:
     self.rhythm_eval_stats = []                   # List of rhythm evaluation statistics (RhythmEvaluationStats) for separate unmatched parts
     self.merged_note_eval_stats = None            # Collective note evaluation statistics for the whole harmonic part
     self.merged_rhythm_eval_stats = None          # Collective rhythm evaluation statistics for the whole harmonic part
-    self.point = 0
+    self.points = 0
 
   def __str__(self):
     percentage = f"{((self.points / NORMALIZE_MAXIMUM) * 100):.2f}%"
 
     string_rep = f""
     string_rep += f"Expected {self.exp_count} notes and rests, got {self.giv_count} notes and rests\n"
-    string_rep += f"  {self.matched_percentage}% was a total match\n"
-    string_rep += f"  {self.unmatched_percentage}% was not a total match\n"
-    string_rep += f"--- Merged note evaluations for the unmatched parts ---\n"
-    string_rep += self.merged_note_eval_stats
-    string_rep += f"--- Merged rhythm evaluations for the unmatched parts ---\n"
-    string_rep += self.merged_rhythm_eval_stats
-    string_rep += f"  Points: {self.points} / {NORMALIZE_MAXIMUM} = {percentage}\n"
+    string_rep += f"  {self.matched_percentage}% was a total match, didn't need further evaluation\n"
+    string_rep += f"  {self.unmatched_percentage}% needed further evaluation\n"
+    if self.merged_note_eval_stats != None:
+      string_rep += f"\n--- Merged note evaluations for the unmatched parts ---\n"
+      string_rep += str(self.merged_note_eval_stats)
+    if self.merged_rhythm_eval_stats != None:
+      string_rep += f"\n--- Merged rhythm evaluations for the unmatched parts ---\n"
+      string_rep += str(self.merged_rhythm_eval_stats)
+    string_rep += f"\nPoints for the whole song: {self.points} / {NORMALIZE_MAXIMUM} = {percentage}\n"
 
     return string_rep

@@ -261,7 +261,7 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
   print("\n------ Final notation string ------")
   print(notation_string)
   final_point = get_final_song_point(len(orig_exp), len(orig_giv), matched_length, unmatched_point_sum)
-  song_stats = get_final_song_stats(song_stats, stats_exp_total_rhythmic_length, stats_giv_total_rhythmic_length, stats_matched_length, stats_unmatched_length)
+  song_stats = get_final_song_stats(song_stats, stats_exp_total_rhythmic_length, stats_giv_total_rhythmic_length, stats_matched_length, stats_unmatched_length, final_point)
   return notation_string, song_stats
 
 def get_final_song_point(exp_length, giv_length, matched_length, unmatched_point_sum):

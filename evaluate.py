@@ -3,8 +3,8 @@ from metrics.distance_algorithms.distances import *
 from metrics.distance_algorithms.boyer_moore import *
 from metrics.distance_algorithms.boyer_moore_m21 import get_bm_m21_notation_with_stats, get_different_parts as get_different_parts_bm_m21
 from metrics.harmonic_parts.harmonic_part_evaluation_stats import HarmonicPartEvaluationStats
-from metrics.normalize_points import NORMALIZE_MAXIMUM
-from statistics import get_final_song_stats, get_song_chunk_note_eval_stats, get_note_eval_stats, get_rhythm_eval_stats, get_stat_elem_count
+from metrics.normalize_points import NORMALIZE_MAXIMUM, NORMALIZE_MINIMUM
+from statistics import get_final_song_stats, get_perfect_song_stats, get_rhythmic_length, get_song_chunk_note_eval_stats, get_note_eval_stats, get_rhythm_eval_stats, get_stat_elem_count
 from visualizer.draw_harmonic_part_results import *
 from visualizer.draw_note_results import *
 from visualizer.draw_rhythmic_results import draw_rhythmic_differences_from_matrix, draw_rhythmic_differences_from_steps, get_color_map
@@ -43,8 +43,8 @@ def get_song_chunk_dtw_evaluation(expected, given):
   percentage = f"{((point / NORMALIZE_MAXIMUM) * 100):.2f}%"
   print("Points:", point, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n\n")
 
-  song_chunk_note_eval_stats = get_song_chunk_note_eval_stats(expected, given, best_permutation, note_evaluation)
-  rhythm_eval_stats = get_rhythm_eval_stats(expected, given, best_permutation, points)
+  song_chunk_note_eval_stats = get_song_chunk_note_eval_stats(expected, given, best_permutation, note_evaluation, point)
+  rhythm_eval_stats = get_rhythm_eval_stats(expected, given, best_permutation, point)
   print("\n------------ Song chunk note statistics ------------")
   print(song_chunk_note_eval_stats)
   print("\n------------ Song chunk rhythm statistics ------------")
@@ -71,14 +71,18 @@ def get_only_dtw_evaluation(exp_score, giv_score):
   giv_count = 0
   points = 0
   for i in range(len(expected_data)):
-    exp_count += get_stat_elem_count(expected[i])
-    giv_count += get_stat_elem_count(given[i])
+    exp_count += get_stat_elem_count(expected_data[i])
+    giv_count += get_stat_elem_count(given_data[i])
+  exp_rhythmic_length = 0
+  giv_rhythmic_length = 0
   song_stats = HarmonicPartEvaluationStats(exp_count, giv_count)
 
   for i in range(len(expected_data)):
     print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
     expected = expected_data[i]
     given = given_data[i]
+    exp_rhythmic_length += get_rhythmic_length(expected)
+    giv_rhythmic_length += get_rhythmic_length(given)
     best_permutation, note_evaluations, point, note_stat, rhythm_stat = get_song_chunk_dtw_evaluation(expected, given)
     notation_string = get_notation_string_from_steps(expected, given, best_permutation, note_evaluations)
     draw_sheet_music(notation_string)
@@ -87,9 +91,11 @@ def get_only_dtw_evaluation(exp_score, giv_score):
     points += point
     print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
   
-  # TODO: Harmonic part statistics
+  normalized_point = normalize(points, NORMALIZE_MINIMUM, NORMALIZE_MAXIMUM * len(expected_data))
   song_stats.point = "{:.2f}".format(points / len(expected_data))
-  # song_stats = get_final_song_stats(song_stats, exp_total_rhythmic_length, giv_total_rhythmic_length, matched_length, unmatched_length)
+  song_stats = get_final_song_stats(song_stats, exp_rhythmic_length, giv_rhythmic_length, 0, giv_rhythmic_length, normalized_point)
+  print("\n------------------------------ Song statistics ------------------------------")
+  print(song_stats)
   
   print("\n[X] Examined all parts of the music")
 
@@ -98,7 +104,6 @@ def run_main_song_evaluation(exp_score, giv_score, m21=False):
     raise ValueError(f"These scores have different amount of parts. Expected {len(exp_score.parts)} parts, given {len(giv_score.parts)} parts.")
   
   print("------ Drawing sheet music ------")
-  put_sheet_in_output_folder(exp_score)
   for i in range(len(exp_score.parts)):
     put_sheet_in_output_folder(exp_score.parts[i])
 
@@ -161,15 +166,14 @@ def get_bm_m21_evaluation(expected, given, giv_score):
   if exp_copy == [] and giv_copy == []:
     print("\n------ Drawing sheet music ------")
     put_sheet_in_output_folder(giv_score, True)
-    print("Points:", NORMALIZE_MAXIMUM, "/", NORMALIZE_MAXIMUM, "= 100%", end="\n")
-    # TODO: Print song stats
+    exp_count = get_stat_elem_count(expected)
+    giv_count = get_stat_elem_count(given)
+    song_stats = get_perfect_song_stats(exp_count, giv_count)
+    print("\n------------------------------ Song statistics ------------------------------")
+    print(song_stats)
   else:
     notation_string, song_stats = get_bm_m21_notation_with_stats(expected, given, exp_copy, giv_copy, exp_chunks, giv_chunks)
-    # print("\n------ Points ------")
-    # percentage = f"{((points / NORMALIZE_MAXIMUM) * 100):.2f}%"
-    # print("Points:", points, "/", NORMALIZE_MAXIMUM, "=", percentage, end="\n")
-    # TODO: Song stat points
-    print("\n------------ Song statistics ------------")
+    print("\n------------------------------ Song statistics ------------------------------")
     print(song_stats)
     draw_sheet_music(notation_string)
 
@@ -306,7 +310,13 @@ def print_song(song):
   if len(song) == 0:
     print("[]")
   for i in range(len(song)):
-    print(f"[{i}] {str(song[i])} - {song[i].duration.fullName}")
+    if song[i].isRest:
+      print(f"[{i}] Rest - {song[i].duration.fullName}")
+    elif song[i].isNote:
+      print(f"[{i}] {str(song[i].nameWithOctave)} - {song[i].duration.fullName}")
+    elif song[i].isChord:
+      notes = [note.nameWithOctave for note in song[i]]
+      print(f"[{i}] Chord{notes} - {song[i].duration.fullName}")
   print()
 
 def print_notes(notes):

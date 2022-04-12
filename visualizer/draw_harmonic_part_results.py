@@ -25,7 +25,7 @@ def add_matched_chunk_to_notation_string_bm_m21(notation_string, orig, bm_chunk_
     elif elem.isRest:
       # notation_string += NOTATION_REST + HarmonicPartColors.BLACK.value + " "
       notation_string += get_current_notation(elem, HarmonicPartColors.BLACK, DistanceType.SAME, False)
-  print("Generated notation string:")
+  print("\nGenerated notation string:")
   print(notation_string[notation_string_length:])
   return notation_string
 
@@ -112,7 +112,7 @@ def add_matched_chunk_to_notation_string_bm_chars(notation_string, orig, bm_arra
       notation_string += NOTATION_CHORD_ENDING
     elif elem.isRest:
       notation_string += get_current_notation(elem, HarmonicPartColors.BLACK, DistanceType.SAME, False)
-  print("Generated notation string:")
+  print("\nGenerated notation string:")
   print(notation_string[notation_string_length:])
   return notation_string
 
@@ -223,7 +223,7 @@ def get_notation_string_from_steps(source, target, steps, note_evaluations):
       if current_target_index < len(target) - 1:
         current_target_index += 1
   
-  print("Generated notation string:")
+  print("\nGenerated notation string:")
   print(notation_string)
   return notation_string
 

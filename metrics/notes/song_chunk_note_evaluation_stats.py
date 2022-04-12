@@ -26,7 +26,7 @@ class SongChunkNoteEvaluationStats:
     harmonic_string = get_harmonic_distribution_string(self)
 
     string_rep = f""
-    string_rep += f"Expected {self.exp_count} notes, got {self.giv_count} notes\n"
+    string_rep += f"Expected {self.exp_count} notes and rests, got {self.giv_count} notes and rests\n"
     string_rep += f"  Perfect match count: {self.perfect_matches}, {self.perfect_match_percentage}% of the expected notes\n"
     string_rep += f"  Cent difference count: {self.cent_differences}, {self.cent_diff_percentage}% of the expected notes\n"
     string_rep += f"  Harmonics distribution:\n{harmonic_string}"
