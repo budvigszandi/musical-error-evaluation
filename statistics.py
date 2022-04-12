@@ -324,10 +324,12 @@ def get_rhythm_eval_stats(expected_rhythm, given_rhythm, scenario, points):
     if current_step == DistanceType.DELETION:
       if current_source_index == 0 or prev_step == DistanceType.DELETION:
         sep_deletion_length += current_source.quarterLength
-        if current_source_index == len(expected_rhythm) - 1:
-          rhythm_eval_stats.deletions.append(sep_deletion_length)
-          sep_deletion_length = 0
       else:
+        sep_deletion_length = current_source.quarterLength
+      if current_source_index == len(expected_rhythm) - 1:
+        rhythm_eval_stats.deletions.append(sep_deletion_length)
+        sep_deletion_length = 0
+      elif scenario[i + 1] != DistanceType.DELETION:
         rhythm_eval_stats.deletions.append(sep_deletion_length)
         sep_deletion_length = 0
       if current_source_index < len(expected_rhythm) - 1:
@@ -335,10 +337,12 @@ def get_rhythm_eval_stats(expected_rhythm, given_rhythm, scenario, points):
     elif current_step == DistanceType.INSERTION:
       if current_target_index == 0 or prev_step == DistanceType.INSERTION:
         sep_insertion_length += current_target.quarterLength
-        if current_target_index == len(given_rhythm) - 1:
-          rhythm_eval_stats.insertions.append(sep_insertion_length)
-          sep_insertion_length = 0
       else:
+        sep_insertion_length = current_target.quarterLength
+      if current_target_index == len(given_rhythm) - 1:
+        rhythm_eval_stats.insertions.append(sep_insertion_length)
+        sep_insertion_length = 0
+      elif scenario[i + 1] != DistanceType.INSERTION:
         rhythm_eval_stats.insertions.append(sep_insertion_length)
         sep_insertion_length = 0
       if current_target_index < len(given_rhythm) - 1:
