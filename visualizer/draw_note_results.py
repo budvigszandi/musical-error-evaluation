@@ -43,7 +43,6 @@ def group_related_nodes_with_edge_creation(graph, expected_notes, scenario):
   for i in range(len(scenario)):
     current_rel = scenario[i]
     rel_type = current_rel.type
-    # TODO: What happens when expecting the same note more times?
     expected_note = scenario[i].expected_note
     exp_index = get_expected_node_index(expected_note, expected_notes) 
     giv_index = i

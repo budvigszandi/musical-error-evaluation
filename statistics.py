@@ -289,7 +289,7 @@ def get_multiply_covered_notes(expected_notes, scenario):
     occurences = 0
     relationships = []
     for rel in scenario:
-      if rel.expected_note == note:
+      if rel.expected_note == note and rel.type != NoteRelationshipType.UNRELATED:
         occurences += 1
         relationships.append(rel)
     if occurences > 1:
