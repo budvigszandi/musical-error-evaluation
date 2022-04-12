@@ -32,7 +32,7 @@ def get_rhythmic_point(step_permutation, source, target):
       if current_target_index < len(target) - 1: current_target_index += 1
   
   normalized_point = normalize(point, minimum_points, maximum_points)
-  return normalized_point
+  return max(0, normalized_point) # needs the max function if we expect nothing and get something
 
 # requires two m21.note.Note/m21.note.Rest/m21.chord.Chord objects
 def get_rhythmic_distance(source, target):
