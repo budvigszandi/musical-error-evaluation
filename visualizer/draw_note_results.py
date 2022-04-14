@@ -39,15 +39,19 @@ def group_expected_nodes(expected_notes):
     node_name = get_node_name(i, expected_notes[i])
     expected_nodes.append(node_name)
 
-def group_related_nodes_with_edge_creation(graph, expected_notes, scenario):
+def group_related_nodes_with_edge_creation(graph, expected_notes, given_notes, scenario):
   for i in range(len(scenario)):
     current_rel = scenario[i]
     rel_type = current_rel.type
-    expected_note = scenario[i].expected_note
-    exp_index = get_expected_node_index(expected_note, expected_notes) 
-    giv_index = i
-    given_note_node_name = get_node_name(giv_index, scenario[i].given_note, True)
-    expected_note_node_name = get_node_name(exp_index, scenario[i].expected_note)
+    if len(expected_notes) > 0:
+      expected_note = scenario[i].expected_note
+      exp_index = get_expected_node_index(expected_note, expected_notes) 
+      expected_note_node_name = get_node_name(exp_index, scenario[i].expected_note)
+    if len(given_notes) > 0:
+      giv_index = i
+      given_note_node_name = get_node_name(giv_index, scenario[i].given_note, True)
+    else:
+      given_note_node_name = expected_note_node_name
     if rel_type == NoteRelationshipType.PERFECT_MATCH:
       graph.add_edges_from([(expected_note_node_name, given_note_node_name)])
       perfect_match_nodes.append(given_note_node_name)
@@ -62,7 +66,7 @@ def group_related_nodes_with_edge_creation(graph, expected_notes, scenario):
       edge_labels[(expected_note_node_name, given_note_node_name)] = f"{current_rel.harmonic_info[0]}. harmonic"
       harmonic_nodes.append(given_note_node_name)
       #print("Harmonic edge", expected_note_node_name, given_note_node_name)
-    elif rel_type == NoteRelationshipType.UNRELATED:
+    elif rel_type == NoteRelationshipType.UNRELATED and len(given_notes) > 0:
       unrelated_nodes.append(given_note_node_name)
       #print("Unrelated, no edge", expected_note_node_name, given_note_node_name)
 

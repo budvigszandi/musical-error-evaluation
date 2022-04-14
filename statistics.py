@@ -237,21 +237,26 @@ def get_note_eval_stats(expected_notes, given_notes, scenario, points):
           harmonic_exp_notes.append(rel.expected_note)
       if rel_type == NoteRelationshipType.UNRELATED:
         note_eval_stats.unrelated += 1
-      if rel.expected_note == expected_notes[0] and rel_type == NoteRelationshipType.PERFECT_MATCH:
-        note_eval_stats.got_lowest = True
+      if len(expected_notes) > 0:
+        if rel.expected_note == expected_notes[0] and rel_type == NoteRelationshipType.PERFECT_MATCH:
+          note_eval_stats.got_lowest = True
     
-    note_eval_stats.perfect_match_percentage = "{:.2f}".format((len(perfect_match_notes) / exp_count) * 100)
-    note_eval_stats.cent_diff_percentage = "{:.2f}".format((len(cent_diff_notes) / exp_count) * 100)
-    note_eval_stats.harmonic_exp_percentage = "{:.2f}".format((len(harmonic_exp_notes) / exp_count) * 100)
-    note_eval_stats.harmonic_giv_percentage = "{:.2f}".format((sum(note_eval_stats.harmonics) / giv_count) * 100)
-    note_eval_stats.unrelated_percentage = "{:.2f}".format((note_eval_stats.unrelated / giv_count) * 100)
     note_eval_stats.uncovered_notes = get_uncovered_notes(expected_notes, scenario)
-    note_eval_stats.uncovered_percentage = "{:.2f}".format((len(note_eval_stats.uncovered_notes) / exp_count) * 100)
     note_eval_stats.covered_only_with_harmonics = get_covered_only_with_harmonics(expected_notes, scenario)
-    note_eval_stats.covered_only_with_harmonics_percentage = "{:.2f}".format((len(note_eval_stats.covered_only_with_harmonics) / exp_count) * 100)
     note_eval_stats.multiply_covered_notes = get_multiply_covered_notes(expected_notes, scenario)
-    note_eval_stats.multiply_covered_percentage = "{:.2f}".format((len(note_eval_stats.multiply_covered_notes) / exp_count) * 100)
     note_eval_stats.points = points
+
+    if len(expected_notes) > 0:
+      note_eval_stats.perfect_match_percentage = "{:.2f}".format((len(perfect_match_notes) / exp_count) * 100)
+      note_eval_stats.cent_diff_percentage = "{:.2f}".format((len(cent_diff_notes) / exp_count) * 100)
+      note_eval_stats.harmonic_exp_percentage = "{:.2f}".format((len(harmonic_exp_notes) / exp_count) * 100)
+      note_eval_stats.uncovered_percentage = "{:.2f}".format((len(note_eval_stats.uncovered_notes) / exp_count) * 100)
+      note_eval_stats.covered_only_with_harmonics_percentage = "{:.2f}".format((len(note_eval_stats.covered_only_with_harmonics) / exp_count) * 100)
+      note_eval_stats.multiply_covered_percentage = "{:.2f}".format((len(note_eval_stats.multiply_covered_notes) / exp_count) * 100)
+
+    if len(given_notes) > 0:
+      note_eval_stats.harmonic_giv_percentage = "{:.2f}".format((sum(note_eval_stats.harmonics) / giv_count) * 100)
+      note_eval_stats.unrelated_percentage = "{:.2f}".format((note_eval_stats.unrelated / giv_count) * 100)
 
     return note_eval_stats
 

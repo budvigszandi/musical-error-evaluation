@@ -32,6 +32,21 @@ def example_note_evaluation_harmonic():
   given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('c5')]
   example_get_note_evaluation(expected_notes, given_notes)
 
+def example_note_evaluation_expected_none_got_some():
+  expected_notes = []
+  given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
+  example_get_note_evaluation(expected_notes, given_notes)
+
+def example_note_evaluation_expected_some_got_none():
+  expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
+  given_notes = []
+  example_get_note_evaluation(expected_notes, given_notes)
+
+def example_note_evaluation_expected_none_got_none():
+  expected_notes = []
+  given_notes = []
+  example_get_note_evaluation(expected_notes, given_notes)
+
 def example_get_note_evaluation(expected_notes, given_notes):
   note_eval = get_note_evaluation(expected_notes, given_notes)
   draw_note_evaluation(expected_notes, given_notes, note_eval)

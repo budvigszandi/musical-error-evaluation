@@ -185,6 +185,25 @@ def get_note_evaluation(expected_notes, given_notes):
   print("Given notes:")
   print_notes(given_notes)
 
+  if len(expected_notes) == 0:
+    best_scenario = []
+    for note in given_notes:
+      best_scenario.append(NoteRelationship(NoteRelationshipType.UNRELATED, note, None))
+    points = NORMALIZE_MINIMUM
+    note_eval_stats = get_note_eval_stats(expected_notes, given_notes, best_scenario, points)
+    print("\n------------ Statistics ------------")
+    print(note_eval_stats)
+    return best_scenario
+  if len(given_notes) == 0:
+    best_scenario = []
+    for note in expected_notes:
+      best_scenario.append(NoteRelationship(NoteRelationshipType.UNRELATED, None, note))
+    points = NORMALIZE_MINIMUM
+    note_eval_stats = get_note_eval_stats(expected_notes, given_notes, best_scenario, points)
+    print("\n------------ Statistics ------------")
+    print(note_eval_stats)
+    return best_scenario
+
   print("[-] Building relationship matrix...")
   rel_matrix = get_relationship_matrix(expected_notes, given_notes)
   print("[X] Built relationship matrix.")
@@ -224,7 +243,7 @@ def draw_note_evaluation(expected_notes, given_notes, note_eval):
   graph = nx.Graph()
   add_nodes(graph, expected_notes, given_notes)
   group_expected_nodes(expected_notes)
-  group_related_nodes_with_edge_creation(graph, expected_notes, note_eval)
+  group_related_nodes_with_edge_creation(graph, expected_notes, given_notes, note_eval)
   group_isolated_expected_nodes(graph)
   print("[X] Assembled result graph, now drawing.")
   draw_graph(graph, ax)
