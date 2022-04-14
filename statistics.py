@@ -429,7 +429,7 @@ def get_rhythmic_length(expected_rhythm):
     total += rhythm.quarterLength
   return total
 
-def get_dtw_boundaries(min_matrix_size, max_matrix_size):
+def get_dtw_boundary_stats(min_matrix_size, max_matrix_size):
   runtimes = get_dtw_runtimes(min_matrix_size, max_matrix_size)
   for elem in runtimes:
     if float(runtimes[elem]) > 15:

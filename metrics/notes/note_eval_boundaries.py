@@ -12,6 +12,11 @@ def get_note_eval_runtimes(min_matrix_size, max_matrix_size):
     get_note_evaluation(d[0], d[1])
     end = time.time()
     runtimes[count] = "{:.2f}".format(end - start)
+  for elem in runtimes:
+    if float(runtimes[elem]) > 15:
+      print(elem, runtimes[elem], "seconds - LONG TIME")
+    else:
+      print(elem, runtimes[elem], "seconds")
   return runtimes
 
 def get_note_dummy_data(min_matrix_size, max_matrix_size):

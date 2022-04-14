@@ -1,129 +1,74 @@
-import music21 as m21
-from evaluate import *
-from metrics.notes.evaluate_notes import *
-from statistics import get_compressed_dtw_dtw_stats, get_dtw_boundaries, get_dtw_levenshtein_stats
+from examples.example_note_evaluations import *
+from examples.example_rhythm_evaluations import *
+from examples.example_song_evaluations import *
+from inspect import getmembers, isfunction
+from examples import example_note_evaluations, example_rhythm_evaluations, example_song_evaluations
+from statistics import get_compressed_dtw_dtw_stats, get_dtw_boundary_stats, get_dtw_levenshtein_stats
 from metrics.notes.note_eval_boundaries import get_note_eval_runtimes
-from visualizer.draw_note_results import *
-from metrics.distance_algorithms.distances import *
-from visualizer.draw_rhythmic_results import *
-from metrics.rhythms.evaluate_rhythms import *
-from input.midi_reader import *
-from visualizer.draw_harmonic_part_results import *
-from metrics.distance_algorithms.compressed_dtw import *
-from metrics.distance_algorithms.boyer_moore import *
 
-# TODO: Refactor main
+def choose_from_main_menu():
+  print("What would you like to run?")
+  print("1 - Song evaluation")
+  print("2 - Song evaluation with only DTW")
+  print("3 - Note evaluation")
+  print("4 - Rhythm evaluation by DTW")
+  print("5 - Rhythm evaluation by Levenshtein")
+  print("6 - Runtime statistics")
+  print("7 - Exit")
+  index = int(input())
+  return index
 
-# ------------------------------
-# Expected and given note arrays
-# ------------------------------
+def run_chosen_method(index):
+  while index < 1 or index > 6:
+    print("That is not an existing option. Try again:")
+    index = int(input())
 
-# expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
-# given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('c5')]
+  # TODO: Exceptions when choosing non-existing options
+  if index == 1:
+    choose_from_evaluations(example_song_evaluations, SONG_FUNCTION_NAME_BEGINNING_BM)
+  elif index == 2:
+    choose_from_evaluations(example_song_evaluations, SONG_FUNCTION_NAME_BEGINNING_DTW)
+  elif index == 3:
+    choose_from_evaluations(example_note_evaluations, NOTE_FUNCTION_NAME_BEGINNING)
+  elif index == 4:
+    choose_from_evaluations(example_rhythm_evaluations, RHYTHM_FUNCTION_NAME_BEGINNING_DTW)
+  elif index == 5:
+    choose_from_evaluations(example_rhythm_evaluations, RHYTHM_FUNCTION_NAME_BEGINNING_LEV)
+  elif index == 6:
+    print("Choose from the following:")
+    print("1 - DTW - Levenshtein statistics")
+    print("2 - Compressed DTW vs DTW statistics")
+    print("3 - DTW runtime check")
+    print("4 - Note evaluation runtime check")
+    stat_index = int(input())
+    run_chosen_statistics(stat_index)
+  elif index == 7:
+    print("Exiting")
 
-expected_notes = [m21.pitch.Pitch('d1'), m21.pitch.Pitch('d--1'), m21.pitch.Pitch('c#3'),
-                  m21.pitch.Pitch('c#4'), m21.pitch.Pitch('a4'), m21.pitch.Pitch('b4'),
-                  m21.pitch.Pitch('c5'), m21.pitch.Pitch('d5')]
-given_notes = [m21.pitch.Pitch('d-3'), m21.pitch.Pitch('d1'),  m21.pitch.Pitch('e2'),
-               m21.pitch.Pitch('f3'), m21.pitch.Pitch('g3'), m21.pitch.Pitch('a3'),
-               m21.pitch.Pitch('a4')]
+def run_chosen_statistics(index):
+  while index < 1 or index > 4:
+    print("That is not an existing option. Try again:")
+    index = int(input())
 
-# Example 1 for harmonics with coverage
-# expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('f4'), m21.pitch.Pitch('c5')]
-# given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('c5'), m21.pitch.Pitch('c6')]
+  if index == 1:
+    get_dtw_levenshtein_stats(1, 7)
+  elif index == 2:
+    get_compressed_dtw_dtw_stats(1, 7)
+  elif index == 3:
+    get_dtw_boundary_stats(1, 10)
+  elif index == 4:
+    get_note_eval_runtimes(1, 8)
 
-# Example 2 for harmonics with coverage
-# expected_notes = [m21.pitch.Pitch('a1'), m21.pitch.Pitch('c2'), m21.pitch.Pitch('e2')]
-# given_notes = [m21.pitch.Pitch('c2'), m21.pitch.Pitch('e3'), m21.pitch.Pitch('b3')]
+def choose_from_evaluations(evaluations, function_name_beginning):
+  print("Examples:")
+  functions = getmembers(evaluations, isfunction)
+  for f in functions:
+    if function_name_beginning in f[0]:
+      print(f"[-] {f[0]}")
+  print("Enter the name of the example you'd like to run:")
+  f_name = input()
+  f_name += "()"
+  eval(f_name)
 
-# expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
-# given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('c5'), m21.pitch.Pitch('c5')]
-
-# expected_notes = [m21.pitch.Pitch('c4')]
-# given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
-
-# ----------------------------------
-# Expected and given rhythmic arrays
-# ----------------------------------
-
-d_quarter = m21.note.Note('d4')
-c_quarter = m21.note.Note('c4')
-
-c_half = m21.note.Note('c4')
-c_half.duration.quarterLength = 2
-
-d_half = m21.note.Note('d4')
-d_half.duration.quarterLength = 2
-
-rest_quarter = m21.note.Rest()
-
-rest_half = m21.note.Rest()
-rest_half.duration.quarterLength = 2
-
-# expected_rhythm = [d_quarter, d_quarter, c_half,    rest_half,    d_quarter]  # qqh2q
-# given_rhythm =    [c_half,    d_quarter, d_quarter, rest_quarter, d_quarter] # hqq1q
-
-expected_rhythm = [d_quarter, d_quarter, d_half,    rest_half,    d_quarter]
-given_rhythm =    [c_half,    c_quarter, c_quarter, rest_quarter, c_quarter]
-
-# ---------------------------
-# Expected and given melodies
-# ---------------------------
-
-exp_score = get_score_from_midi("../midi/rhythm-expected.mid")
-giv_score = get_score_from_midi("../midi/rhythm-given.mid")
-
-# ----------------------------------------
-# Song evaluation with Boyer-Moore and DTW
-# ----------------------------------------
-
-# run_main_song_evaluation(exp_score, giv_score, True)
-
-# ------------------------------
-# Song evaluation using only DTW 
-# ------------------------------
-
-# get_only_dtw_evaluation(exp_score, giv_score)
-
-# ---------------
-# Note evaluation
-# ---------------
-
-# note_eval = get_note_evaluation(expected_notes, given_notes)
-# draw_note_evaluation(expected_notes, given_notes, note_eval)
-
-# -------------------------------------------
-# Rhythm evaluation with Levenshtein distance
-# -------------------------------------------
-
-# get_levenshtein_rhythm_evaluation(expected_rhythm, given_rhythm)
-
-# --------------------------
-# Rhythm evaluation with DTW
-# --------------------------
-
-# get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
-
-# ----------------------------
-# DTW - Levenshtein statistics
-# ----------------------------
-
-# get_dtw_levenshtein_stats(1, 7)
-
-# --------------
-# Compressed DTW
-# --------------
-
-get_compressed_dtw_dtw_stats(1, 7)
-
-# -----------------
-# DTW runtime check
-# -----------------
-
-# runtimes = get_dtw_boundaries(1, 10)
-
-# -----------------------------
-# Note evaluation runtime check
-# -----------------------------
-
-# runtimes = get_note_eval_runtimes(1, 8)
+index = choose_from_main_menu()
+run_chosen_method(index)
