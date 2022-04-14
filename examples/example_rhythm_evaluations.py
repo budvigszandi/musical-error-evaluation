@@ -13,6 +13,25 @@ def example_rhythm_evaluation_dtw_1():
                      m21.note.Note('c4', quarterLength=1)]
   get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
 
+def example_rhythm_evaluation_dtw_expected_none_got_none():
+  expected_rhythm = []
+  given_rhythm =    []
+  get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
+
+def example_rhythm_evaluation_dtw_expected_some_got_none():
+  expected_rhythm = [m21.note.Note('d4', quarterLength=1), m21.note.Note('d4', quarterLength=1),
+                     m21.note.Note('d4', quarterLength=2), m21.note.Rest(quarterLength=2),
+                     m21.note.Note('d4', quarterLength=1)]
+  given_rhythm =    []
+  get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
+
+def example_rhythm_evaluation_dtw_expected_none_got_some():
+  expected_rhythm = []
+  given_rhythm =    [m21.note.Note('c4', quarterLength=2), m21.note.Note('c4', quarterLength=1),
+                     m21.note.Note('c4', quarterLength=1), m21.note.Rest(quarterLength=1),
+                     m21.note.Note('c4', quarterLength=1)]
+  get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm)
+
 def example_rhythm_evaluation_lev_1():
   expected_rhythm = [m21.note.Note('d4', quarterLength=1), m21.note.Note('d4', quarterLength=1),
                      m21.note.Note('d4', quarterLength=2), m21.note.Rest(quarterLength=2),
