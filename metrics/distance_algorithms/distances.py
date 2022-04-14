@@ -224,9 +224,9 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
 
           if current_source_index < len(source) - 1: current_source_index += 1
           if current_target_index < len(target) - 1: current_target_index += 1
-        if contains_infinity:
+        if contains_infinity and dtw_matrix_i != 0 and dtw_matrix_j != 0:
           break
-      if contains_infinity:
+      if contains_infinity and dtw_matrix_i != 0 and dtw_matrix_j != 0:
         continue
       converted_permutations.append(permutation_as_reltype)
       note_evaluations.append(current_note_eval)
