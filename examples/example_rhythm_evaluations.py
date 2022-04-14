@@ -1,5 +1,4 @@
 import music21 as m21
-
 from evaluate import get_dtw_rhythm_evaluation, get_levenshtein_rhythm_evaluation
 
 RHYTHM_FUNCTION_NAME_BEGINNING_DTW = "example_rhythm_evaluation_dtw"
