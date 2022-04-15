@@ -12,7 +12,7 @@ NOTATION_REST = "r"
 
 def add_matched_chunk_to_notation_string_bm_m21(notation_string, orig, bm_chunk_begin, bm_chunk_end, ins_empty_chunks):
   notation_string_length = len(notation_string)
-  orig_chunk = orig[bm_chunk_begin - ins_empty_chunks : bm_chunk_end - ins_empty_chunks]
+  orig_chunk = orig[max(0, bm_chunk_begin - ins_empty_chunks) : bm_chunk_end - ins_empty_chunks]
   m21_array = orig_chunk
   for elem in m21_array:
     if elem.isNote:
@@ -267,10 +267,12 @@ def get_current_notation(note, color, distance_type, is_rhythm_different):
       return note.name.lower() + length + color.value + title
     elif octave < 3:
       difference = 3 - octave
-      return note.name.upper() + note.name.upper() * difference + length + color.value + title
+      return note.name[0].upper() + note.name[0].upper() * difference + note.name[1:] + length + color.value + title
+      # return note.name.upper() + note.name.upper() * difference + length + color.value + title
     elif octave > 3:
       difference = octave - 4
-      return note.name.lower() + "'" * difference + length + color.value + title
+      return note.name[0].lower() + "'" * difference + note.name[1:] + length + color.value + title
+      # return note.name.lower() + "'" * difference + length + color.value + title
 
 def get_lyric_title(distance_type, is_rhythm_different, only_rhythm_difference):
   if only_rhythm_difference:

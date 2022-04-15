@@ -120,6 +120,7 @@ def get_different_parts(expected, given):
       break
     found_biggest = False
     for i in range(len(fixpoints_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
+      print("Searching", i, "long fixpoints", end='\r')
       for fp in fixpoints_by_length[i]:
         occurences = m21_bm_search(giv_copy, fp)
         if len(occurences) == 1: # only getting unique fixpoints
@@ -136,6 +137,8 @@ def get_different_parts(expected, given):
             print("New given:")
             print(giv_copy, end="\n\n")
       fixpoints_by_length = fixpoints_by_length[:i]
+      if len(fixpoints_by_length) == 0:
+        found_all = True
       if found_biggest:
         break
   

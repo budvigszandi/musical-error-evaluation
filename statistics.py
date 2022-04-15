@@ -18,8 +18,8 @@ def get_perfect_song_stats(exp_count, giv_count):
   return song_stats
 
 def get_final_song_stats(song_stats, exp_total_rhythmic_length, giv_total_rhythmic_length, matched_length, unmatched_length, point):
-  song_stats.matched_percentage = "{:.2f}".format((matched_length / exp_total_rhythmic_length) * 100)
-  song_stats.unmatched_percentage = "{:.2f}".format((unmatched_length / exp_total_rhythmic_length) * 100)
+  song_stats.matched_percentage = float((matched_length / exp_total_rhythmic_length) * 100)
+  song_stats.unmatched_percentage = float((unmatched_length / exp_total_rhythmic_length) * 100)
   merged_note_stats = get_merged_note_stats(0, 0, song_stats.note_eval_stats)
   merged_rhythm_stats = get_merged_rhythm_stats(0, 0, exp_total_rhythmic_length, giv_total_rhythmic_length, song_stats.rhythm_eval_stats)
   song_stats.merged_note_eval_stats = merged_note_stats
@@ -54,15 +54,16 @@ def get_merged_note_stats(exp_count, giv_count, note_stats_list):
     covered_only_with_harmonics_percentages.append(float(note_stat.covered_only_with_harmonics_percentage))
     multiply_covered_percentages.append(float(note_stat.multiply_covered_percentage))
   
-  merged_note_stats.perfect_match_percentage = "{:.2f}".format(sum(perfect_match_percentages) / len(perfect_match_percentages))
-  merged_note_stats.cent_diff_percentage = "{:.2f}".format(sum(cent_diff_percentages) / len(cent_diff_percentages))
-  merged_note_stats.harmonic_exp_percentage = "{:.2f}".format(sum(harmonic_exp_percentages) / len(harmonic_exp_percentages))
-  merged_note_stats.harmonic_giv_percentage = "{:.2f}".format(sum(harmonic_giv_percentages) / len(harmonic_giv_percentages))
-  merged_note_stats.unrelated_percentage = "{:.2f}".format(merged_note_stats.unrelated / merged_note_stats.giv_count)
-  merged_note_stats.got_lowest_percentage = "{:.2f}".format(merged_note_stats.got_lowest_count / note_stat_count)
-  merged_note_stats.uncovered_percentage = "{:.2f}".format(sum(uncovered_percentages) / len(uncovered_percentages))
-  merged_note_stats.covered_only_with_harmonics_percentage = "{:.2f}".format(sum(covered_only_with_harmonics_percentages) / len(covered_only_with_harmonics_percentages))
-  merged_note_stats.multiply_covered_percentage = "{:.2f}".format(sum(multiply_covered_percentages) / len(multiply_covered_percentages))
+  merged_note_stats.perfect_match_percentage = float(sum(perfect_match_percentages) / len(perfect_match_percentages))
+  merged_note_stats.cent_diff_percentage = float(sum(cent_diff_percentages) / len(cent_diff_percentages))
+  merged_note_stats.harmonic_exp_percentage = float(sum(harmonic_exp_percentages) / len(harmonic_exp_percentages))
+  merged_note_stats.harmonic_giv_percentage = float(sum(harmonic_giv_percentages) / len(harmonic_giv_percentages))
+  if merged_note_stats.giv_count > 0:
+    merged_note_stats.unrelated_percentage = float(merged_note_stats.unrelated / merged_note_stats.giv_count)
+  merged_note_stats.got_lowest_percentage = float(merged_note_stats.got_lowest_count / note_stat_count)
+  merged_note_stats.uncovered_percentage = float(sum(uncovered_percentages) / len(uncovered_percentages))
+  merged_note_stats.covered_only_with_harmonics_percentage = float(sum(covered_only_with_harmonics_percentages) / len(covered_only_with_harmonics_percentages))
+  merged_note_stats.multiply_covered_percentage = float(sum(multiply_covered_percentages) / len(multiply_covered_percentages))
   
   return merged_note_stats
 
@@ -90,21 +91,21 @@ def get_merged_rhythm_stats(exp_count, giv_count, exp_total_rhythmic_length, giv
     vastly_longer_rhythm_percentages.append(float(rhythm_stat.vastly_longer_rhythm_percentage))
   
   if exp_total_rhythmic_length != 0:
-    merged_rhythm_stats.insertions_percentage = float("{:.2f}".format((sum(merged_rhythm_stats.insertions) / exp_total_rhythmic_length) * 100))
-    merged_rhythm_stats.deletions_percentage = float("{:.2f}".format((sum(merged_rhythm_stats.deletions) / exp_total_rhythmic_length) * 100))
-    merged_rhythm_stats.note_rhythm_switch_percentage = float("{:.2f}".format((merged_rhythm_stats.note_rhythm_switch_length / exp_total_rhythmic_length) * 100))
-    merged_rhythm_stats.rhythm_note_switch_percentage = float("{:.2f}".format((merged_rhythm_stats.rhythm_note_switch_length / exp_total_rhythmic_length) * 100))
+    merged_rhythm_stats.insertions_percentage = float((sum(merged_rhythm_stats.insertions) / exp_total_rhythmic_length) * 100)
+    merged_rhythm_stats.deletions_percentage = float((sum(merged_rhythm_stats.deletions) / exp_total_rhythmic_length) * 100)
+    merged_rhythm_stats.note_rhythm_switch_percentage = float((merged_rhythm_stats.note_rhythm_switch_length / exp_total_rhythmic_length) * 100)
+    merged_rhythm_stats.rhythm_note_switch_percentage = float((merged_rhythm_stats.rhythm_note_switch_length / exp_total_rhythmic_length) * 100)
     if len(slightly_shorter_rhythm_percentages) > 0:
-      merged_rhythm_stats.slightly_shorter_rhythm_percentage = float("{:.2f}".format(sum(slightly_shorter_rhythm_percentages) / len(slightly_shorter_rhythm_percentages)))
+      merged_rhythm_stats.slightly_shorter_rhythm_percentage = float(sum(slightly_shorter_rhythm_percentages) / len(slightly_shorter_rhythm_percentages))
     if len(slightly_longer_rhythm_percentages) > 0:
-      merged_rhythm_stats.slightly_longer_rhythm_percentage = float("{:.2f}".format(sum(slightly_longer_rhythm_percentages) / len(slightly_longer_rhythm_percentages)))
+      merged_rhythm_stats.slightly_longer_rhythm_percentage = float(sum(slightly_longer_rhythm_percentages) / len(slightly_longer_rhythm_percentages))
     if len(vastly_shorter_rhythm_percentages) > 0:
-      merged_rhythm_stats.vastly_shorter_rhythm_percentage = float("{:.2f}".format(sum(vastly_shorter_rhythm_percentages) / len(vastly_shorter_rhythm_percentages)))
+      merged_rhythm_stats.vastly_shorter_rhythm_percentage = float(sum(vastly_shorter_rhythm_percentages) / len(vastly_shorter_rhythm_percentages))
     if len(vastly_longer_rhythm_percentages) > 0:
-      merged_rhythm_stats.vastly_longer_rhythm_percentage = float("{:.2f}".format(sum(vastly_longer_rhythm_percentages) / len(vastly_longer_rhythm_percentages)))
-    merged_rhythm_stats.total_length_difference_percentage = float("{:.2f}".format((giv_total_rhythmic_length / exp_total_rhythmic_length) * 100))
+      merged_rhythm_stats.vastly_longer_rhythm_percentage = float(sum(vastly_longer_rhythm_percentages) / len(vastly_longer_rhythm_percentages))
+    merged_rhythm_stats.total_length_difference_percentage = float((giv_total_rhythmic_length / exp_total_rhythmic_length) * 100)
   else:
-    merged_rhythm_stats.insertions_percentage = float("{:.2f}".format(sum(merged_rhythm_stats.insertions) * 100))
+    merged_rhythm_stats.insertions_percentage = float(sum(merged_rhythm_stats.insertions) * 100)
     merged_rhythm_stats.total_length_difference_percentage = merged_rhythm_stats.insertions_percentage
   merged_rhythm_stats.points = 0
 
@@ -128,10 +129,16 @@ def get_song_chunk_note_eval_stats(expected, given, scenario, note_evals, points
 
   for i in range(len(scenario)):
     current_step = scenario[i]
-    if len(expected) > 0: current_source = expected[current_source_index]
-    if len(given) > 0: current_target = given[current_target_index]
-    chunk_exp_count = get_stat_elem_count([current_source])
-    chunk_giv_count = get_stat_elem_count([current_target])
+    if len(expected) > 0:
+      current_source = expected[current_source_index]
+      chunk_exp_count = get_stat_elem_count([current_source])
+    else:
+      chunk_exp_count = 0
+    if len(given) > 0:
+      current_target = given[current_target_index]
+      chunk_giv_count = get_stat_elem_count([current_target])
+    else:
+      chunk_giv_count = 0
 
     if current_step == DistanceType.DELETION:
       uncovered_count += chunk_exp_count
@@ -184,14 +191,14 @@ def get_song_chunk_note_eval_stats(expected, given, scenario, note_evals, points
       if current_target_index < len(given) - 1:
         current_target_index += 1
 
-  song_chunk_note_stats.perfect_match_percentage = "{:.2f}".format(sum(perfect_match_percentages) / len(perfect_match_percentages))
-  song_chunk_note_stats.cent_diff_percentage = "{:.2f}".format(sum(cent_diff_percentages) / len(cent_diff_percentages))
-  song_chunk_note_stats.harmonic_exp_percentage = "{:.2f}".format(sum(harmonic_exp_percentages) / len(harmonic_exp_percentages))
-  song_chunk_note_stats.harmonic_giv_percentage = "{:.2f}".format(sum(harmonic_giv_percentages) / len(harmonic_giv_percentages))
-  song_chunk_note_stats.unrelated_percentage = "{:.2f}".format((song_chunk_note_stats.unrelated / exp_count) * 100)
-  song_chunk_note_stats.uncovered_percentage = "{:.2f}".format((uncovered_count / exp_count) * 100)
-  song_chunk_note_stats.covered_only_with_harmonics_percentage = "{:.2f}".format((covered_only_with_harmonics_count / exp_count) * 100)
-  song_chunk_note_stats.multiply_covered_percentage = "{:.2f}".format((multiply_covered_count / exp_count) * 100)
+  song_chunk_note_stats.perfect_match_percentage = float(sum(perfect_match_percentages) / len(perfect_match_percentages))
+  song_chunk_note_stats.cent_diff_percentage = float(sum(cent_diff_percentages) / len(cent_diff_percentages))
+  song_chunk_note_stats.harmonic_exp_percentage = float(sum(harmonic_exp_percentages) / len(harmonic_exp_percentages))
+  song_chunk_note_stats.harmonic_giv_percentage = float(sum(harmonic_giv_percentages) / len(harmonic_giv_percentages))
+  song_chunk_note_stats.unrelated_percentage = float((song_chunk_note_stats.unrelated / exp_count) * 100)
+  song_chunk_note_stats.uncovered_percentage = float((uncovered_count / exp_count) * 100)
+  song_chunk_note_stats.covered_only_with_harmonics_percentage = float((covered_only_with_harmonics_count / exp_count) * 100)
+  song_chunk_note_stats.multiply_covered_percentage = float((multiply_covered_count / exp_count) * 100)
 
   return song_chunk_note_stats
 
@@ -247,16 +254,16 @@ def get_note_eval_stats(expected_notes, given_notes, scenario, points):
     note_eval_stats.points = points
 
     if len(expected_notes) > 0:
-      note_eval_stats.perfect_match_percentage = "{:.2f}".format((len(perfect_match_notes) / exp_count) * 100)
-      note_eval_stats.cent_diff_percentage = "{:.2f}".format((len(cent_diff_notes) / exp_count) * 100)
-      note_eval_stats.harmonic_exp_percentage = "{:.2f}".format((len(harmonic_exp_notes) / exp_count) * 100)
-      note_eval_stats.uncovered_percentage = "{:.2f}".format((len(note_eval_stats.uncovered_notes) / exp_count) * 100)
-      note_eval_stats.covered_only_with_harmonics_percentage = "{:.2f}".format((len(note_eval_stats.covered_only_with_harmonics) / exp_count) * 100)
-      note_eval_stats.multiply_covered_percentage = "{:.2f}".format((len(note_eval_stats.multiply_covered_notes) / exp_count) * 100)
+      note_eval_stats.perfect_match_percentage = float((len(perfect_match_notes) / exp_count) * 100)
+      note_eval_stats.cent_diff_percentage = float((len(cent_diff_notes) / exp_count) * 100)
+      note_eval_stats.harmonic_exp_percentage = float((len(harmonic_exp_notes) / exp_count) * 100)
+      note_eval_stats.uncovered_percentage = float((len(note_eval_stats.uncovered_notes) / exp_count) * 100)
+      note_eval_stats.covered_only_with_harmonics_percentage = float((len(note_eval_stats.covered_only_with_harmonics) / exp_count) * 100)
+      note_eval_stats.multiply_covered_percentage = float((len(note_eval_stats.multiply_covered_notes) / exp_count) * 100)
 
     if len(given_notes) > 0:
-      note_eval_stats.harmonic_giv_percentage = "{:.2f}".format((sum(note_eval_stats.harmonics) / giv_count) * 100)
-      note_eval_stats.unrelated_percentage = "{:.2f}".format((note_eval_stats.unrelated / giv_count) * 100)
+      note_eval_stats.harmonic_giv_percentage = float((sum(note_eval_stats.harmonics) / giv_count) * 100)
+      note_eval_stats.unrelated_percentage = float((note_eval_stats.unrelated / giv_count) * 100)
 
     return note_eval_stats
 
@@ -393,24 +400,17 @@ def get_rhythm_eval_stats(expected_rhythm, given_rhythm, scenario, points):
     prev_step = current_step
   
   if total_length_exp != 0:
-    rhythm_eval_stats.insertions_percentage = float("{:.2f}".format((sum(rhythm_eval_stats.insertions) / total_length_exp) * 100))
-    rhythm_eval_stats.deletions_percentage = float("{:.2f}".format((sum(rhythm_eval_stats.deletions) / total_length_exp) * 100))
-    rhythm_eval_stats.note_rhythm_switch_percentage = float("{:.2f}".format((rhythm_eval_stats.note_rhythm_switch_length / total_length_exp) * 100))
-    rhythm_eval_stats.rhythm_note_switch_percentage = float("{:.2f}".format((rhythm_eval_stats.rhythm_note_switch_length / total_length_exp) * 100))
-    rhythm_eval_stats.slightly_shorter_rhythm_percentage = float("{:.2f}".format((slightly_shorter_length_loss / total_length_exp) * 100))
-    rhythm_eval_stats.slightly_longer_rhythm_percentage = float("{:.2f}".format((slightly_longer_length_gain / total_length_exp) * 100))
-    rhythm_eval_stats.vastly_shorter_rhythm_percentage = float("{:.2f}".format((vastly_shorter_length_loss / total_length_exp) * 100))
-    rhythm_eval_stats.vastly_longer_rhythm_percentage = float("{:.2f}".format((vastly_longer_length_gain / total_length_exp) * 100))
-    rhythm_eval_stats.total_length_difference_percentage = float("{:.2f}".format((total_length_giv / total_length_exp) * 100))
+    rhythm_eval_stats.insertions_percentage = float((sum(rhythm_eval_stats.insertions) / total_length_exp) * 100)
+    rhythm_eval_stats.deletions_percentage = float((sum(rhythm_eval_stats.deletions) / total_length_exp) * 100)
+    rhythm_eval_stats.note_rhythm_switch_percentage = float((rhythm_eval_stats.note_rhythm_switch_length / total_length_exp) * 100)
+    rhythm_eval_stats.rhythm_note_switch_percentage = float((rhythm_eval_stats.rhythm_note_switch_length / total_length_exp) * 100)
+    rhythm_eval_stats.slightly_shorter_rhythm_percentage = float((slightly_shorter_length_loss / total_length_exp) * 100)
+    rhythm_eval_stats.slightly_longer_rhythm_percentage = float((slightly_longer_length_gain / total_length_exp) * 100)
+    rhythm_eval_stats.vastly_shorter_rhythm_percentage = float((vastly_shorter_length_loss / total_length_exp) * 100)
+    rhythm_eval_stats.vastly_longer_rhythm_percentage = float((vastly_longer_length_gain / total_length_exp) * 100)
+    rhythm_eval_stats.total_length_difference_percentage = float((total_length_giv / total_length_exp) * 100)
   else:
-    rhythm_eval_stats.insertions_percentage = float("{:.2f}".format(sum(rhythm_eval_stats.insertions) * 100))
-    rhythm_eval_stats.deletions_percentage = 0
-    rhythm_eval_stats.note_rhythm_switch_percentage = 0
-    rhythm_eval_stats.rhythm_note_switch_percentage = 0
-    rhythm_eval_stats.slightly_shorter_rhythm_percentage = 0
-    rhythm_eval_stats.slightly_longer_rhythm_percentage = 0
-    rhythm_eval_stats.vastly_shorter_rhythm_percentage = 0
-    rhythm_eval_stats.vastly_longer_rhythm_percentage = 0
+    rhythm_eval_stats.insertions_percentage = float(sum(rhythm_eval_stats.insertions) * 100)
     rhythm_eval_stats.total_length_difference_percentage = rhythm_eval_stats.insertions_percentage
   rhythm_eval_stats.points = points
 

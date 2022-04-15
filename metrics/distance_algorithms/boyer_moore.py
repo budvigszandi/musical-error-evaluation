@@ -248,6 +248,8 @@ def insert_empty_chunks(exp_copy, giv_copy, exp_begin, exp_end, giv_begin, giv_e
     exp_copy.insert(exp_end, EMPTY_CHUNK_CHARACTER)
   elif blank_after_giv and not blank_after_exp:
     giv_copy.insert(giv_end, EMPTY_CHUNK_CHARACTER)
+  elif giv_begin == 0 and exp_begin != 0:
+    giv_copy.insert(giv_begin, EMPTY_CHUNK_CHARACTER)
   return exp_copy, giv_copy
 
 def get_remaining_chunks(song):

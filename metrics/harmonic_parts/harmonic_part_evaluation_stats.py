@@ -18,8 +18,8 @@ class HarmonicPartEvaluationStats:
 
     string_rep = f""
     string_rep += f"Expected {self.exp_count} notes and rests, got {self.giv_count} notes and rests\n"
-    string_rep += f"  {self.matched_percentage}% was a total match, didn't need further evaluation\n"
-    string_rep += f"  {self.unmatched_percentage}% needed further evaluation\n"
+    string_rep += f"  {self.matched_percentage:.2f}% was a total match, didn't need further evaluation\n"
+    string_rep += f"  {self.unmatched_percentage:.2f}% needed further evaluation\n"
     if self.merged_note_eval_stats != None:
       string_rep += f"\n--- Merged note evaluations for the unmatched parts ---\n"
       string_rep += str(self.merged_note_eval_stats)

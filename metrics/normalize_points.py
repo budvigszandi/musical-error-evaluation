@@ -5,6 +5,9 @@ def normalize(value, min, max):
   start = NORMALIZE_MINIMUM
   end = NORMALIZE_MAXIMUM
   width = end - start
+  value = float(value)
+  min = float(min)
+  max = float(max)
   
   if max == min:
     return NORMALIZE_MAXIMUM
