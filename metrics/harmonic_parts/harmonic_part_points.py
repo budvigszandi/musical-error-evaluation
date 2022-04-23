@@ -8,5 +8,5 @@ class HarmonicPartPoints(IntEnum):
 
   INSERTED_NOTE_POINT = -2 # Gets reducted for each added harmonic complexity
 
-  CHORD_NOTE_SWITCH_POINT = -5
+  CHORD_NOTE_SWITCH_POINT = - CORRECT_HARMONIC_ELEMENT_POINT / 2
   REST_SOUND_SWITCH_POINT = - CHORD_NOTE_SWITCH_POINT * 2
