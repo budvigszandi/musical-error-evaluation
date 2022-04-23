@@ -70,9 +70,8 @@ def get_harmonic_part_distance(source, target):
     elif is_rest_sound_switch:
       # Development idea: the distance could be even bigger if more sounds are expected (if necessary)
       distance -= HarmonicPartPoints.REST_SOUND_SWITCH_POINT
-    elif both_are_rests:
-      rhythmic_distance = get_rhythmic_distance(source, target)
-      distance += rhythmic_distance
+    rhythmic_distance = get_rhythmic_distance(source, target)
+    distance += rhythmic_distance
   return round(distance, 2)
 
 def get_best_note_evaluation(source, target, get_scenario, get_points):
