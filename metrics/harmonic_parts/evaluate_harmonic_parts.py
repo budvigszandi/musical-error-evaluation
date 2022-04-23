@@ -56,7 +56,6 @@ def get_harmonic_part_distance(source, target):
     neither_is_rest = (not source.isRest) and (not target.isRest)
     is_chord_note_switch = (source.isNote and target.isChord) or (source.isChord and target.isNote)
     is_rest_sound_switch = (source.isRest and (not target.isRest)) or ((not source.isRest) and target.isRest)
-    both_are_rests = source.isRest and target.isRest
     if neither_is_rest:
       if is_chord_note_switch:
         distance -= HarmonicPartPoints.CHORD_NOTE_SWITCH_POINT
