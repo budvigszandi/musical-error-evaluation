@@ -185,6 +185,13 @@ def get_note_evaluation(expected_notes, given_notes):
   print("Given notes:")
   print_notes(given_notes)
 
+  if len(expected_notes) == 0 and len(given_notes) == 0:
+    best_scenario = []
+    points = NORMALIZE_MAXIMUM
+    note_eval_stats = get_note_eval_stats(expected_notes, given_notes, best_scenario, points)
+    print("\n------------ Statistics ------------")
+    print(note_eval_stats)
+    return best_scenario
   if len(expected_notes) == 0:
     best_scenario = []
     for note in given_notes:

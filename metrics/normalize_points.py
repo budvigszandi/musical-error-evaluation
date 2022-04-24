@@ -1,4 +1,4 @@
-NORMALIZE_MINIMUM = 1
+NORMALIZE_MINIMUM = 0
 NORMALIZE_MAXIMUM = 10
 
 def normalize(value, min, max):
