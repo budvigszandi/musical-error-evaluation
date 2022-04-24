@@ -42,7 +42,8 @@ class NoteEvaluationStats:
     string_rep += f"    {self.harmonic_giv_percentage:.2f}% of the given notes were harmonics of something\n"
     string_rep += f"  Unrelated note count: {self.unrelated}, {self.unrelated_percentage:.2f}% of the given notes\n"
     string_rep += f"  Got lowest expected note: {self.got_lowest}\n"
-    string_rep += f"  Uncovered {self.uncovered_percentage:.2f}% of the expected notes: {uncovered_string}\n"
+    string_rep += f"  Uncovered {self.uncovered_percentage:.2f}% of the expected notes:\n"
+    string_rep += f"{uncovered_string}"
     string_rep += f"  Covered {self.covered_only_with_harmonics_percentage:.2f}% of the expected notes with only harmonics:\n"
     string_rep += f"{covered_only_with_harmonics_string}"
     string_rep += f"  Multiply covered {self.multiply_covered_percentage:.2f}% of the expected notes:\n"
@@ -63,7 +64,7 @@ def get_harmonic_distribution_string(self):
 
 def get_uncovered_notes_string(self):
   if len(self.uncovered_notes) == 0:
-    return "None\n"
+    return "    None\n"
   
   u_string = ""
   for i in range(len(self.uncovered_notes)):

@@ -142,7 +142,7 @@ def get_sum_of_scenario(index_list, relationship_matrix, relationship_point_matr
                                relationship matrix.
   '''
   expected_notes_count = len(relationship_point_matrix[0])
-  minimum_points = 0
+  minimum_points = len(relationship_point_matrix) * NotePoints.UNRELATED_POINT
   maximum_points = expected_notes_count * NotePoints.PERFECT_MATCH_POINT * NotePoints.RELATIONSHIP_POINT_WEIGHT + \
                    + expected_notes_count * NotePoints.COVERED_NOTE_POINT * NotePoints.COVERED_NOTE_POINT_WEIGHT
   
