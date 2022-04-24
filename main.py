@@ -55,7 +55,7 @@ def run_chosen_statistics(index):
   elif index == 2:
     get_compressed_dtw_dtw_stats(1, 7)
   elif index == 3:
-    get_dtw_boundary_stats(1, 10)
+    get_dtw_boundary_stats(1, 9)
   elif index == 4:
     get_note_eval_runtimes(1, 8)
 

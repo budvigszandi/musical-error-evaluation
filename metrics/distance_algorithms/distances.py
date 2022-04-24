@@ -143,7 +143,7 @@ def dtw(s, t, window, harmonic_parts = False):
       dtw_matrix[i, j] = cost + last_min
   return dtw_matrix
 
-def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False):
+def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix, harmonic_parts = False, checking_runtime = False):
   all_step_permutations = step_permutations
   steps_of_same_amount = all_step_permutations[0]
 
@@ -171,9 +171,11 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
     else:
       return converted_permutations, points, note_evaluations
 
-  total_perm_count = get_permutation_count_for_matrix(len(source), len(target))
-  actual_perm_count = 0
+  # --- Commenting this because get_permutation_count_for_matrix doesn't count properly yet ---
+  # total_perm_count = get_permutation_count_for_matrix(len(source), len(target))
+  # actual_perm_count = 0
 
+  permutation_count = 0
   for i in all_step_permutations:
     steps_of_same_amount = i
     for j in steps_of_same_amount:
@@ -229,15 +231,21 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
       if contains_infinity and dtw_matrix_i != 0 and dtw_matrix_j != 0:
         continue
       converted_permutations.append(permutation_as_reltype)
+      permutation_count += 1
       note_evaluations.append(current_note_eval)
       if harmonic_parts:
         points.append(get_harmonic_part_point(permutation_as_reltype, source, target))
       else:
         points.append(get_rhythmic_point(permutation_as_reltype, source, target))
-      actual_perm_count += 1
-      print(f"  Counting all step permutation points... {((actual_perm_count / total_perm_count) * 100):.2f}%", end="\r")
+      # --- Commenting this because get_permutation_count_for_matrix doesn't count properly yet ---
+      # actual_perm_count += 1
+      # print(f"  Counting all step permutation points... {((actual_perm_count / total_perm_count) * 100):.2f}%", end="\r")
 
-  if not harmonic_parts:
+  print(f"\nPermutation count on {len(dtw_matrix)}x{len(dtw_matrix[0])} matrix: {permutation_count}")
+
+  if checking_runtime:
+    return converted_permutations, points, permutation_count
+  elif not harmonic_parts:
     return converted_permutations, points
   else:
     return converted_permutations, points, note_evaluations

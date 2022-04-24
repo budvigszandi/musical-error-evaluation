@@ -437,10 +437,10 @@ def get_rhythmic_length(expected_rhythm):
 def get_dtw_boundary_stats(min_matrix_size, max_matrix_size):
   runtimes = get_dtw_runtimes(min_matrix_size, max_matrix_size)
   for elem in runtimes:
-    if float(runtimes[elem]) > 15:
-      print(elem, runtimes[elem], "seconds - LONG TIME")
+    if float(runtimes[elem][1]) > 15:
+      print(elem, runtimes[elem][0], runtimes[elem][1], "seconds - LONG TIME")
     else:
-      print(elem, runtimes[elem], "seconds")
+      print(elem, runtimes[elem][0], runtimes[elem][1], "seconds")
 
 def get_dtw_levenshtein_stats(min_matrix_size, max_matrix_size):
   dummy_data = get_dtw_dummy_data(min_matrix_size, max_matrix_size)
