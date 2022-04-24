@@ -241,8 +241,6 @@ def convert_steps_with_points_dtw(step_permutations, source, target, dtw_matrix,
       # actual_perm_count += 1
       # print(f"  Counting all step permutation points... {((actual_perm_count / total_perm_count) * 100):.2f}%", end="\r")
 
-  print(f"\nPermutation count on {len(dtw_matrix)}x{len(dtw_matrix[0])} matrix: {permutation_count}")
-
   if checking_runtime:
     return converted_permutations, points, permutation_count
   elif not harmonic_parts:

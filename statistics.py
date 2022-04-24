@@ -445,16 +445,16 @@ def get_dtw_boundary_stats(min_matrix_size, max_matrix_size):
 def get_dtw_levenshtein_stats(min_matrix_size, max_matrix_size):
   dummy_data = get_dtw_dummy_data(min_matrix_size, max_matrix_size)
 
-  print(f"Getting amounts of Levenshtein vs. DTW permutations on matrices from {min_matrix_size}x{min_matrix_size} to {max_matrix_size}x{max_matrix_size}")
+  print(f"Getting amounts of Levenshtein vs. DTW permutations on expected and given data from {min_matrix_size};{min_matrix_size} to {max_matrix_size};{max_matrix_size}")
   
   dtw_amounts = {}
   levenshtein_amounts = {}
 
   for pair in dummy_data:
-    print(f"Counting on {len(pair[0])}x{len(pair[1])} matrix")
+    print(f"Counting on {len(pair[0])} expected and {len(pair[1])} given elements")
     expected = pair[0]
     given = pair[1]
-    key = f"{len(expected)}x{len(given)}"
+    key = f"Exp {len(expected)} Giv {len(given)}"
 
     all_step_permutations = get_all_step_permutations(expected, given)
     dtw_matrix = dtw(expected, given, 3, True)
@@ -467,11 +467,15 @@ def get_dtw_levenshtein_stats(min_matrix_size, max_matrix_size):
     levenshtein_amounts[key] = len(converted_permutations_lev)
 
   for key in dtw_amounts:
-    print(f"\n{key} matrix:")
+    print(f"\n{key}:")
     print("  Levenshtein permutations:", levenshtein_amounts[key])
     print("  DTW permutations:", dtw_amounts[key])
-    print(f"DTW amount is {((dtw_amounts[key] / levenshtein_amounts[key]) * 100):.2f}% of Levenshtein amount")
-    print(f"Leveshtein amount is DTW amount * {(levenshtein_amounts[key] / dtw_amounts[key]):.2f}")
+    dtw_percent = (dtw_amounts[key] / levenshtein_amounts[key]) * 100
+    levenshtein_div_dtw = levenshtein_amounts[key] / dtw_amounts[key]
+    print(f"DTW amount is {dtw_percent:.2f}% of Levenshtein amount")
+    print(f"Leveshtein amount is DTW amount * {levenshtein_div_dtw:.2f}")
+    print("One-line summary (Expected count, given count, Levenshtein count, DTW count, DTW % of Levenshtein, Levenshtein / DTW):")
+    print(f"{key} {levenshtein_amounts[key]} {dtw_amounts[key]} {dtw_percent:.2f}% {levenshtein_div_dtw:.2f}")
 
 def get_compressed_dtw_dtw_stats(min_matrix_size, max_matrix_size):
   dummy_data = get_dtw_dummy_data(min_matrix_size, max_matrix_size)

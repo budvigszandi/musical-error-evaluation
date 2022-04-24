@@ -51,7 +51,7 @@ def run_chosen_statistics(index):
     index = int(input())
 
   if index == 1:
-    get_dtw_levenshtein_stats(1, 7)
+    get_dtw_levenshtein_stats(1, 9)
   elif index == 2:
     get_compressed_dtw_dtw_stats(1, 7)
   elif index == 3:
