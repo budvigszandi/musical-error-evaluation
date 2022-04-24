@@ -6,17 +6,12 @@ def get_note_eval_runtimes(min_matrix_size, max_matrix_size):
   data = get_note_dummy_data(min_matrix_size, max_matrix_size)
   print(f"Getting note evaluation runtimes on matrices from {min_matrix_size}x{min_matrix_size} to {max_matrix_size}x{max_matrix_size}")
   for d in data:
-    count = str(len(d[0])) + "x" + str(len(d[1]))
+    print(f"Checking when expected {len(d[1])} and given {len(d[0])}")
+    size = "Exp " + str(len(d[1])) + " Giv " + str(len(d[0]))
     start = time.time()
-    from evaluate import get_note_evaluation
-    get_note_evaluation(d[0], d[1])
+    scenario_count = get_note_eval_scenario_count(d[0], d[1])
     end = time.time()
-    runtimes[count] = "{:.2f}".format(end - start)
-  for elem in runtimes:
-    if float(runtimes[elem]) > 15:
-      print(elem, runtimes[elem], "seconds - LONG TIME")
-    else:
-      print(elem, runtimes[elem], "seconds")
+    runtimes[size] = (str(scenario_count) + " scenarios", "{:.2f}".format(end - start))
   return runtimes
 
 def get_note_dummy_data(min_matrix_size, max_matrix_size):
@@ -30,3 +25,11 @@ def get_note_dummy_data(min_matrix_size, max_matrix_size):
       giv = j * [note_c]
       dummy_data.append([exp, giv])
   return dummy_data
+
+def get_note_eval_scenario_count(expected_notes, given_notes):
+  from metrics.notes.evaluate_notes import get_relationship_matrix, get_relationship_points, get_scenarios, get_best_scenario
+  rel_matrix = get_relationship_matrix(expected_notes, given_notes)
+  rel_points_matrix = get_relationship_points(rel_matrix)
+  scenarios = get_scenarios(rel_matrix, rel_points_matrix)
+  best_scenario = get_best_scenario(scenarios)
+  return len(scenarios)

@@ -4,6 +4,7 @@ from metrics.distance_algorithms.distances import convert_steps_with_points_dtw,
 from metrics.distance_algorithms.dtw_boundaries import get_dtw_dummy_data, get_dtw_runtimes
 from metrics.harmonic_parts.harmonic_part_evaluation_stats import HarmonicPartEvaluationStats
 from metrics.normalize_points import NORMALIZE_MAXIMUM
+from metrics.notes.note_eval_boundaries import get_note_eval_runtimes
 from metrics.notes.song_chunk_note_evaluation_stats import SongChunkNoteEvaluationStats
 from metrics.notes.note_evaluation_stats import NoteEvaluationStats
 from metrics.notes.note_points import NotePoints
@@ -433,6 +434,14 @@ def get_rhythmic_length(expected_rhythm):
   for rhythm in expected_rhythm:
     total += rhythm.quarterLength
   return total
+
+def get_note_eval_boundary_stats(min_matrix_size, max_matrix_size):
+  runtimes = get_note_eval_runtimes(min_matrix_size, max_matrix_size)
+  for elem in runtimes:
+    if float(runtimes[elem][1]) > 15:
+      print(elem, runtimes[elem][0], runtimes[elem][1], "seconds - LONG TIME")
+    else:
+      print(elem, runtimes[elem][0], runtimes[elem][1], "seconds")
 
 def get_dtw_boundary_stats(min_matrix_size, max_matrix_size):
   runtimes = get_dtw_runtimes(min_matrix_size, max_matrix_size)

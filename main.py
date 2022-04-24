@@ -3,8 +3,7 @@ from examples.example_rhythm_evaluations import *
 from examples.example_song_evaluations import *
 from inspect import getmembers, isfunction
 from examples import example_note_evaluations, example_rhythm_evaluations, example_song_evaluations
-from statistics import get_compressed_dtw_dtw_stats, get_dtw_boundary_stats, get_dtw_levenshtein_stats
-from metrics.notes.note_eval_boundaries import get_note_eval_runtimes
+from statistics import get_compressed_dtw_dtw_stats, get_dtw_boundary_stats, get_dtw_levenshtein_stats, get_note_eval_boundary_stats
 
 def choose_from_main_menu():
   print("What would you like to run?")
@@ -57,7 +56,7 @@ def run_chosen_statistics(index):
   elif index == 3:
     get_dtw_boundary_stats(1, 9)
   elif index == 4:
-    get_note_eval_runtimes(1, 8)
+    get_note_eval_boundary_stats(1, 8)
 
 def choose_from_evaluations(evaluations, function_name_beginning):
   print("Examples:")
