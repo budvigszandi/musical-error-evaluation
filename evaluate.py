@@ -21,6 +21,10 @@ def get_song_chunk_dtw_evaluation(expected, given):
   print("DTW matrix")
   print(dtw_matrix, end="\n\n")
 
+  if (len(expected) >= 8 and len(given) >= 8):
+    print("[!!!] DTW evaluations this big can take a very long time")
+    print("[!!!] (from 1.5 minutes [exp:8, got:9] to 4.5 minutes [exp:9, got:9] and beyond)!")
+
   print("[-] Getting all step permuations for DTW matrix...")
   all_step_permutations = get_all_step_permutations(expected, given)
   print("[X] Got all step permutations")
@@ -81,6 +85,9 @@ def get_only_dtw_evaluation(exp_score, giv_score):
     print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
     expected = expected_data[i]
     given = given_data[i]
+    if (len(expected) >= 8 and len(given) >= 8):
+      print("[!!!] DTW evaluations this big can take a very long time")
+      print("[!!!] (from 1.5 minutes [exp:8, got:9] to 4.5 minutes [exp:9, got:9] and beyond)!")
     exp_rhythmic_length += get_rhythmic_length(expected)
     giv_rhythmic_length += get_rhythmic_length(given)
     best_permutation, note_evaluations, point, note_stat, rhythm_stat = get_song_chunk_dtw_evaluation(expected, given)
@@ -220,8 +227,8 @@ def get_note_evaluation(expected_notes, given_notes):
   print("[X] Built relationship point matrix.")
 
   if (len(expected_notes) >= 6 and len(given_notes) >= 8) or (len(expected_notes) >= 8 and len(given_notes) >= 7):
-    print("[!] Note evaluations this big can take a very long time")
-    print("[!] (from 45 seconds [exp:8, got:7] to 6 minutes [exp:8, got:8] and beyond)!")
+    print("[!!!] Note evaluations this big can take a very long time")
+    print("[!!!] (from 45 seconds [exp:8, got:7] to 6 minutes [exp:8, got:8] and beyond)!")
 
   print("[-] Getting scenarios...")
   scenarios = get_scenarios(rel_matrix, rel_points_matrix)
@@ -302,6 +309,10 @@ def get_dtw_rhythm_evaluation(expected_rhythm, given_rhythm):
 
   print("DTW matrix")
   print(dtw_matrix, end="\n\n")
+
+  if (len(expected_rhythm) >= 8 and len(given_rhythm) >= 8):
+    print("[!!!] DTW evaluations this big can take a very long time")
+    print("[!!!] (from 1.5 minutes [exp:8, got:9] to 4.5 minutes [exp:9, got:9] and beyond)!")
 
   print("[-] Getting all step permuations for DTW matrix...")
   all_step_permutations = get_all_step_permutations(expected_rhythm, given_rhythm)
