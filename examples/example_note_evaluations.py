@@ -47,6 +47,11 @@ def example_note_evaluation_expected_more_got_one():
   given_notes = [m21.pitch.Pitch('e6')]
   example_get_note_evaluation(expected_notes, given_notes)
 
+def example_note_evaluation_duplicate_cover():
+  expected_notes = [m21.pitch.Pitch('c4')]
+  given_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('c5'), m21.pitch.Pitch('c6')]
+  example_get_note_evaluation(expected_notes, given_notes)
+
 def example_note_evaluation_got_only_unrelated():
   expected_notes = [m21.pitch.Pitch('c4'), m21.pitch.Pitch('e4'), m21.pitch.Pitch('g4')]
   given_notes = [m21.pitch.Pitch('a2'), m21.pitch.Pitch('c3'), m21.pitch.Pitch('e3')]

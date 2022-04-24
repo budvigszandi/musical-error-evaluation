@@ -104,7 +104,7 @@ def get_scenarios(relationship_matrix, relationship_point_matrix):
   columns = len(relationship_point_matrix[0])
   index_variations = get_index_variations(rows, columns)
   for index_list in index_variations:
-    sum = get_sum_of_scenario(index_list, relationship_point_matrix)
+    sum = get_sum_of_scenario(index_list, relationship_matrix, relationship_point_matrix)
     scenario = get_current_scenario(relationship_matrix, index_list)
     scenario_tuple = tuple(scenario)
     scenarios[scenario_tuple] = sum
@@ -129,7 +129,7 @@ def get_current_scenario(relationship_matrix, index_list):
     scenario.append(relationship_matrix[i][index_list[i]])
   return scenario
 
-def get_sum_of_scenario(index_list, relationship_point_matrix):
+def get_sum_of_scenario(index_list, relationship_matrix, relationship_point_matrix):
   '''
   Returns a number which represents how many points a particular combination
   of relationships between the expected and given notes is worth.
@@ -148,7 +148,9 @@ def get_sum_of_scenario(index_list, relationship_point_matrix):
   
   sum = 0
   for i in range(len(index_list)):
-    sum += relationship_point_matrix[i][index_list[i]]
+    is_duplicate = is_duplicate_cover(relationship_matrix, index_list, i)
+    if not is_duplicate:
+      sum += relationship_point_matrix[i][index_list[i]]
   sum *= NotePoints.RELATIONSHIP_POINT_WEIGHT
   covered_notes_count = get_covered_notes_count(index_list)
   sum += covered_notes_count * NotePoints.COVERED_NOTE_POINT_WEIGHT
@@ -156,7 +158,20 @@ def get_sum_of_scenario(index_list, relationship_point_matrix):
   sum += duplicate_reduction_point * NotePoints.DUPLICATE_POINT_WEIGHT
 
   normalized_sum = normalize(sum, minimum_points, maximum_points)
-  return normalized_sum
+  return max(0, normalized_sum)
+
+def is_duplicate_cover(relationship_matrix, index_list, index_list_index):
+  occurences = []
+  for i in range(len(index_list[:index_list_index])):
+    if index_list[i] == index_list[index_list_index]:
+      occurences.append(i)
+
+  only_unrelated_relationships = True
+  if len(occurences) > 0:
+    for i in range(len(occurences)):
+      if relationship_matrix[i][index_list[occurences[i]]] != NoteRelationshipType.UNRELATED:
+        only_unrelated_relationships = False
+  return not only_unrelated_relationships
 
 def get_covered_notes_count(index_list):
   '''
