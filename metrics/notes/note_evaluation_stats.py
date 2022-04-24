@@ -66,12 +66,13 @@ def get_uncovered_notes_string(self):
   if len(self.uncovered_notes) == 0:
     return "    None\n"
   
-  u_string = ""
+  u_string = "    "
   for i in range(len(self.uncovered_notes)):
     if i == len(self.uncovered_notes) - 1:
       u_string += self.uncovered_notes[i].nameWithOctave
     else:
       u_string += self.uncovered_notes[i].nameWithOctave + ", "
+  u_string += "\n"
   return u_string
 
 def get_covered_only_with_harmonics_string(self):

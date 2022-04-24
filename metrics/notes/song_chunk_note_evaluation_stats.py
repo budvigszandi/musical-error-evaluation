@@ -35,7 +35,7 @@ class SongChunkNoteEvaluationStats:
     string_rep += f"  Unrelated note count: {self.unrelated}, {self.unrelated_percentage:.2f}% of the given notes\n"
     string_rep += f"  Got lowest expected note {self.got_lowest_count} times, {self.got_lowest_percentage:.2f}% of all\n"
     string_rep += f"  Uncovered {self.uncovered_percentage:.2f}% of the expected notes\n"
-    string_rep += f"  Covered {self.covered_only_with_harmonics_percentage:.2f}% of the expected notes with only harmonics:\n"
-    string_rep += f"  Multiply covered {self.multiply_covered_percentage:.2f}% of the expected notes:\n"
+    string_rep += f"  Covered {self.covered_only_with_harmonics_percentage:.2f}% of the expected notes with only harmonics\n"
+    string_rep += f"  Multiply covered {self.multiply_covered_percentage:.2f}% of the expected notes\n"
     
     return string_rep
