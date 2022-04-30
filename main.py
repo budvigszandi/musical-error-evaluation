@@ -4,6 +4,7 @@ from examples.example_song_evaluations import *
 from inspect import getmembers, isfunction
 from examples import example_note_evaluations, example_rhythm_evaluations, example_song_evaluations
 from statistics import get_compressed_dtw_dtw_stats, get_dtw_boundary_stats, get_dtw_levenshtein_stats, get_note_eval_boundary_stats
+import sys
 
 def choose_from_main_menu():
   print("What would you like to run?")
@@ -69,5 +70,10 @@ def choose_from_evaluations(evaluations, function_name_beginning):
   f_name += "()"
   eval(f_name)
 
-index = choose_from_main_menu()
-run_chosen_method(index)
+if len(sys.argv) == 3:
+  exp_score = get_score_from_midi(sys.argv[1])
+  giv_score = get_score_from_midi(sys.argv[2])
+  run_main_song_evaluation(exp_score, giv_score, True)
+else:
+  index = choose_from_main_menu()
+  run_chosen_method(index)
