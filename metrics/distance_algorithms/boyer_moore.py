@@ -12,7 +12,7 @@ REST_CHARACTER = "R"
 CHORD_BEGINNING_CHAR = "K"
 CHORD_NOTE_CHAR = "Q"
 CHORD_ENDING_CHAR = "Z"
-MINIMUM_FIXPOINT_LENGTH = 2
+MINIMUM_CHARACTERISTICS_LENGTH = 2
 BLANK_CHARACTER = "$"
 EMPTY_CHUNK_CHARACTER = "@"
 
@@ -105,40 +105,40 @@ def m21_to_boyer_moore(m21_array):
         bm_array.append(char)
   return bm_array
 
-def get_possible_fixpoints(song, length):
-  fixpoints = []
-  fixpoint = []
-  current, added, fixpoint_beginning, shift = 0, 0, 0, 0
+def get_possible_characteristics(song, length):
+  characteristics = []
+  characteristic = []
+  current, added, characteristic_beginning, shift = 0, 0, 0, 0
   while True:
     # --- add next ---
     if song[current] == CHORD_BEGINNING_CHAR:
       chord_end_index = get_chord_end_index(song[current:])
-      fixpoint.extend(song[current : current + chord_end_index + 1])
+      characteristic.extend(song[current : current + chord_end_index + 1])
       # print(f"  adding {song[current : current + chord_end_index + 1]}")
       current += chord_end_index + 1
       if added == 0:
-        shift = len(fixpoint)
+        shift = len(characteristic)
       added += 1
     else:
       octave_index = get_next_number_index(song[current:])
-      fixpoint.extend(song[current : current + octave_index + 1])
+      characteristic.extend(song[current : current + octave_index + 1])
       # print(f"  adding {song[current : current + octave_index + 1]}")
       current += octave_index + 1
       if added == 0:
-        shift = len(fixpoint)
+        shift = len(characteristic)
       added += 1
     # ----------------
     if added == length:
-      fixpoints.append(fixpoint)
-      # print("final chunk", fixpoint)
-      # print(f"begin {fixpoint_beginning} len {len(fixpoint)} begin+len {fixpoint_beginning + len(fixpoint)} len(song) {len(song)}")
-      if fixpoint_beginning + len(fixpoint) >= len(song):
+      characteristics.append(characteristic)
+      # print("final chunk", characteristic)
+      # print(f"begin {characteristic} len {len(characteristic)} begin+len {characteristic_beginning + len(characteristic)} len(song) {len(song)}")
+      if characteristic_beginning + len(characteristic) >= len(song):
         break
-      fixpoint = []
+      characteristic = []
       added = 0
-      fixpoint_beginning += shift
-      current = fixpoint_beginning
-  return fixpoints
+      characteristic_beginning += shift
+      current = characteristic_beginning
+  return characteristics
 
 def get_chord_end_index(song_chunk):
   for i in range(len(song_chunk)):
@@ -164,7 +164,7 @@ def get_different_parts(expected, given):
   if expected == given:
     print("The expected and given songs are exactly the same.")
     return [], [], [], []
-  fixpoints_by_length = get_possible_fixpoints_by_length(expected)
+  characteristics_by_length = get_possible_characteristics_by_length(expected)
   exp_copy = copy.copy(expected)
   giv_copy = copy.copy(given)
   found_all = False
@@ -173,28 +173,28 @@ def get_different_parts(expected, given):
     if not found_biggest:
       found_all = True
     if found_all:
-      print("\n------------ All fixpoints found ------------")
-      print("Found all unique fixpoints.")
+      print("\n------------ All characteristics found ------------")
+      print("Found all unique characteristics.")
       break
     found_biggest = False
-    for i in range(len(fixpoints_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
-      for fp in fixpoints_by_length[i]:
+    for i in range(len(characteristics_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
+      for fp in characteristics_by_length[i]:
         occurences = search(giv_copy, fp)
-        if len(occurences) == 1: # only getting unique fixpoints
+        if len(occurences) == 1: # only getting unique characteristics
           found_biggest = True
           exp_occurences = search(exp_copy, fp)
-          if len(exp_occurences) == 1: # only getting unique fixpoints
-            print("\n------ Fixpoint found ------")
-            print(f"Found a unique fixpoint: {fp}\nat {occurences[0]}-{occurences[0] + len(fp)} in the given song.\n")
+          if len(exp_occurences) == 1: # only getting unique characteristics
+            print("\n------ Characteristic found ------")
+            print(f"Found a unique characteristic: {fp}\nat {occurences[0]}-{occurences[0] + len(fp)} in the given song.\n")
             exp_occurence = exp_occurences[0]
             # Development idea: compare occurences -> only blank the ones close to each other
-            exp_copy, giv_copy = make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
-            # given_copy = make_fixpoint_blank(given_copy, occurences, fp)
+            exp_copy, giv_copy = make_characteristic_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
+            # given_copy = make_characteristic_blank(given_copy, occurences, fp)
             print("New expected:")
             print(exp_copy, end="\n\n")
             print("New given:")
             print(giv_copy, end="\n\n")
-      fixpoints_by_length = fixpoints_by_length[:i]
+      characteristics_by_length = characteristics_by_length[:i]
       if found_biggest:
         break
   
@@ -207,23 +207,23 @@ def get_different_parts(expected, given):
   print_remaining_chunks(giv_chunks)
   return exp_copy, giv_copy, exp_chunks, giv_chunks
 
-def get_possible_fixpoints_by_length(expected):
-  fixpoints_by_length = [] # every row is a list of possible fixpoints of the same length
-  length = MINIMUM_FIXPOINT_LENGTH
+def get_possible_characteristics_by_length(expected):
+  characteristics_by_length = [] # every row is a list of possible characteristics of the same length
+  length = MINIMUM_CHARACTERISTICS_LENGTH
   while True:
     try:
-      possible_fixpoints = get_possible_fixpoints(expected, length)
+      possible_characteristics = get_possible_characteristics(expected, length)
     except IndexError:
       break
-    fixpoints_by_length.append(possible_fixpoints)
+    characteristics_by_length.append(possible_characteristics)
     length += 1
-  return fixpoints_by_length
+  return characteristics_by_length
 
-def make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, giv_occurence, fixpoint):
+def make_characteristic_blank(exp_copy, giv_copy, exp_occurence, giv_occurence, characteristic):
   exp_begin = exp_occurence
-  exp_end = exp_begin + len(fixpoint)
+  exp_end = exp_begin + len(characteristic)
   giv_begin = giv_occurence
-  giv_end = giv_begin + len(fixpoint)
+  giv_end = giv_begin + len(characteristic)
   for i in range(exp_begin, exp_end):
     exp_copy[i] = BLANK_CHARACTER
   for i in range(giv_begin, giv_end):

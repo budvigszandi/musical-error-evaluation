@@ -1,5 +1,5 @@
 import copy
-from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, get_next_blank_letter_index, get_non_blank_letter_index, make_fixpoint_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_FIXPOINT_LENGTH
+from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, get_next_blank_letter_index, get_non_blank_letter_index, make_characteristic_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_CHARACTERISTICS_LENGTH
 from input.midi_reader import *
 from metrics.harmonic_parts.harmonic_part_evaluation_stats import HarmonicPartEvaluationStats
 from metrics.harmonic_parts.harmonic_part_points import HarmonicPartPoints
@@ -106,7 +106,7 @@ def get_different_parts(expected, given):
   if expected == given:
     print("The expected and given songs are exactly the same.")
     return [], [], [], []
-  fixpoints_by_length = get_possible_fixpoints_by_length(expected)
+  characteristics_by_length = get_possible_characteristics_by_length(expected)
   exp_copy = copy.copy(expected)
   giv_copy = copy.copy(given)
   found_all = False
@@ -115,29 +115,29 @@ def get_different_parts(expected, given):
     if not found_biggest:
       found_all = True
     if found_all:
-      print("\n------------ All fixpoints found ------------")
-      print("Found all unique fixpoints.")
+      print("\n------------ All characteristics found ------------")
+      print("Found all unique characteristics.")
       break
     found_biggest = False
-    for i in range(len(fixpoints_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
-      print("Searching", i, "long fixpoints", end='\r')
-      for fp in fixpoints_by_length[i]:
+    for i in range(len(characteristics_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
+      print("Searching", i, "long characteristics", end='\r')
+      for fp in characteristics_by_length[i]:
         occurences = m21_bm_search(giv_copy, fp)
-        if len(occurences) == 1: # only getting unique fixpoints
+        if len(occurences) == 1: # only getting unique characteristics
           found_biggest = True
           exp_occurences = m21_bm_search(exp_copy, fp)
-          if len(exp_occurences) == 1: # only getting unique fixpoints
-            print("\n------ Fixpoint found ------")
-            print(f"Found a unique fixpoint: {fp}\nat {occurences[0]}-{occurences[0] + len(fp) - 1} in the given song.\n")
+          if len(exp_occurences) == 1: # only getting unique characteristics
+            print("\n------ Characteristic found ------")
+            print(f"Found a unique characteristic: {fp}\nat {occurences[0]}-{occurences[0] + len(fp) - 1} in the given song.\n")
             exp_occurence = exp_occurences[0]
             # Development idea: compare occurences -> only blank the ones close to each other
-            exp_copy, giv_copy = make_fixpoint_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
+            exp_copy, giv_copy = make_characteristic_blank(exp_copy, giv_copy, exp_occurence, occurences[0], fp)
             print("New expected:")
             print(exp_copy, end="\n\n")
             print("New given:")
             print(giv_copy, end="\n\n")
-      fixpoints_by_length = fixpoints_by_length[:i]
-      if len(fixpoints_by_length) == 0:
+      characteristics_by_length = characteristics_by_length[:i]
+      if len(characteristics_by_length) == 0:
         found_all = True
       if found_biggest:
         break
@@ -151,39 +151,39 @@ def get_different_parts(expected, given):
   print_remaining_chunks(giv_chunks)
   return exp_copy, giv_copy, exp_chunks, giv_chunks
 
-def get_possible_fixpoints_by_length(expected):
-  fixpoints_by_length = [] # every row is a list of possible fixpoints of the same length
-  length = MINIMUM_FIXPOINT_LENGTH
+def get_possible_characteristics_by_length(expected):
+  characteristics_by_length = [] # every row is a list of possible characteristics of the same length
+  length = MINIMUM_CHARACTERISTICS_LENGTH
   while True:
     try:
-      possible_fixpoints = get_possible_fixpoints(expected, length)
+      possible_characteristics = get_possible_characteristics(expected, length)
     except IndexError:
       break
-    fixpoints_by_length.append(possible_fixpoints)
+    characteristics_by_length.append(possible_characteristics)
     length += 1
-  return fixpoints_by_length
+  return characteristics_by_length
 
-def get_possible_fixpoints(song, length):
-  fixpoints = []
-  fixpoint = []
-  current, added, fixpoint_beginning, shift = 0, 0, 0, 0
+def get_possible_characteristics(song, length):
+  characteristics = []
+  characteristic = []
+  current, added, characteristic_beginning, shift = 0, 0, 0, 0
   while True:
     # --- add next ---
-    fixpoint.append(song[current])
+    characteristic.append(song[current])
     current += 1
     if added == 0:
-      shift = len(fixpoint)
+      shift = len(characteristic)
     added += 1
     # ----------------
     if added == length:
-      fixpoints.append(fixpoint)
-      if fixpoint_beginning + len(fixpoint) >= len(song):
+      characteristics.append(characteristic)
+      if characteristic_beginning + len(characteristic) >= len(song):
         break
-      fixpoint = []
+      characteristic = []
       added = 0
-      fixpoint_beginning += shift
-      current = fixpoint_beginning
-  return fixpoints
+      characteristic_beginning += shift
+      current = characteristic_beginning
+  return characteristics
 
 def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_chunks, giv_chunks):
   notation_string = ""

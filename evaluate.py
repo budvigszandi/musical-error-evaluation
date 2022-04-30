@@ -154,7 +154,7 @@ def run_main_song_evaluation(exp_score, giv_score, m21=False):
 #   print("Given:")
 #   print(bm_given, end="\n\n")
 
-#   print("---------------------------- Boyer-Moore fixpoints ----------------------------")
+#   print("---------------------------- Boyer-Moore characteristics ----------------------------")
 #   exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts(bm_expected, bm_given)
 #   if exp_copy == [] and giv_copy == []:
 #     print("\n------ Drawing sheet music ------")
@@ -166,7 +166,7 @@ def run_main_song_evaluation(exp_score, giv_score, m21=False):
 def get_bm_m21_evaluation(expected, given, giv_score):
   print("--------------------------- Boyer-Moore initializing --------------------------")
 
-  print("---------------------------- Boyer-Moore fixpoints ----------------------------")
+  print("---------------------------- Boyer-Moore characteristics ----------------------------")
   exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts_bm_m21(expected, given)
 
   print("--------------------------------- Evaluation ----------------------------------")
