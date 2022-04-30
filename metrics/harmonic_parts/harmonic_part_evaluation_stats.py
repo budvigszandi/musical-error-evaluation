@@ -26,6 +26,6 @@ class HarmonicPartEvaluationStats:
     if self.merged_rhythm_eval_stats != None:
       string_rep += f"\n--- Merged rhythm evaluations for the unmatched parts ---\n"
       string_rep += str(self.merged_rhythm_eval_stats)
-    string_rep += f"\nPoints for the whole song: {self.points} / {NORMALIZE_MAXIMUM} = {percentage}\n"
+    string_rep += f"\nPoints for the whole song: {self.points:.2f} / {NORMALIZE_MAXIMUM} = {percentage}\n"
 
     return string_rep

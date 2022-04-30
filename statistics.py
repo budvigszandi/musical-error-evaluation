@@ -60,7 +60,7 @@ def get_merged_note_stats(exp_count, giv_count, note_stats_list):
   merged_note_stats.harmonic_exp_percentage = float(sum(harmonic_exp_percentages) / len(harmonic_exp_percentages))
   merged_note_stats.harmonic_giv_percentage = float(sum(harmonic_giv_percentages) / len(harmonic_giv_percentages))
   if merged_note_stats.giv_count > 0:
-    merged_note_stats.unrelated_percentage = float(merged_note_stats.unrelated / merged_note_stats.giv_count)
+    merged_note_stats.unrelated_percentage = float(merged_note_stats.unrelated / merged_note_stats.giv_count) * 100
   merged_note_stats.got_lowest_percentage = float(merged_note_stats.got_lowest_count / note_stat_count)
   merged_note_stats.uncovered_percentage = float(sum(uncovered_percentages) / len(uncovered_percentages))
   merged_note_stats.covered_only_with_harmonics_percentage = float(sum(covered_only_with_harmonics_percentages) / len(covered_only_with_harmonics_percentages))

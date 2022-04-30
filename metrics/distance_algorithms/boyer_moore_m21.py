@@ -193,7 +193,6 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
   exp_ins_empty_chunks = 0
   giv_ins_empty_chunks = 0
   matched_length = 0
-  unmatched_point_sum = 0
 
   exp_count = get_stat_elem_count(orig_exp)
   giv_count = get_stat_elem_count(orig_giv)
@@ -202,6 +201,7 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
   stats_giv_total_rhythmic_length = get_rhythmic_length(orig_giv)
   stats_matched_length = 0
   stats_unmatched_length = 0
+  unmatched_weighed_product_points = []
 
   while current < len(orig_giv):    
     if giv_copy[current] == BLANK_CHARACTER:
@@ -248,7 +248,7 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
       # This import is here to dodge circular import
       from evaluate import get_song_chunk_dtw_evaluation
       steps, note_eval, point, note_stat, rhythm_stat = get_song_chunk_dtw_evaluation(dtw_expected, dtw_given)
-      unmatched_point_sum += point
+      unmatched_weighed_product_points.append(exp_chunk_length * point)
       notation_string += get_notation_string_from_steps(dtw_expected, dtw_given, steps, note_eval)
       print("\nCurrent full notation string:")
       print(notation_string)
@@ -263,17 +263,13 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
     print("Unmatched chunk pairs remaining:", len(exp_chunks) - unmatched_chunk_count)
   print("\n------ Final notation string ------")
   print(notation_string)
-  final_point = get_final_song_point(len(orig_exp), len(orig_giv), matched_length, unmatched_point_sum)
+  final_point = get_final_song_point(len(orig_exp), matched_length, unmatched_weighed_product_points)
   song_stats = get_final_song_stats(song_stats, stats_exp_total_rhythmic_length, stats_giv_total_rhythmic_length, stats_matched_length, stats_unmatched_length, final_point)
   return notation_string, song_stats
 
-def get_final_song_point(exp_length, giv_length, matched_length, unmatched_point_sum):
-  matched_point_sum = matched_length * NORMALIZE_MAXIMUM
-
-  final_minimum = exp_length * HarmonicPartPoints.DELETED_HARMONIC_ELEMENT_POINT + \
-                  + giv_length * HarmonicPartPoints.INSERTED_HARMONIC_ELEMENT_POINT
-  final_maximum = exp_length * NORMALIZE_MAXIMUM
-
-  final_point_sum = matched_point_sum + unmatched_point_sum
-  final_point_normalized = normalize(final_point_sum, final_minimum, final_maximum)
-  return final_point_normalized
+def get_final_song_point(exp_length, matched_length, unmatched_weighed_product_points):
+  if matched_length < exp_length:
+    unmatched_point_avg = float(sum(unmatched_weighed_product_points) / (exp_length - matched_length))
+    final_point = float((matched_length * NORMALIZE_MAXIMUM + (exp_length - matched_length) * unmatched_point_avg) / exp_length)
+    return final_point
+  return NORMALIZE_MAXIMUM
