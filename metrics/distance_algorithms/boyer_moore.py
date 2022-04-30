@@ -12,7 +12,7 @@ REST_CHARACTER = "R"
 CHORD_BEGINNING_CHAR = "K"
 CHORD_NOTE_CHAR = "Q"
 CHORD_ENDING_CHAR = "Z"
-MINIMUM_CHARACTERISTICS_LENGTH = 2
+MINIMUM_CHARACTERISTIC_LENGTH = 2
 BLANK_CHARACTER = "$"
 EMPTY_CHUNK_CHARACTER = "@"
 
@@ -209,7 +209,7 @@ def get_different_parts(expected, given):
 
 def get_possible_characteristics_by_length(expected):
   characteristics_by_length = [] # every row is a list of possible characteristics of the same length
-  length = MINIMUM_CHARACTERISTICS_LENGTH
+  length = MINIMUM_CHARACTERISTIC_LENGTH
   while True:
     try:
       possible_characteristics = get_possible_characteristics(expected, length)

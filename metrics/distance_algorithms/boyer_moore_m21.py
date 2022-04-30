@@ -1,9 +1,8 @@
 import copy
-from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, get_next_blank_letter_index, get_non_blank_letter_index, make_characteristic_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_CHARACTERISTICS_LENGTH
+from metrics.distance_algorithms.boyer_moore import BLANK_CHARACTER, EMPTY_CHUNK_CHARACTER, get_next_blank_letter_index, get_non_blank_letter_index, make_characteristic_blank, get_remaining_chunks, print_remaining_chunks, MINIMUM_CHARACTERISTIC_LENGTH
 from input.midi_reader import *
 from metrics.harmonic_parts.harmonic_part_evaluation_stats import HarmonicPartEvaluationStats
-from metrics.harmonic_parts.harmonic_part_points import HarmonicPartPoints
-from metrics.normalize_points import NORMALIZE_MAXIMUM, normalize
+from metrics.normalize_points import NORMALIZE_MAXIMUM
 from statistics import get_final_song_stats, get_rhythmic_length, get_stat_elem_count
 from visualizer.draw_harmonic_part_results import add_matched_chunk_to_notation_string_bm_m21, get_notation_string_from_steps
 
@@ -153,7 +152,7 @@ def get_different_parts(expected, given):
 
 def get_possible_characteristics_by_length(expected):
   characteristics_by_length = [] # every row is a list of possible characteristics of the same length
-  length = MINIMUM_CHARACTERISTICS_LENGTH
+  length = MINIMUM_CHARACTERISTIC_LENGTH
   while True:
     try:
       possible_characteristics = get_possible_characteristics(expected, length)
