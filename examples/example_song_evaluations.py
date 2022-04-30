@@ -4,14 +4,19 @@ from input.midi_reader import get_score_from_midi
 SONG_FUNCTION_NAME_BEGINNING_BM = "example_song_evaluation_bm"
 SONG_FUNCTION_NAME_BEGINNING_DTW = "example_song_evaluation_dtw"
 
-def example_song_evaluation_bm_1():
-  exp_score = get_score_from_midi("examples/midis/rhythm-expected.mid")
-  giv_score = get_score_from_midi("examples/midis/rhythm-given.mid")
+def example_song_evaluation_bm_french_song():
+  exp_score = get_score_from_midi("../midi/regi-francia-dal.mid")
+  giv_score = get_score_from_midi("../midi/regi-francia-dal-mod-1.mid")
   run_main_song_evaluation(exp_score, giv_score, True)
 
-def example_song_evaluation_bm_2():
-  exp_score = get_score_from_midi("examples/midis/deja-vu.mid")
-  giv_score = get_score_from_midi("examples/midis/deja-vu-1csuszas-1felharm.mid")
+def example_song_evaluation_bm_french_song_2():
+  exp_score = get_score_from_midi("../midi/regi-francia-dal.mid")
+  giv_score = get_score_from_midi("../midi/regi-francia-dal-mod-2.mid")
+  run_main_song_evaluation(exp_score, giv_score, True)
+
+def example_song_evaluation_bm_tricky_rhythm():
+  exp_score = get_score_from_midi("examples/midis/rhythm-expected.mid")
+  giv_score = get_score_from_midi("examples/midis/rhythm-given.mid")
   run_main_song_evaluation(exp_score, giv_score, True)
 
 def example_song_evaluation_dtw_1():
