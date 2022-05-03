@@ -118,7 +118,7 @@ def get_different_parts(expected, given):
       print("Found all unique characteristics.")
       break
     found_biggest = False
-    for i in range(len(characteristics_by_length) - 2, -1, -1): # going from the biggest (that is not the whole) to lowest
+    for i in range(len(characteristics_by_length) - 1, -1, -1): # going from the biggest to lowest
       print("Searching", i, "long characteristics", end='\r')
       for fp in characteristics_by_length[i]:
         occurences = m21_bm_search(giv_copy, fp)
