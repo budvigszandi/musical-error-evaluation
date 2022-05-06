@@ -211,7 +211,7 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
         print(f"Matched chunk at {current}-{current + next_non_blank_letter_index}")
         print(matched_chunk)
         matched_length += current + next_non_blank_letter_index - current
-        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, current + next_non_blank_letter_index - giv_ins_empty_chunks, giv_ins_empty_chunks)
+        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, current + next_non_blank_letter_index - giv_ins_empty_chunks, exp_ins_empty_chunks)
         current += next_non_blank_letter_index
         current_exp += next_non_blank_letter_index
       else:
@@ -219,7 +219,7 @@ def get_bm_m21_notation_with_stats(orig_exp, orig_giv, exp_copy, giv_copy, exp_c
         print(f"Matched chunk at {current}-{len(giv_copy)}")
         print(matched_chunk)
         matched_length += len(giv_copy) - current
-        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1, giv_ins_empty_chunks)
+        notation_string = add_matched_chunk_to_notation_string_bm_m21(notation_string, orig_giv, current - giv_ins_empty_chunks, len(giv_copy) - 1, exp_ins_empty_chunks)
         current = len(giv_copy)
         current_exp = len(exp_copy)
       print("\nCurrent full notation string:")
