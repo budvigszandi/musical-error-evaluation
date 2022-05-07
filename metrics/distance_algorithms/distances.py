@@ -1,11 +1,8 @@
 import numpy as np
 from more_itertools import distinct_permutations
-from metrics.distance_algorithms.dtw_boundaries import get_permutation_count_for_matrix
 from metrics.rhythms.evaluate_rhythms import *
 from metrics.distance_algorithms.distance_type import *
 from metrics.harmonic_parts.evaluate_harmonic_parts import *
-
-# TODO: Correct the +1s in size_of_source and size_of_target in functions
 
 def get_levenshtein_distance(source, target):
   size_of_source = len(source) + 1

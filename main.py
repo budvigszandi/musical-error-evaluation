@@ -23,7 +23,6 @@ def run_chosen_method(index):
     print("That is not an existing option. Try again:")
     index = int(input())
 
-  # TODO: Exceptions when choosing non-existing options
   if index == 1:
     choose_from_evaluations(example_song_evaluations, SONG_FUNCTION_NAME_BEGINNING_BM)
   elif index == 2:

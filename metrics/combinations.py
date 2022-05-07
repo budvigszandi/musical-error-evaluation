@@ -1,12 +1,4 @@
 def get_index_variations(rows, columns):
-  '''
-  Returns a list of all the index combinations we can get from an (n x m) matrix
-  if we want to get exactly one value from every row.
-
-  Args:
-    rows: an integer (>=0) number of rows
-    columns: an integer (>=0) number of columns
-  '''
   arr = [[] for i in range(rows)]
   for i in range(rows):
     for j in range(columns):
