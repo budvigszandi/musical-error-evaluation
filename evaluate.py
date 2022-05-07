@@ -121,6 +121,7 @@ def run_main_song_evaluation(exp_score, giv_score, m21=False):
 
   print(f"[-] Examining {len(expected_data)} part(s) of music")
 
+  notation_strings = []
   for i in range(len(expected_data)):
     print(f"\n[-] Evaluating part {i + 1} of {len(expected_data)}...")
     expected = expected_data[i]
@@ -138,10 +139,12 @@ def run_main_song_evaluation(exp_score, giv_score, m21=False):
     #   get_bm_char_evaluation(expected, given, giv_score)
     # else:
     #   get_bm_m21_evaluation(expected, given, giv_score)
-    get_bm_m21_evaluation(expected, given, giv_score)
+    notation_string = get_bm_m21_evaluation(expected, given, giv_score)
+    notation_strings.append(notation_string)
     print(f"\n[X] Evaluated part {i + 1} of {len(expected_data)}")
   
   print("\n[X] Examined all parts of the music")
+  return notation_strings
 
 # This is a function for metrics.distance_algorithms.boyer_moore, which is not
 # used, but kept for chance of future development
@@ -170,6 +173,7 @@ def get_bm_m21_evaluation(expected, given, giv_score):
   exp_copy, giv_copy, exp_chunks, giv_chunks = get_different_parts_bm_m21(expected, given)
 
   print("--------------------------------- Evaluation ----------------------------------")
+  notation_string = ""
   if exp_copy == [] and giv_copy == []:
     print("\n------ Drawing sheet music ------")
     put_sheet_in_output_folder(giv_score, True)
@@ -183,6 +187,7 @@ def get_bm_m21_evaluation(expected, given, giv_score):
     print("\n------------------------------ Song statistics ------------------------------")
     print(song_stats)
     draw_sheet_music(notation_string)
+  return notation_string
 
 def get_note_evaluation(expected_notes, given_notes):
   print("------------------------------- Note evaluation -------------------------------")

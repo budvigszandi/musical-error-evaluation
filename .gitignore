@@ -1,3 +1,2 @@
 __pycache__
-profiling
-*.txt
+.pytest_cache
