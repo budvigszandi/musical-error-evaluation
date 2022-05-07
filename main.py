@@ -19,7 +19,7 @@ def choose_from_main_menu():
   return index
 
 def run_chosen_method(index):
-  while index < 1 or index > 6:
+  while index < 1 or index > 7:
     print("That is not an existing option. Try again:")
     index = int(input())
 
